@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String?       @unique
+  passwordHash String?
+  nickname     String
+  isGuest      Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  
+  puzzles      Puzzle[]
+  hostedRooms  Room[]
+  gameSessions GameSession[]
+}
+
+model Puzzle {
+  id          String        @id @default(cuid())
+  code        String        @unique @db.VarChar(8)
+  title       String
+  creatorId   String
+  creator     User          @relation(fields: [creatorId], references: [id])
+  words       Json
+  grid        Json
+  placements  Json
+  config      Json
+  status      String        @default("draft")
+  visibility  String        @default("private")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  rooms        Room[]
+  gameSessions GameSession[]
+
+  @@index([code])
+}
+
+model Room {
+  id        String   @id @default(cuid())
+  code      String   @unique @db.VarChar(64)
+  puzzleId  String
+  puzzle    Puzzle   @relation(fields: [puzzleId], references: [id])
+  hostId    String
+  host      User     @relation(fields: [hostId], references: [id])
+  status    String   @default("waiting")
+  createdAt DateTime @default(now())
+
+  gameSessions GameSession[]
+
+  @@index([code])
+}
+
+model GameSession {
+  id          String   @id @default(cuid())
+  puzzleId    String
+  puzzle      Puzzle   @relation(fields: [puzzleId], references: [id])
+  roomId      String?
+  room        Room?    @relation(fields: [roomId], references: [id])
+  playerId    String
+  player      User     @relation(fields: [playerId], references: [id])
+  wordsFound  Json     @default("[]")
+  wordsTotal  Int
+  mistakes    Int      @default(0)
+  startedAt   BigInt
+  completedAt BigInt?
+  elapsedMs   BigInt?
+  status      String   @default("playing")
+
+  @@index([puzzleId, status])
+}
