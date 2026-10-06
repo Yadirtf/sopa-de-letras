@@ -55,4 +55,5 @@ abstract class ApiEndpoints {
   static const String notifications = '/notifications';
   static const String notificationsReadAll = '/notifications/read-all';
   static String notificationRead(String id) => '/notifications/$id/read';
+  static const String pushDevices = '/notifications/devices';
 }
