@@ -20,6 +20,10 @@ export class WordSearchEditorController {
     private readonly deleteUseCase: DeleteWordSearchUseCase
   ) {}
 
+  private getUserId(req: FastifyRequest): string | null {
+    return req.user?.userId || (req.user as any)?.id || null;
+  }
+
   preview = async (req: FastifyRequest, reply: FastifyReply) => {
     const dto = previewWordSearchSchema.parse(req.body);
     const result = await this.previewUseCase.execute(dto);
@@ -34,8 +38,15 @@ export class WordSearchEditorController {
   };
 
   create = async (req: FastifyRequest, reply: FastifyReply) => {
+    const userId = this.getUserId(req);
+    if (!userId) {
+      return reply.status(401).send({
+        code: "UNAUTHORIZED",
+        message: "Debes iniciar sesión para crear y publicar una sopa de letras",
+      });
+    }
+
     const dto = createWordSearchSchema.parse(req.body);
-    const userId = (req as any).user?.id;
     const result = await this.createUseCase.execute(dto, userId);
 
     if (result.isFailure) {
@@ -48,7 +59,14 @@ export class WordSearchEditorController {
   };
 
   getMy = async (req: FastifyRequest, reply: FastifyReply) => {
-    const userId = (req as any).user?.id;
+    const userId = this.getUserId(req);
+    if (!userId) {
+      return reply.status(401).send({
+        code: "UNAUTHORIZED",
+        message: "Debes iniciar sesión para ver tus creaciones",
+      });
+    }
+
     const result = await this.getMyUseCase.execute(userId);
 
     if (result.isFailure) {
@@ -61,9 +79,16 @@ export class WordSearchEditorController {
   };
 
   update = async (req: FastifyRequest, reply: FastifyReply) => {
+    const userId = this.getUserId(req);
+    if (!userId) {
+      return reply.status(401).send({
+        code: "UNAUTHORIZED",
+        message: "Debes iniciar sesión para modificar una sopa de letras",
+      });
+    }
+
     const { id } = wordSearchIdParamSchema.parse(req.params);
     const dto = updateWordSearchSchema.parse(req.body);
-    const userId = (req as any).user?.id;
     const result = await this.updateUseCase.execute(id, dto, userId);
 
     if (result.isFailure) {
@@ -76,8 +101,15 @@ export class WordSearchEditorController {
   };
 
   delete = async (req: FastifyRequest, reply: FastifyReply) => {
+    const userId = this.getUserId(req);
+    if (!userId) {
+      return reply.status(401).send({
+        code: "UNAUTHORIZED",
+        message: "Debes iniciar sesión para eliminar una sopa de letras",
+      });
+    }
+
     const { id } = wordSearchIdParamSchema.parse(req.params);
-    const userId = (req as any).user?.id;
     const result = await this.deleteUseCase.execute(id, userId);
 
     if (result.isFailure) {
