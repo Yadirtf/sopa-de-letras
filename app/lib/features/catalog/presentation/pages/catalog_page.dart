@@ -79,12 +79,25 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
         title: Text('Explorar Sopas', style: AppTypography.heading2.copyWith(fontSize: 20)),
         actions: [
           IconButton(
+            icon: const Icon(Icons.auto_awesome_motion_rounded, color: AppColors.accentAmber),
+            tooltip: 'Mis Creaciones',
+            onPressed: () => context.push('/my-creations'),
+          ),
+          IconButton(
             icon: const Icon(Icons.person_outline_rounded, color: AppColors.accentCyan),
             onPressed: () => context.push('/profile'),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.accentViolet,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Crear Sopa'),
+        onPressed: () => context.push('/create-word-search'),
+      ),
       body: Column(
+
         children: [
           CatalogSearchBar(
             initialValue: state.searchQuery,

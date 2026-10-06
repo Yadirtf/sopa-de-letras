@@ -5,19 +5,17 @@ import {
   CatalogFilterOptions,
   CatalogResult,
 } from "../../../domain/repositories/word-search.repository.interface";
+import { mapWordSearchToDomain } from "../mappers/word-search.mapper";
 
 export class PrismaWordSearchRepository implements IWordSearchRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async findCatalog(options: CatalogFilterOptions): Promise<CatalogResult> {
     const where: any = { isPublic: true };
-
     if (options.category && options.category.toLowerCase() !== 'todos') {
       where.category = { equals: options.category, mode: 'insensitive' };
     }
-    if (options.difficulty) {
-      where.difficulty = options.difficulty;
-    }
+    if (options.difficulty) where.difficulty = options.difficulty;
     if (options.search) {
       where.OR = [
         { title: { contains: options.search, mode: 'insensitive' } },
@@ -31,7 +29,6 @@ export class PrismaWordSearchRepository implements IWordSearchRepository {
       orderBy: [{ playCount: 'desc' }, { createdAt: 'desc' }],
       include: { creator: { select: { name: true } } },
     };
-
     if (options.cursor) {
       queryArgs.cursor = { id: options.cursor };
       queryArgs.skip = 1;
@@ -42,16 +39,12 @@ export class PrismaWordSearchRepository implements IWordSearchRepository {
       this.prisma.wordSearch.count({ where }),
     ]);
 
-    let nextCursor: string | null = null;
     const hasNext = rawItems.length > options.limit;
     const pageItems = hasNext ? rawItems.slice(0, options.limit) : rawItems;
-
-    if (hasNext && pageItems.length > 0) {
-      nextCursor = pageItems[pageItems.length - 1].id;
-    }
+    const nextCursor = hasNext && pageItems.length > 0 ? pageItems[pageItems.length - 1].id : null;
 
     return {
-      items: pageItems.map((raw) => this.mapToDomain(raw)),
+      items: pageItems.map(mapWordSearchToDomain),
       nextCursor,
       totalCount,
     };
@@ -62,8 +55,16 @@ export class PrismaWordSearchRepository implements IWordSearchRepository {
       where: { id },
       include: { creator: { select: { name: true } } },
     });
-    if (!raw) return null;
-    return this.mapToDomain(raw);
+    return raw ? mapWordSearchToDomain(raw) : null;
+  }
+
+  async findByCreatorId(creatorId: string): Promise<WordSearch[]> {
+    const list = await this.prisma.wordSearch.findMany({
+      where: { creatorId },
+      orderBy: { createdAt: 'desc' },
+      include: { creator: { select: { name: true } } },
+    });
+    return list.map(mapWordSearchToDomain);
   }
 
   async save(ws: WordSearch): Promise<void> {
@@ -86,29 +87,34 @@ export class PrismaWordSearchRepository implements IWordSearchRepository {
     });
   }
 
-  async count(): Promise<number> {
-    return this.prisma.wordSearch.count({ where: { isPublic: true } });
+  async update(ws: WordSearch): Promise<void> {
+    await this.prisma.wordSearch.update({
+      where: { id: ws.id },
+      data: {
+        title: ws.title,
+        description: ws.description,
+        category: ws.category,
+        isPublic: ws.isPublic,
+        updatedAt: ws.updatedAt,
+      },
+    });
   }
 
-  private mapToDomain(raw: any): WordSearch {
-    const wordsArray = Array.isArray(raw.words) ? raw.words : [];
-    return WordSearch.create({
-      id: raw.id,
-      title: raw.title,
-      description: raw.description,
-      category: raw.category,
-      difficulty: raw.difficulty,
-      language: raw.language,
-      gridSize: raw.gridSize,
-      wordCount: wordsArray.length,
-      playCount: raw.playCount,
-      isPublic: raw.isPublic,
-      creatorId: raw.creatorId,
-      creatorName: raw.creator?.name,
-      grid: raw.grid,
-      words: raw.words,
-      createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt,
+  async delete(id: string): Promise<void> {
+    await this.prisma.wordSearch.delete({ where: { id } });
+  }
+
+  async hasActiveRooms(wordSearchId: string): Promise<boolean> {
+    const active = await this.prisma.room.count({
+      where: {
+        wordSearchId,
+        status: { in: ['WAITING', 'STARTING', 'IN_GAME'] },
+      },
     });
+    return active > 0;
+  }
+
+  async count(): Promise<number> {
+    return this.prisma.wordSearch.count({ where: { isPublic: true } });
   }
 }

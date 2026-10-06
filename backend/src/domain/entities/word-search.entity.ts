@@ -52,4 +52,33 @@ export class WordSearch {
   public incrementPlayCount(): void {
     this.props.playCount += 1;
   }
+
+  public updateDetails(details: {
+    title?: string;
+    description?: string | null;
+    category?: string;
+    isPublic?: boolean;
+  }): void {
+    if (details.title !== undefined) {
+      if (!details.title || details.title.trim().length < 3) {
+        throw new Error('El título debe tener al menos 3 caracteres');
+      }
+      this.props.title = details.title.trim();
+    }
+    if (details.description !== undefined) {
+      this.props.description = details.description;
+    }
+    if (details.category !== undefined) {
+      this.props.category = details.category.trim().toUpperCase();
+    }
+    if (details.isPublic !== undefined) {
+      this.props.isPublic = details.isPublic;
+    }
+    this.props.updatedAt = new Date();
+  }
+
+  public isOwnedBy(userId: string): boolean {
+    return this.props.creatorId === userId;
+  }
 }
+

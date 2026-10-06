@@ -4,6 +4,8 @@ import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/forgot_pin_page.dart';
 import '../../features/auth/presentation/pages/profile_page.dart';
 import '../../features/catalog/presentation/pages/catalog_page.dart';
+import '../../features/editor/presentation/pages/create_word_search_page.dart';
+import '../../features/editor/presentation/pages/my_creations_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
@@ -29,9 +31,18 @@ final appRouter = GoRouter(
       builder: (context, state) => const CatalogPage(),
     ),
     GoRoute(
+      path: '/create-word-search',
+      builder: (context, state) => const CreateWordSearchPage(),
+    ),
+    GoRoute(
+      path: '/my-creations',
+      builder: (context, state) => const MyCreationsPage(),
+    ),
+    GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfilePage(),
     ),
   ],
 );
+
 

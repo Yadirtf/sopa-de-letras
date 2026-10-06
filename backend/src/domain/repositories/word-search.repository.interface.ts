@@ -17,6 +17,11 @@ export interface CatalogResult {
 export interface IWordSearchRepository {
   findCatalog(options: CatalogFilterOptions): Promise<CatalogResult>;
   findById(id: string): Promise<WordSearch | null>;
+  findByCreatorId(creatorId: string): Promise<WordSearch[]>;
   save(wordSearch: WordSearch): Promise<void>;
+  update(wordSearch: WordSearch): Promise<void>;
+  delete(id: string): Promise<void>;
+  hasActiveRooms(wordSearchId: string): Promise<boolean>;
   count(): Promise<number>;
 }
+

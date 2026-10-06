@@ -259,11 +259,11 @@ graph TD
 
 ---
 
-### ÉPICA 3: Generador y Editor de Sopas de Letras (EP-03)
+### ÉPICA 3: Generador y Editor de Sopas de Letras (EP-03) — [ESTADO: ✅ IMPLEMENTADA]
 
 #### US-11: Motor Algorítmico de Generación por Backtracking
 - **ID:** `US-11`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 13 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 13 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* sistema y creador, *quiero* un motor algorítmico que posicione palabras en 8 direcciones y complete los espacios vacíos, *para* generar sopas balanceadas y válidas en menos de 500ms.
 - **Criterios de Aceptación:**
   - **Dado** un listado de entre 5 y 20 palabras en español y una dimensión de cuadrícula (10x10 a 20x20).
@@ -280,7 +280,7 @@ graph TD
 
 #### US-12: Formulario de Creación de Sopa de Letras
 - **ID:** `US-12`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* usuario registrado, *quiero* crear mi propia sopa de letras ingresando un título, categoría temática, palabras personalizadas y seleccionando la dificultad, *para* compartirla con la comunidad.
 - **Criterios de Aceptación:**
   - **Dado** que el usuario ingresa entre 5 y 20 palabras (sin números, longitud 3 a 15 caracteres).
@@ -295,7 +295,7 @@ graph TD
 
 #### US-13: Gestión y Edición de Sopas Propias
 - **ID:** `US-13`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* creador de una sopa, *quiero* editar su título/categoría o eliminarla si no tiene partidas activas, *para* mantener mi contenido actualizado.
 - **Criterios de Aceptación:**
   - **Dado** un usuario intentando editar o borrar una sopa.
@@ -307,6 +307,7 @@ graph TD
   - `backend/`: Casos de uso `UpdateWordSearchUseCase` y `DeleteWordSearchUseCase` con verificación de autoría.
   - `app/`: Pestaña "Mis Creaciones" con opciones de menú contextual y diálogo de confirmación.
 - **Trazabilidad:** RF-14, RNF-08.
+
 
 ---
 
