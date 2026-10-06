@@ -1,18 +1,22 @@
 import nodemailer, { Transporter } from "nodemailer";
 import { Email } from "../../domain/value-objects/email.vo";
 import { IMailService, SendMailOptions } from "../../domain/services/mail.service.interface";
+import { MailQueue } from "./mail-queue";
+import { otpMail, pinChangedMail, RenderedMail, welcomeMail } from "./mail-templates";
 
+/**
+ * Correo transaccional WordHive (US-03, US-26).
+ * Todos los metodos encolan y regresan al instante: el registro o el cambio
+ * de PIN nunca esperan al servidor SMTP. Los reintentos viven en MailQueue.
+ */
 export class NodemailerMailService implements IMailService {
-  private transporter: Transporter;
+  private readonly transporter: Transporter;
   private readonly fromAddress: string;
 
-  constructor(smtpConfig: {
-    host: string;
-    port: number;
-    user: string;
-    pass: string;
-    from: string;
-  }) {
+  constructor(
+    smtpConfig: { host: string; port: number; user: string; pass: string; from: string },
+    private readonly queue: MailQueue = new MailQueue()
+  ) {
     this.fromAddress = smtpConfig.from;
     this.transporter = nodemailer.createTransport({
       host: smtpConfig.host,
@@ -23,57 +27,37 @@ export class NodemailerMailService implements IMailService {
   }
 
   async sendMail(options: SendMailOptions): Promise<void> {
-    try {
-      await this.transporter.sendMail({
-        from: `"WordHive" <${this.fromAddress}>`,
-        to: options.to.value,
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-      });
-    } catch (err) {
-      console.error("[MailService Error] No se pudo despachar el correo:", err);
-    }
+    this.queue.enqueue({
+      description: `"${options.subject}" -> ${options.to.value}`,
+      send: () =>
+        this.transporter.sendMail({
+          from: this.formatFrom(),
+          to: options.to.value,
+          subject: options.subject,
+          html: options.html,
+          text: options.text,
+        }),
+    });
   }
 
   async sendWelcomeEmail(to: Email, name: string): Promise<void> {
-    const html = `
-      <div style="background-color:#080B14; color:#F0F4FF; font-family:'Inter',sans-serif; padding:32px; border-radius:12px; max-width:600px; margin:auto;">
-        <h1 style="color:#7C3AED; font-family:'Outfit',sans-serif; margin-bottom:12px;">¡Bienvenido a WordHive, ${name}!</h1>
-        <p style="color:#8892A4; font-size:16px; line-height:1.6;">
-          Tu cuenta ha sido creada exitosamente. Tu PIN numérico de 4 dígitos te permitirá acceder de forma instantánea desde cualquier dispositivo.
-        </p>
-        <div style="background-color:#151D2E; border:1px solid #7C3AED33; padding:16px; border-radius:8px; margin:24px 0;">
-          <p style="margin:0; color:#06B6D4; font-weight:bold;">¡Listo para competir!</p>
-          <p style="margin:4px 0 0; color:#8892A4; font-size:14px;">Crea salas multijugador, desafía a tus amigos y escala en el ranking.</p>
-        </div>
-      </div>
-    `;
-    await this.sendMail({ to, subject: "¡Bienvenido a WordHive!", html });
+    await this.sendRendered(to, welcomeMail(name));
   }
 
   async sendOtpEmail(to: Email, otpCode: string): Promise<void> {
-    const html = `
-      <div style="background-color:#080B14; color:#F0F4FF; font-family:'Inter',sans-serif; padding:32px; border-radius:12px; max-width:600px; margin:auto;">
-        <h2 style="color:#7C3AED; font-family:'Outfit',sans-serif;">Recuperación de PIN — WordHive</h2>
-        <p style="color:#8892A4;">Has solicitado restablecer tu PIN de acceso. Utiliza el siguiente código temporal:</p>
-        <div style="background-color:#151D2E; text-align:center; padding:20px; border-radius:8px; margin:24px 0; border:1px solid #7C3AED;">
-          <span style="font-family:'JetBrains Mono',monospace; font-size:36px; letter-spacing:10px; color:#F59E0B; font-weight:bold;">${otpCode}</span>
-        </div>
-        <p style="color:#8892A4; font-size:13px;">Este código expirará en 10 minutos. Si no solicitaste este cambio, ignora este mensaje.</p>
-      </div>
-    `;
-    await this.sendMail({ to, subject: `Código de recuperación: ${otpCode}`, html });
+    await this.sendRendered(to, otpMail(otpCode));
   }
 
   async sendPinChangedAlert(to: Email, name: string): Promise<void> {
-    const html = `
-      <div style="background-color:#080B14; color:#F0F4FF; font-family:'Inter',sans-serif; padding:32px; border-radius:12px; max-width:600px; margin:auto;">
-        <h2 style="color:#F43F5E;">Alerta de Seguridad WordHive</h2>
-        <p style="color:#8892A4;">Hola ${name}, te notificamos que el PIN de tu cuenta ha sido actualizado recientemente.</p>
-        <p style="color:#8892A4; font-size:13px;">Si no realizaste este cambio, por favor restablece tu PIN de inmediato.</p>
-      </div>
-    `;
-    await this.sendMail({ to, subject: "Alerta de Seguridad: PIN actualizado", html });
+    await this.sendRendered(to, pinChangedMail(name, new Date()));
+  }
+
+  private async sendRendered(to: Email, mail: RenderedMail): Promise<void> {
+    await this.sendMail({ to, subject: mail.subject, html: mail.html, text: mail.text });
+  }
+
+  /** SMTP_FROM puede venir como "WordHive <x@y>" o solo "x@y"; evitamos duplicar el nombre. */
+  private formatFrom(): string {
+    return this.fromAddress.includes("<") ? this.fromAddress : `"WordHive" <${this.fromAddress}>`;
   }
 }

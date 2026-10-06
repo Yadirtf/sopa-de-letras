@@ -34,6 +34,9 @@ import { userRoutes } from "./user.routes";
 import { wordSearchRoutes } from "./word-search.routes";
 import { roomRoutes } from "./room.routes";
 import { createRoomContainer } from "../../di/room.container";
+import { createSocialContainer } from "../../di/social.container";
+import { friendsRoutes } from "./friends.routes";
+import { notificationsRoutes } from "./notifications.routes";
 import { env } from "../../../config/env";
 
 export async function registerRoutes(fastify: FastifyInstance) {
@@ -83,8 +86,11 @@ export async function registerRoutes(fastify: FastifyInstance) {
   );
   const authMiddleware = createAuthMiddleware(tokenService, sessionCache);
 
+  // Social Container (Épica 5: Amigos, Presencia, Invitaciones y Notificaciones)
+  const socialContainer = createSocialContainer({ prisma: prismaClient, redis: redisClient, tokenService, sessionCache });
+
   // Room Container (Épica 4: Multijugador Realtime)
-  const roomContainer = createRoomContainer(prismaClient, redisClient);
+  const roomContainer = createRoomContainer(prismaClient, redisClient, socialContainer);
 
   // Registro de rutas con prefijo de API v1
   await fastify.register(authRoutes, { prefix: "/api/v1/auth", authController });
@@ -98,6 +104,17 @@ export async function registerRoutes(fastify: FastifyInstance) {
   await fastify.register(roomRoutes, {
     prefix: "/api/v1/rooms",
     roomController: roomContainer.roomController,
+    authMiddleware,
+  });
+
+  await fastify.register(friendsRoutes, {
+    prefix: "/api/v1/friends",
+    friendsController: socialContainer.friendsController,
+    authMiddleware,
+  });
+  await fastify.register(notificationsRoutes, {
+    prefix: "/api/v1/notifications",
+    notificationsController: socialContainer.notificationsController,
     authMiddleware,
   });
 

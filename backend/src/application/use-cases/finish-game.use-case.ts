@@ -1,11 +1,16 @@
 import { IRoomRepository } from "../../domain/repositories/room.repository.interface";
 import { RedisRoomCache } from "../../infrastructure/cache/redis-room.cache";
 import { PodiumItemDto } from "../dtos/room.dto";
+import { NotificationDispatcher } from "../services/notification-dispatcher.service";
+
+/** Solo el podio genera un logro en la campana; mas que eso seria ruido (US-25). */
+const ACHIEVEMENT_MAX_RANK = 3;
 
 export class FinishGameUseCase {
   constructor(
     private readonly roomRepo: IRoomRepository,
-    private readonly roomCache: RedisRoomCache
+    private readonly roomCache: RedisRoomCache,
+    private readonly notifier?: NotificationDispatcher
   ) {}
 
   async execute(code: string): Promise<{
@@ -61,6 +66,8 @@ export class FinishGameUseCase {
       // In-memory or database graceful continuation
     }
 
+    this.recordAchievements(state.code, state.wordSearchTitle, podium);
+
     const durationSeconds = state.startedAt
       ? Math.max(1, Math.round((now - state.startedAt) / 1000))
       : (state.timeLimitSeconds || 0);
@@ -70,5 +77,23 @@ export class FinishGameUseCase {
       totalWords: state.words.length,
       durationSeconds,
     };
+  }
+
+  private recordAchievements(roomCode: string, wordSearchTitle: string, podium: PodiumItemDto[]): void {
+    if (!this.notifier || podium.length < 2) return;
+    for (const item of podium.filter((p) => p.rank <= ACHIEVEMENT_MAX_RANK)) {
+      // El dispatcher nunca lanza: jugadores anonimos sin fila en BD simplemente se omiten.
+      void this.notifier.notify({
+        recipientId: item.userId,
+        type: "GAME_END",
+        payload: {
+          roomCode,
+          wordSearchTitle,
+          rank: item.rank,
+          trophiesEarned: item.trophiesEarned,
+          totalPlayers: podium.length,
+        },
+      });
+    }
   }
 }
