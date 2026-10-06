@@ -35,3 +35,13 @@ export class InvalidWordListError extends DomainError {
     super(`Lista de palabras inválida: ${reason}`);
   }
 }
+
+export class UnexpectedWordSearchError extends DomainError {
+  readonly code = "UNEXPECTED_WORD_SEARCH_ERROR";
+  readonly statusCode = 500;
+
+  constructor(message = "Error inesperado al procesar la sopa de letras") {
+    super(message);
+  }
+}
+

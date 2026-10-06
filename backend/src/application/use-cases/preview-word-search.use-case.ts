@@ -1,5 +1,6 @@
 import { Result, ok, fail } from "../common/result";
 import { DomainError } from "../../domain/errors/auth.errors";
+import { UnexpectedWordSearchError } from "../../domain/errors/generator.errors";
 import { WordSearchGeneratorService } from "../../domain/services/word-search-generator.service";
 import { PreviewWordSearchDto, PreviewWordSearchResponseDto } from "../dtos/editor.dtos";
 
@@ -23,7 +24,8 @@ export class PreviewWordSearchUseCase {
       if (err instanceof DomainError) {
         return fail(err);
       }
-      return fail(new DomainError(err.message || "Error al previsualizar la sopa") as any);
+      return fail(new UnexpectedWordSearchError(err?.message || "Error al previsualizar la sopa"));
     }
   }
 }
+

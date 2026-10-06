@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { Result, ok, fail } from "../common/result";
 import { DomainError } from "../../domain/errors/auth.errors";
+import { UnexpectedWordSearchError } from "../../domain/errors/generator.errors";
 import { WordSearch } from "../../domain/entities/word-search.entity";
 import { IWordSearchRepository } from "../../domain/repositories/word-search.repository.interface";
 import { ICatalogCacheService } from "../../domain/services/catalog-cache.service.interface";
@@ -62,7 +63,8 @@ export class CreateWordSearchUseCase {
       });
     } catch (err: any) {
       if (err instanceof DomainError) return fail(err);
-      return fail(new DomainError(err.message || "Error al crear la sopa de letras") as any);
+      return fail(new UnexpectedWordSearchError(err?.message || "Error al crear la sopa de letras"));
     }
   }
 }
+

@@ -32,6 +32,10 @@ export class RedisCatalogCache implements ICatalogCacheService {
     }
   }
 
+  async invalidate(pattern = "cache:catalog:*"): Promise<void> {
+    return this.invalidateCatalog();
+  }
+
   async invalidateCatalog(): Promise<void> {
     try {
       const keys = await this.redis.keys("cache:catalog:*");
@@ -42,6 +46,7 @@ export class RedisCatalogCache implements ICatalogCacheService {
       this.memoryStore.clear();
     }
   }
+
 
   private serialize(result: CatalogResult): string {
     const rawItems = result.items.map((ws) => ({

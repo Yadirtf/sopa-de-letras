@@ -108,11 +108,12 @@ export class PrismaWordSearchRepository implements IWordSearchRepository {
     const active = await this.prisma.room.count({
       where: {
         wordSearchId,
-        status: { in: ['WAITING', 'STARTING', 'IN_GAME'] },
+        status: { in: ['WAITING', 'IN_PROGRESS'] },
       },
     });
     return active > 0;
   }
+
 
   async count(): Promise<number> {
     return this.prisma.wordSearch.count({ where: { isPublic: true } });
