@@ -1,169 +1,35 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-  <!-- SEO -->
+  <!-- SEO & Social Meta -->
   <title>WordHive — Sopa de letras multijugador en tiempo real</title>
-  <meta name="description" content="Juega sopa de letras con tus amigos en tiempo real. Compite, invita, descubre miles de sopas. La primera plataforma social de sopa de letras." />
-  <meta name="keywords" content="sopa de letras, multijugador, juego online, wordgame, wordhive" />
+  <meta name="description" content="Juega sopa de letras con tus amigos en tiempo real. Compite, invita con QR, descubre miles de sopas de letras con ranking en vivo." />
+  <meta name="keywords" content="sopa de letras, multijugador, wordhive, juego online, realtime word search, pin login" />
+  <meta name="theme-color" content="#080B14" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="WordHive — Sopa de letras multijugador" />
-  <meta property="og:description" content="Juega solo, vence a todos. La sopa de letras reinventada como deporte social." />
+  <meta property="og:description" content="Juega solo, vence a todos. La sopa de letras reinventada como deporte social con bioluminiscencia nocturna." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://wordhive.onrender.com" />
+  <meta property="og:url" content="https://wordhive-landing.onrender.com" />
 
-  <!-- Fonts -->
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔤</text></svg>">
+
+  <!-- Google Fonts: Outfit, Inter, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Styles -->
+  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="/src/styles/main.css" />
 </head>
 <body>
-  <!-- NAVBAR -->
-  <nav class="navbar" id="navbar" role="navigation" aria-label="Navegacion principal">
-    <div class="navbar__container">
-      <a href="/" class="navbar__logo" aria-label="WordHive inicio">
-        <span class="navbar__logo-icon" aria-hidden="true">🔤</span>
-        <span class="navbar__logo-text">WordHive</span>
-      </a>
-      <ul class="navbar__links" role="list">
-        <li><a href="#explorar" class="navbar__link">Explorar</a></li>
-        <li><a href="#como-jugar" class="navbar__link">Como jugar</a></li>
-        <li><a href="#registro" class="navbar__cta-link" id="nav-register-btn">Crear cuenta</a></li>
-      </ul>
-      <button class="navbar__mobile-toggle" id="mobile-menu-toggle" aria-label="Abrir menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
-
-  <main id="main-content">
-    <!-- HERO -->
-    <section class="hero" id="hero" aria-labelledby="hero-title">
-      <div class="hero__grid-bg" id="hero-grid" aria-hidden="true"></div>
-      <div class="hero__content">
-        <div class="hero__badge">
-          <span class="hero__badge-dot" aria-hidden="true"></span>
-          <span id="online-counter">...</span> jugadores en linea ahora
-        </div>
-        <h1 class="hero__title" id="hero-title">
-          Encuentra las palabras.<br />
-          <span class="hero__title-accent">Vence a todos.</span>
-        </h1>
-        <p class="hero__subtitle">
-          La primera plataforma social de sopa de letras. Compite contra amigos en tiempo real, descubre miles de sopas y demuestra quien va mas rapido.
-        </p>
-        <div class="hero__actions">
-          <a href="#registro" class="btn btn--primary btn--lg" id="hero-register-btn">
-            <span>Jugar gratis</span>
-            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="#explorar" class="btn btn--ghost btn--lg" id="hero-explore-btn">
-            Explorar sopas
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section class="features" id="como-jugar" aria-labelledby="features-title">
-      <div class="features__container">
-        <h2 class="section-title" id="features-title">Por que WordHive?</h2>
-        <div class="features__grid" role="list">
-          <article class="feature-card" role="listitem">
-            <div class="feature-card__icon" aria-hidden="true">🏆</div>
-            <h3 class="feature-card__title">Compite en tiempo real</h3>
-            <p class="feature-card__body">Ve quien lleva la delantera mientras juegas. El ranking se actualiza en vivo: cada palabra encontrada es un punto de orgullo.</p>
-          </article>
-          <article class="feature-card" role="listitem">
-            <div class="feature-card__icon" aria-hidden="true">👥</div>
-            <h3 class="feature-card__title">Invita a tus amigos</h3>
-            <p class="feature-card__body">Crea una sala, comparte el enlace o el QR y empieza a jugar en segundos. Tus amigos pueden unirse desde cualquier dispositivo.</p>
-          </article>
-          <article class="feature-card" role="listitem">
-            <div class="feature-card__icon" aria-hidden="true">🧠</div>
-            <h3 class="feature-card__title">Miles de sopas</h3>
-            <p class="feature-card__body">Explora sopas de letras creadas por la comunidad: animales, historia, ciencia, peliculas y mucho mas. O crea las tuyas propias.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- CATALOG PREVIEW -->
-    <section class="catalog-preview" id="explorar" aria-labelledby="catalog-title">
-      <div class="catalog-preview__container">
-        <h2 class="section-title" id="catalog-title">Explora sin registrarte</h2>
-        <p class="section-subtitle">Descubre el catalogo completo. Crea una cuenta para jugar.</p>
-        <div class="catalog-preview__grid" id="catalog-grid" role="list" aria-label="Sopas de letras destacadas">
-          <!-- Renderizado dinamico via JS -->
-          <div class="catalog-skeleton" aria-hidden="true"></div>
-          <div class="catalog-skeleton" aria-hidden="true"></div>
-          <div class="catalog-skeleton" aria-hidden="true"></div>
-          <div class="catalog-skeleton" aria-hidden="true"></div>
-          <div class="catalog-skeleton" aria-hidden="true"></div>
-          <div class="catalog-skeleton" aria-hidden="true"></div>
-        </div>
-        <a href="#registro" class="btn btn--outline btn--center" id="view-more-btn">Ver catalogo completo</a>
-      </div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section class="steps" aria-labelledby="steps-title">
-      <div class="steps__container">
-        <h2 class="section-title" id="steps-title">Como funciona</h2>
-        <ol class="steps__list" role="list">
-          <li class="step-card">
-            <span class="step-card__number" aria-hidden="true">01</span>
-            <h3 class="step-card__title">Elige una sopa</h3>
-            <p class="step-card__body">Navega el catalogo y selecciona la sopa que quieras jugar. Filtra por tema, dificultad o idioma.</p>
-          </li>
-          <li class="step-card">
-            <span class="step-card__number" aria-hidden="true">02</span>
-            <h3 class="step-card__title">Invita amigos</h3>
-            <p class="step-card__body">Crea una sala, comparte el enlace unico o el codigo QR. Tus amigos se unen al lobby en segundos.</p>
-          </li>
-          <li class="step-card">
-            <span class="step-card__number" aria-hidden="true">03</span>
-            <h3 class="step-card__title">Compite y gana</h3>
-            <p class="step-card__body">Encuentra palabras mas rapido que los demas. El primero en completar la sopa gana. Quien sera el WordHive champion?</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- CTA FINAL -->
-    <section class="cta-final" id="registro" aria-labelledby="cta-title">
-      <div class="cta-final__container">
-        <h2 class="cta-final__title" id="cta-title">Listo para jugar?</h2>
-        <p class="cta-final__subtitle">Crea tu cuenta gratis en menos de 30 segundos. Solo necesitas tu nombre, correo y un PIN de 4 digitos.</p>
-        <a href="#" class="btn btn--primary btn--xl" id="final-register-btn">Crear cuenta gratis</a>
-        <p class="cta-final__disclaimer">Sin tarjeta de credito. Sin compromisos. Gratis para siempre.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="footer" role="contentinfo">
-    <div class="footer__container">
-      <div class="footer__brand">
-        <span class="footer__logo">🔤 WordHive</span>
-        <p class="footer__tagline">Juega solo, vence a todos.</p>
-      </div>
-      <nav class="footer__links" aria-label="Links del footer">
-        <a href="#" class="footer__link">Terminos</a>
-        <a href="#" class="footer__link">Privacidad</a>
-        <a href="#" class="footer__link">Contacto</a>
-      </nav>
-    </div>
-  </footer>
-
-  <!-- Scripts -->
-  <script type="module" src="/src/js/main.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

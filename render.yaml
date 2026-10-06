@@ -61,6 +61,11 @@ services:
     rootDir: web
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://wordhive-api.onrender.com/api/v1
+      - key: VITE_SOCKET_URL
+        value: https://wordhive-api.onrender.com
     headers:
       - path: /*
         name: X-Frame-Options

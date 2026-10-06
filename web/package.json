@@ -2,12 +2,20 @@
   "name": "wordhive-web",
   "version": "1.0.0",
   "description": "WordHive Landing Page",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node test-e2e.js"
   },
   "devDependencies": {
     "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "canvas-confetti": "^1.9.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   }
 }

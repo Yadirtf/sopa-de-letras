@@ -1,8 +1,14 @@
 abstract class ApiEndpoints {
-  // Base URL configurable (Local dev vs Render staging/prod)
+  // Base URL configurable con fallback por defecto al backend en Render.com
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'http://10.0.2.2:3000/api/v1', // Android emulator default o http://localhost:3000/api/v1
+    defaultValue: 'https://wordhive-api.onrender.com/api/v1',
+  );
+
+  // WebSocket Server URL para tiempo real
+  static const String socketUrl = String.fromEnvironment(
+    'SOCKET_URL',
+    defaultValue: 'https://wordhive-api.onrender.com',
   );
 
   // Autenticación

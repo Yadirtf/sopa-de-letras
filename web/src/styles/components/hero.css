@@ -145,11 +145,46 @@
   box-shadow: 0 0 14px var(--wh-accent-emerald);
 }
 
-.mini-puzzle-target {
+.mini-puzzle-targets {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-top: 14px;
+}
+
+.mini-puzzle-targets__label {
   font-size: 12px;
+  color: var(--wh-text-secondary);
+  font-weight: 600;
+}
+
+.target-pill {
+  padding: 3px 10px;
+  background: rgba(15, 22, 35, 0.8);
+  border: 1px solid var(--wh-border-subtle);
+  border-radius: 999px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--wh-text-secondary);
+  transition: all var(--tr-quick);
+}
+
+.target-pill--found {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--wh-accent-emerald);
+  color: #6ee7b7;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.mini-puzzle-win {
+  margin-top: 12px;
   text-align: center;
-  color: var(--wh-accent-cyan);
+  font-size: 12px;
+  color: var(--wh-accent-amber);
+  font-weight: 700;
 }
 
 @media (max-width: 860px) {

@@ -5,7 +5,7 @@ export const registerSchema = z.object({
   age: z.number().int().min(5, "Edad mínima: 5 años").max(120),
   email: z.string().email("Correo electrónico inválido"),
   pin: z.string().regex(/^\d{4}$/, "El PIN debe consistir de exactamente 4 dígitos numéricos"),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: z.string().optional(),
 });
 
 export const loginSchema = z.object({
@@ -15,7 +15,7 @@ export const loginSchema = z.object({
 
 export const guestLoginSchema = z.object({
   name: z.string().min(3).max(25).optional(),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: z.string().optional(),
 });
 
 export const forgotPinSchema = z.object({
@@ -35,5 +35,5 @@ export const updatePinSchema = z.object({
 
 export const updateProfileSchema = z.object({
   name: z.string().min(3).max(25).optional(),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: z.string().optional(),
 });

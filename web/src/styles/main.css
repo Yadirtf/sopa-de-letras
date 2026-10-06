@@ -7,6 +7,10 @@
 @import './components/pinpad.css';
 @import './components/avatars.css';
 @import './components/hero.css';
+@import './components/auth-showcase.css';
+@import './components/modal.css';
+@import './components/catalog.css';
+@import './components/leaderboard.css';
 @import './components/qa-panel.css';
 
 /* Secciones Adicionales de la Landing */
