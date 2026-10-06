@@ -13,7 +13,7 @@ class LocalPush {
 }
 
 /// Convierte un `notification:new` del socket en aviso para la barra, solo
-/// para lo que pide acción (invitaciones y solicitudes). El `tag` coincide
+/// para lo social (invitaciones y amistades). El `tag` coincide
 /// con el del backend para que nunca se dupliquen.
 LocalPush? localPushFor(Map<String, dynamic> event) {
   final raw = event['notification'];
@@ -22,6 +22,7 @@ LocalPush? localPushFor(Map<String, dynamic> event) {
   final tag = switch (n.kind) {
     NotificationKind.roomInvite => 'invite-${n.text('roomCode') ?? ''}',
     NotificationKind.friendRequest => 'friend-request-${n.text('fromUserId') ?? ''}',
+    NotificationKind.friendAccepted => 'friend-accepted-${n.text('friendId') ?? ''}',
     _ => null,
   };
   if (tag == null) return null;

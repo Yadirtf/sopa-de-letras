@@ -91,6 +91,10 @@ jobs:
           fi
           python3 -c "import json;d=json.load(open('android/app/google-services.json'));print('Firebase:', d['project_info']['project_id'])"
 
+      - name: Aviso si la APK sale sin Firebase
+        if: env.HAS_FIREBASE != 'true'
+        run: echo "::warning title=APK sin avisos push::Falta el secreto GOOGLE_SERVICES_JSON. Esta APK no recibirá avisos con la app cerrada (ver docs/DEPLOY_RENDER_AND_APK.md §4)."
+
       - name: Versión
         id: version
         run: |

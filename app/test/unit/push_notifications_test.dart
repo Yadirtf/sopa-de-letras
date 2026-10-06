@@ -39,6 +39,12 @@ void main() {
       expect(local.body, 'Ana quiere ser tu amigo');
     });
 
+    test('también avisa cuando aceptan tu solicitud', () {
+      final local = localPushFor(_event('FRIEND_ACCEPTED', {'friendName': 'Beto', 'friendId': 'u-beto'}));
+      expect(local!.tag, 'friend-accepted-u-beto');
+      expect(local.data, containsPair('type', 'FRIEND_ACCEPTED'));
+    });
+
     test('las medallas y eventos informativos se quedan solo en la campana', () {
       expect(localPushFor(_event('GAME_END', {'rank': 1})), isNull);
       expect(localPushFor({'notification': 'roto'}), isNull);

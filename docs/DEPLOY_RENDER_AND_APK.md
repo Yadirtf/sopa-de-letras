@@ -88,3 +88,10 @@ Las invitaciones a jugar y las solicitudes de amistad llegan a la barra de notif
    - Para compilar en local, copia el archivo a `app/android/app/google-services.json` (está en `.gitignore`).
 4. **Render (backend):** en Firebase, *Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada*. En Render, servicio `wordhive-api` → *Environment*, crea `FIREBASE_SERVICE_ACCOUNT` y pega el JSON completo (también acepta base64). Al reiniciar, el log dice `[Push] FCM activo para el proyecto ...`.
 5. Instala la APK nueva, inicia sesión y acepta "¡Sí, avísame!".
+
+### ¿No llegan los avisos con la app cerrada? Revisa en este orden
+
+1. **Backend:** abre `https://wordhive-api.onrender.com/health`. Debe decir `"push": "activo"`. Si dice `"sin credenciales de Firebase"`, falta o está mal `FIREBASE_SERVICE_ACCOUNT` en Render.
+2. **APK:** en GitHub → Actions, abre la última compilación de `main`. Si aparece la advertencia *"APK sin avisos push"*, falta el secreto `GOOGLE_SERVICES_JSON`; agrégalo y vuelve a compilar (botón *Run workflow*). Hay que instalar esa APK nueva.
+3. **Teléfono:** en *Ajustes → Apps → WordHive → Notificaciones* deben estar activadas, y el canal "Amigos e invitaciones" en *Alertas / Sonido*.
+4. **Ahorro de batería (Xiaomi, Huawei, Oppo, Samsung):** si se cierra la app deslizándola, algunos teléfonos bloquean los avisos. En *Ajustes → Batería → WordHive* elige "Sin restricciones" y, en Xiaomi, activa "Inicio automático".
