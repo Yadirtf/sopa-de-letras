@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'catalog_grid_delegate.dart';
 
+/// Esqueleto con la misma forma que la cuadrícula de tarjetas, latiendo
+/// suavemente mientras llega el catálogo.
 class CatalogSkeletonWidget extends StatefulWidget {
   const CatalogSkeletonWidget({super.key});
 
@@ -8,111 +11,59 @@ class CatalogSkeletonWidget extends StatefulWidget {
   State<CatalogSkeletonWidget> createState() => _CatalogSkeletonWidgetState();
 }
 
-class _CatalogSkeletonWidgetState extends State<CatalogSkeletonWidget>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.3, end: 0.7).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
+class _CatalogSkeletonWidgetState extends State<CatalogSkeletonWidget> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
+    ..repeat(reverse: true);
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pulse.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: 4,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) => _buildSkeletonCard(_animation.value),
-        );
-      },
+    return SliverPadding(
+      padding: catalogGridPadding,
+      sliver: SliverGrid(
+        gridDelegate: catalogGridDelegate,
+        delegate: SliverChildBuilderDelegate(
+          childCount: 6,
+          (context, _) => FadeTransition(
+            opacity: Tween(begin: 0.35, end: 0.8).animate(_pulse),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.bgCard,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.borderSubtle),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 92,
+                    decoration: const BoxDecoration(
+                      color: AppColors.bgSecondary,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _bar(width: 110),
+                  const SizedBox(height: 8),
+                  _bar(width: 70),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildSkeletonCard(double opacity) {
-    return Container(
-      height: 110,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.bgCard.withValues(alpha: opacity),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.borderGlow.withValues(alpha: opacity * 0.5),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 140,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: AppColors.textMuted.withValues(alpha: opacity),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const Spacer(),
-              Container(
-                width: 60,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: AppColors.accentViolet.withValues(alpha: opacity * 0.4),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            width: 220,
-            height: 12,
-            decoration: BoxDecoration(
-              color: AppColors.textMuted.withValues(alpha: opacity * 0.7),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          Row(
-            children: [
-              Container(
-                width: 70,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: AppColors.accentCyan.withValues(alpha: opacity * 0.5),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                width: 90,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: AppColors.accentAmber.withValues(alpha: opacity * 0.5),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _bar({required double width}) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        width: width,
+        height: 12,
+        decoration: BoxDecoration(color: AppColors.bgSecondary, borderRadius: BorderRadius.circular(6)),
+      );
 }

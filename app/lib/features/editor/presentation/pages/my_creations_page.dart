@@ -110,12 +110,6 @@ class MyCreationsPage extends ConsumerWidget {
                     },
                   ),
                 ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.accentViolet,
-        foregroundColor: Colors.white,
-        onPressed: () => context.push('/create-word-search'),
-        child: const Icon(Icons.add_rounded),
-      ),
     );
   }
 

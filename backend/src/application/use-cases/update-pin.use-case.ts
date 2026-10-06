@@ -3,8 +3,10 @@ import { IUserRepository } from "../../domain/repositories/user.repository.inter
 import { IHashService } from "../../domain/services/hash.service.interface";
 import { IMailService } from "../../domain/services/mail.service.interface";
 import {
-  InvalidCredentialsError,
+  GuestNotAllowedError,
+  SamePinError,
   UserNotFoundError,
+  WrongCurrentPinError,
   DomainError,
 } from "../../domain/errors/auth.errors";
 import { UpdatePinDto } from "../dtos/auth.dtos";
@@ -24,12 +26,20 @@ export class UpdatePinUseCase {
         return fail(new UserNotFoundError());
       }
 
+      // El invitado tiene un PIN aleatorio que nunca vio: no hay nada que cambiar.
+      if (user.isGuest) {
+        return fail(new GuestNotAllowedError("cambiar el PIN"));
+      }
+
       const isCurrentPinValid = await this.hashService.compare(dto.currentPin, user.pinHash);
       if (!isCurrentPinValid) {
-        return fail(new InvalidCredentialsError());
+        return fail(new WrongCurrentPinError());
       }
 
       const newPin = Pin.create(dto.newPin);
+      if (newPin.value === dto.currentPin.trim()) {
+        return fail(new SamePinError());
+      }
       const newPinHash = await this.hashService.hash(newPin.value);
 
       user.updatePinHash(newPinHash);

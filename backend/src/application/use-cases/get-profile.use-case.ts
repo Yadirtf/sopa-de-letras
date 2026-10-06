@@ -1,17 +1,9 @@
 import { IUserRepository } from "../../domain/repositories/user.repository.interface";
 import { UserNotFoundError, DomainError } from "../../domain/errors/auth.errors";
 import { Result, ok, fail } from "../common/result";
+import { toUserProfile, UserProfileResponse } from "../common/user-profile.mapper";
 
-export interface UserProfileResponse {
-  id: string;
-  name: string;
-  age: number;
-  email: string;
-  avatarUrl: string | null;
-  isGuest: boolean;
-  isOnline: boolean;
-  createdAt: Date;
-}
+export type { UserProfileResponse } from "../common/user-profile.mapper";
 
 export class GetProfileUseCase {
   constructor(private readonly userRepo: IUserRepository) {}
@@ -22,17 +14,7 @@ export class GetProfileUseCase {
       if (!user) {
         return fail(new UserNotFoundError());
       }
-
-      return ok({
-        id: user.id,
-        name: user.name.value,
-        age: user.age,
-        email: user.email.value,
-        avatarUrl: user.avatarUrl,
-        isGuest: user.isGuest,
-        isOnline: user.isOnline,
-        createdAt: user.createdAt,
-      });
+      return ok(toUserProfile(user));
     } catch (error) {
       return fail(error as DomainError);
     }

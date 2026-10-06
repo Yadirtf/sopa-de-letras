@@ -3,7 +3,11 @@ import { UpdatePinUseCase } from "../../../src/application/use-cases/update-pin.
 import { User } from "../../../src/domain/entities/user.entity";
 import { Email } from "../../../src/domain/value-objects/email.vo";
 import { Username } from "../../../src/domain/value-objects/username.vo";
-import { InvalidCredentialsError } from "../../../src/domain/errors/auth.errors";
+import {
+  GuestNotAllowedError,
+  SamePinError,
+  WrongCurrentPinError,
+} from "../../../src/domain/errors/auth.errors";
 
 describe("UpdatePinUseCase", () => {
   let userRepoMock: any;
@@ -62,7 +66,36 @@ describe("UpdatePinUseCase", () => {
 
     expect(result.isFailure).toBe(true);
     if (result.isFailure) {
-      expect(result.error).toBeInstanceOf(InvalidCredentialsError);
+      expect(result.error).toBeInstanceOf(WrongCurrentPinError);
     }
+  });
+
+  it("debe rechazar un PIN nuevo igual al actual", async () => {
+    const result = await useCase.execute({ userId: "user-789", currentPin: "2222", newPin: "2222" });
+
+    expect(result.isFailure).toBe(true);
+    if (result.isFailure) expect(result.error).toBeInstanceOf(SamePinError);
+    expect(userRepoMock.update).not.toHaveBeenCalled();
+  });
+
+  it("no permite cambiar el PIN a un invitado", async () => {
+    const guest = new User({
+      id: "guest-1",
+      name: Username.create("Invitado 123"),
+      age: 18,
+      email: Email.create("guest-1@guest.wordhive.app"),
+      pinHash: "hash_guest",
+      avatarUrl: null,
+      isOnline: true,
+      isGuest: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    userRepoMock.findById.mockResolvedValue(guest);
+
+    const result = await useCase.execute({ userId: "guest-1", currentPin: "1234", newPin: "5678" });
+
+    expect(result.isFailure).toBe(true);
+    if (result.isFailure) expect(result.error).toBeInstanceOf(GuestNotAllowedError);
   });
 });

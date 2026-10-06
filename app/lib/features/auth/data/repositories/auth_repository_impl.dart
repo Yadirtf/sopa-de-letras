@@ -5,6 +5,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
 import '../datasources/auth_local_datasource.dart';
 import '../models/user_model.dart';
+import 'auth_error_message.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
@@ -28,16 +29,9 @@ class AuthRepositoryImpl implements AuthRepository {
         pin: pin,
         avatarUrl: avatarUrl,
       );
-      final user = UserModel.fromJson(res['user']);
-      final tokens = res['tokens'];
-      await _localDataSource.saveAuthData(
-        user: user,
-        accessToken: tokens['accessToken'],
-        refreshToken: tokens['refreshToken'],
-      );
-      return Right(user);
+      return Right(await _persistSession(res));
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Error de conexión');
+      return Left(authErrorMessage(e, 'Error de conexión'));
     } catch (e) {
       return Left(e.toString());
     }
@@ -50,16 +44,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final res = await _remoteDataSource.login(email: email, pin: pin);
-      final user = UserModel.fromJson(res['user']);
-      final tokens = res['tokens'];
-      await _localDataSource.saveAuthData(
-        user: user,
-        accessToken: tokens['accessToken'],
-        refreshToken: tokens['refreshToken'],
-      );
-      return Right(user);
+      return Right(await _persistSession(res));
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Credenciales inválidas');
+      return Left(authErrorMessage(e, 'Credenciales inválidas'));
     } catch (e) {
       return Left(e.toString());
     }
@@ -72,16 +59,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final res = await _remoteDataSource.guestLogin(name: name, avatarUrl: avatarUrl);
-      final user = UserModel.fromJson(res['user']);
-      final tokens = res['tokens'];
-      await _localDataSource.saveAuthData(
-        user: user,
-        accessToken: tokens['accessToken'],
-        refreshToken: tokens['refreshToken'],
-      );
-      return Right(user);
+      return Right(await _persistSession(res));
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Error al iniciar como invitado');
+      return Left(authErrorMessage(e, 'Error al iniciar como invitado'));
     }
   }
 
@@ -91,7 +71,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final msg = await _remoteDataSource.requestPinReset(email);
       return Right(msg);
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Error al solicitar código');
+      return Left(authErrorMessage(e, 'Error al solicitar código'));
     }
   }
 
@@ -109,7 +89,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(msg);
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Código o PIN inválido');
+      return Left(authErrorMessage(e, 'Código o PIN inválido'));
     }
   }
 
@@ -125,7 +105,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(msg);
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Error al actualizar PIN');
+      return Left(authErrorMessage(e, 'Error al actualizar PIN'));
     }
   }
 
@@ -133,9 +113,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<String, UserEntity>> updateProfile({String? name, String? avatarUrl}) async {
     try {
       final user = await _remoteDataSource.updateProfile(name: name, avatarUrl: avatarUrl);
+      // La cache es la fuente del usuario al reabrir la app: hay que mantenerla al día.
+      await _localDataSource.updateCachedUser(user);
       return Right(user);
     } on DioException catch (e) {
-      return Left(e.response?.data?['message'] ?? 'Error al actualizar perfil');
+      return Left(authErrorMessage(e, 'Error al actualizar perfil'));
     }
   }
 
@@ -148,5 +130,16 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await _localDataSource.clearAuthData();
+  }
+
+  Future<UserModel> _persistSession(Map<String, dynamic> res) async {
+    final user = UserModel.fromJson(res['user']);
+    final tokens = res['tokens'];
+    await _localDataSource.saveAuthData(
+      user: user,
+      accessToken: tokens['accessToken'],
+      refreshToken: tokens['refreshToken'],
+    );
+    return user;
   }
 }

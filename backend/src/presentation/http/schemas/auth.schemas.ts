@@ -34,6 +34,11 @@ export const updatePinSchema = z.object({
 });
 
 export const updateProfileSchema = z.object({
-  name: z.string().min(3).max(25).optional(),
+  name: z
+    .string()
+    .trim()
+    .min(3, "El nombre debe tener al menos 3 letras")
+    .max(25, "El nombre no puede pasar de 25 letras")
+    .optional(),
   avatarUrl: z.string().optional(),
 });
