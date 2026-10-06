@@ -73,8 +73,12 @@ void main() {
     });
     await flush();
     expect(notifier.state.isGameActive, isTrue);
-    expect(notifier.state.countdownValue, isNull);
+    expect(notifier.state.gameStartedAt, isNotNull);
     expect(notifier.state.room!.status, RoomStatusEnum.inProgress);
+    // La capa 3-2-1 se queda hasta que su animacion termina (antes se cortaba en el "3").
+    expect(notifier.state.countdownValue, 3);
+    notifier.dismissCountdown();
+    expect(notifier.state.countdownValue, isNull);
   });
 
   test('un error al entrar se explica y no deja la sala como unida', () async {

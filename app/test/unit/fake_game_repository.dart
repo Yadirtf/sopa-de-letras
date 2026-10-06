@@ -38,6 +38,8 @@ class FakeGameRepository implements GameRepository {
   final started = StreamController<Map<String, dynamic>>.broadcast();
   final rematchStarted = StreamController<Map<String, dynamic>>.broadcast();
   final gameEnded = StreamController<List<PodiumEntryEntity>>.broadcast();
+  final wordFound = StreamController<WordFoundEventEntity>.broadcast();
+  final connection = StreamController<bool>.broadcast();
 
   @override
   Future<GameRoomEntity> createRoom(
@@ -68,13 +70,19 @@ class FakeGameRepository implements GameRepository {
   @override
   void voteRematch({required String roomCode, required String userId}) {}
 
+  /// Lo que "responde" el servidor al enviar una palabra (null = aceptada).
+  String? submitError;
+
   @override
-  void submitWord(
+  Future<String?> submitWord(
       {required String roomCode,
       required String userId,
       required String word,
       required List<int> startCoord,
-      required List<int> endCoord}) {}
+      required List<int> endCoord}) async {
+    sent.add('word:$word');
+    return submitError;
+  }
 
   @override
   void connectSocket() {}
@@ -91,7 +99,7 @@ class FakeGameRepository implements GameRepository {
   @override
   Stream<Map<String, dynamic>> onGameStarted() => started.stream;
   @override
-  Stream<WordFoundEventEntity> onWordFound() => const Stream.empty();
+  Stream<WordFoundEventEntity> onWordFound() => wordFound.stream;
   @override
   Stream<List<LeaderboardEntryEntity>> onLeaderboardUpdated() => const Stream.empty();
   @override
@@ -100,4 +108,6 @@ class FakeGameRepository implements GameRepository {
   Stream<RematchVoteStateEntity> onRematchUpdate() => const Stream.empty();
   @override
   Stream<Map<String, dynamic>> onRematchStarted() => rematchStarted.stream;
+  @override
+  Stream<bool> onConnectionChanged() => connection.stream;
 }

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,7 +13,7 @@ class CellCoord {
       other is CellCoord && runtimeType == other.runtimeType && row == other.row && col == other.col;
 
   @override
-  int get hashCode => row.hashCode ^ col.hashCode;
+  int get hashCode => Object.hash(row, col);
 }
 
 class BoardSelectionState {
@@ -28,90 +29,61 @@ class BoardSelectionState {
     this.formedWord = '',
   });
 
-  BoardSelectionState copyWith({
-    CellCoord? startCell,
-    CellCoord? currentCell,
-    List<CellCoord>? selectedCells,
-    String? formedWord,
-  }) {
-    return BoardSelectionState(
-      startCell: startCell,
-      currentCell: currentCell,
-      selectedCells: selectedCells ?? this.selectedCells,
-      formedWord: formedWord ?? this.formedWord,
-    );
-  }
+  bool get isActive => startCell != null;
 }
 
-final gameBoardProvider =
-    StateNotifierProvider<GameBoardNotifier, BoardSelectionState>((ref) {
+final gameBoardProvider = StateNotifierProvider.autoDispose<GameBoardNotifier, BoardSelectionState>((ref) {
   return GameBoardNotifier();
 });
+
+/// Las 8 direcciones de una sopa de letras, en el orden de los angulos (0, 45, 90... grados).
+const _directions = [
+  (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1), //
+];
 
 class GameBoardNotifier extends StateNotifier<BoardSelectionState> {
   GameBoardNotifier() : super(const BoardSelectionState());
 
   void startSelection(int row, int col, List<List<String>> grid) {
-    if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) return;
-    HapticFeedback.lightImpact();
+    if (!_inside(row, col, grid)) return;
+    HapticFeedback.selectionClick();
+    final start = CellCoord(row, col);
     state = BoardSelectionState(
-      startCell: CellCoord(row, col),
-      currentCell: CellCoord(row, col),
-      selectedCells: [CellCoord(row, col)],
+      startCell: start,
+      currentCell: start,
+      selectedCells: [start],
       formedWord: grid[row][col],
     );
   }
 
+  /// El dedo nunca va perfectamente recto: tomamos el angulo del trazo, lo
+  /// "imantamos" a la direccion mas cercana de las 8 y proyectamos la distancia
+  /// sobre ella. Asi un trazo torcido sigue marcando la palabra completa.
   void updateSelection(int row, int col, List<List<String>> grid) {
-    if (state.startCell == null) return;
-    if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length) return;
-
-    final start = state.startCell!;
+    final start = state.startCell;
+    if (start == null || grid.isEmpty) return;
     final dr = row - start.row;
     final dc = col - start.col;
 
-    if (dr == 0 && dc == 0) return;
-
-    // Vector direction snapping to 8 directions (horizontal, vertical, diagonal)
-    int stepR = 0;
-    int stepC = 0;
-
-    final absR = dr.abs();
-    final absC = dc.abs();
-
-    if (absR == 0) {
-      stepC = dc > 0 ? 1 : -1;
-    } else if (absC == 0) {
-      stepR = dr > 0 ? 1 : -1;
-    } else {
-      // Diagonal snapping
-      stepR = dr > 0 ? 1 : -1;
-      stepC = dc > 0 ? 1 : -1;
+    final cells = <CellCoord>[start];
+    if (dr != 0 || dc != 0) {
+      final octant = (math.atan2(dr, dc) / (math.pi / 4)).round() % 8;
+      final (stepR, stepC) = _directions[octant];
+      final steps = ((dr * stepR + dc * stepC) / (stepR * stepR + stepC * stepC)).round();
+      for (var i = 1; i <= steps; i++) {
+        final r = start.row + stepR * i;
+        final c = start.col + stepC * i;
+        if (!_inside(r, c, grid)) break;
+        cells.add(CellCoord(r, c));
+      }
     }
 
-    final length = (stepR != 0 && stepC != 0)
-        ? (absR + absC) ~/ 2 + 1
-        : (absR > 0 ? absR : absC) + 1;
-
-    final newCells = <CellCoord>[];
-    final buffer = StringBuffer();
-
-    for (int i = 0; i < length; i++) {
-      final r = start.row + stepR * i;
-      final c = start.col + stepC * i;
-      if (r < 0 || r >= grid.length || c < 0 || c >= grid[0].length) break;
-      newCells.add(CellCoord(r, c));
-      buffer.write(grid[r][c]);
-    }
-
-    if (newCells.length != state.selectedCells.length) {
-      HapticFeedback.lightImpact();
-    }
-
-    state = state.copyWith(
+    if (cells.length != state.selectedCells.length) HapticFeedback.selectionClick();
+    state = BoardSelectionState(
+      startCell: start,
       currentCell: CellCoord(row, col),
-      selectedCells: newCells,
-      formedWord: buffer.toString(),
+      selectedCells: cells,
+      formedWord: cells.map((c) => grid[c.row][c.col]).join(),
     );
   }
 
@@ -120,4 +92,7 @@ class GameBoardNotifier extends StateNotifier<BoardSelectionState> {
     state = const BoardSelectionState();
     return previous;
   }
+
+  static bool _inside(int r, int c, List<List<String>> grid) =>
+      r >= 0 && r < grid.length && c >= 0 && c < grid[r].length;
 }

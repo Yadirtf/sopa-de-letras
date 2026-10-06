@@ -6,6 +6,7 @@ import { RedisRoomCache } from "../../infrastructure/cache/redis-room.cache";
 import { RoomManagerService } from "../../application/services/room-manager.service";
 import { RoomLifecycleService } from "../../application/services/room-lifecycle.service";
 import { RoomRematchService } from "../../application/services/room-rematch.service";
+import { RoomConnectionService } from "../../application/services/room-connection.service";
 import { WordSearchGeneratorService } from "../../domain/services/word-search-generator.service";
 import { CreateRoomUseCase } from "../../application/use-cases/create-room.use-case";
 import { GetRoomByCodeUseCase } from "../../application/use-cases/get-room-by-code.use-case";
@@ -14,6 +15,7 @@ import { RoomController } from "../http/controllers/room.controller";
 import { RoomEventsHandler } from "../../infrastructure/websocket/handlers/room-events.handler";
 import { GameEventsHandler } from "../../infrastructure/websocket/handlers/game-events.handler";
 import { SocketDispatcher } from "../../infrastructure/websocket/handlers/socket-dispatcher";
+import { RoomDisconnectHandler } from "../../infrastructure/websocket/handlers/room-disconnect.handler";
 import { SocialContainer } from "./social.container";
 
 export function createRoomContainer(prisma: PrismaClient, redis: Redis, social?: SocialContainer) {
@@ -35,10 +37,11 @@ export function createRoomContainer(prisma: PrismaClient, redis: Redis, social?:
 
   const roomEventsHandler = new RoomEventsHandler(roomManager, roomLifecycle, social?.socketBindings.roomLifecycle);
   const gameEventsHandler = new GameEventsHandler(roomManager, finishGameUseCase, rematchService, roomLifecycle);
+  const disconnectHandler = new RoomDisconnectHandler(roomManager, new RoomConnectionService(roomCache));
   const socketDispatcher = new SocketDispatcher(
     roomEventsHandler,
     gameEventsHandler,
-    roomManager,
+    disconnectHandler,
     social?.socketBindings
   );
 

@@ -7,10 +7,12 @@ import '../../../auth/presentation/providers/auth_notifier.dart';
 import '../../domain/entities/room_lobby_entities.dart';
 import '../providers/game_room_notifier.dart';
 import '../providers/game_room_state.dart';
+import '../widgets/connection_lost_banner.dart';
+import '../widgets/leave_room_dialog.dart';
 import '../widgets/lobby_action_bar_widget.dart';
+import '../widgets/lobby_invite_button.dart';
 import '../widgets/lobby_status_banner_widget.dart';
 import '../widgets/room_player_slot_widget.dart';
-import '../../../social/presentation/widgets/invite_friends_sheet.dart';
 
 class RoomLobbyPage extends ConsumerStatefulWidget {
   final String roomCode;
@@ -38,7 +40,9 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
     await notifier.joinRoom(code: widget.roomCode, userId: user.id, username: user.name, avatarUrl: user.avatarUrl);
   }
 
-  void _leave() {
+  /// Solo sale quien lo pide: si se cae el internet, el servidor le guarda el puesto.
+  Future<void> _leave() async {
+    if (!await LeaveRoomDialog.confirm(context, inGame: false) || !mounted) return;
     ref.read(gameRoomNotifierProvider.notifier).leaveRoom();
     context.go('/catalog');
   }
@@ -61,28 +65,36 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.bgPrimary,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _leave();
+      },
+      child: Scaffold(
         backgroundColor: AppColors.bgPrimary,
-        elevation: 0,
-        title: Text('Sala ${widget.roomCode}', style: AppTypography.heading2.copyWith(fontSize: 18)),
-        actions: [
-          TextButton.icon(
-            onPressed: _leave,
-            icon: const Icon(Icons.exit_to_app_rounded, color: AppColors.accentRose),
-            label: Text('Salir', style: AppTypography.labelLarge.copyWith(color: AppColors.accentRose)),
-          ),
-        ],
-      ),
-      body: room == null
-          ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: _buildLobby(state, notifier, LobbyReadiness.of(room, currentUserId)),
-              ),
+        appBar: AppBar(
+          backgroundColor: AppColors.bgPrimary,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text('Sala ${widget.roomCode}', style: AppTypography.heading2.copyWith(fontSize: 18)),
+          actions: [
+            TextButton.icon(
+              key: const ValueKey('lobby-leave-button'),
+              onPressed: _leave,
+              icon: const Icon(Icons.logout_rounded, color: AppColors.accentRose),
+              label: Text('Abandonar sala', style: AppTypography.labelLarge.copyWith(color: AppColors.accentRose)),
             ),
+          ],
+        ),
+        body: room == null
+            ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: _buildLobby(state, notifier, LobbyReadiness.of(room, currentUserId)),
+                ),
+              ),
+      ),
     );
   }
 
@@ -98,6 +110,7 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
           style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: 12),
+        ConnectionLostBanner(visible: !state.isConnected),
         LobbyStatusBannerWidget(readiness: readiness),
         const SizedBox(height: 16),
         Expanded(
@@ -116,21 +129,7 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
           ),
         ),
         const SizedBox(height: 12),
-        if (!room.isFull)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.accentAmber,
-                minimumSize: const Size.fromHeight(48),
-                backgroundColor: AppColors.accentAmber.withValues(alpha: 0.1),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              onPressed: () => InviteFriendsSheet.show(context, room.code),
-              icon: const Icon(Icons.person_add_alt_1_rounded),
-              label: Text('Invitar amigos', style: AppTypography.labelLarge.copyWith(color: AppColors.accentAmber)),
-            ),
-          ),
+        if (!room.isFull) LobbyInviteButton(roomCode: room.code),
         LobbyActionBarWidget(
           readiness: readiness,
           isStarting: state.isStarting,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../../domain/repositories/game_repository.dart';
+import '../../domain/entities/game_event_entities.dart';
 import '../../domain/entities/game_room_entity.dart';
 import 'game_room_state.dart';
 
@@ -30,12 +31,14 @@ class GameRoomSocketListener {
             room: s.room?.copyWith(status: RoomStatusEnum.countdown),
           ))),
 
+      // La cuenta 3-2-1 la cierra su propia animacion (dismissCountdown), no este evento:
+      // si no, el "¡A buscar!" desaparecia antes de verse.
       repository.onGameStarted().listen((data) => update((s) {
             final grid = _parseGrid(data['grid']);
             final words = _parseWords(data['words']);
             return s.copyWith(
-              clearCountdown: true,
               isGameActive: true,
+              gameStartedAt: DateTime.now(),
               room: s.room?.copyWith(
                 status: RoomStatusEnum.inProgress,
                 grid: grid.isNotEmpty ? grid : null,
@@ -44,10 +47,17 @@ class GameRoomSocketListener {
             );
           })),
 
+      // La primera persona en encontrar la palabra se queda con su color en el tablero.
       repository.onWordFound().listen((event) => update((s) {
-            final updated = Map.of(s.claimedWords)..[event.word.toUpperCase()] = event;
-            return s.copyWith(claimedWords: updated, latestWordFound: event);
+            final claimed = Map.of(s.claimedWords)..putIfAbsent(event.word.toUpperCase(), () => event);
+            return s.copyWith(
+              claimedWords: claimed,
+              latestWordFound: event,
+              room: event.pointsAwarded > 0 ? _withPoints(s.room, event) : s.room,
+            );
           })),
+
+      repository.onConnectionChanged().listen((online) => update((s) => s.copyWith(isConnected: online))),
 
       repository.onLeaderboardUpdated().listen((entries) => update((s) => s.copyWith(leaderboard: entries))),
 
@@ -70,6 +80,18 @@ class GameRoomSocketListener {
             );
           })),
     ];
+  }
+
+  /// Suma la palabra al jugador que la encontro: con esto se mueve la carrera de oponentes.
+  static GameRoomEntity? _withPoints(GameRoomEntity? room, WordFoundEventEntity event) {
+    if (room == null) return null;
+    return room.copyWith(players: [
+      for (final p in room.players)
+        if (p.userId == event.claimedByUserId && !p.wordsFound.contains(event.word.toUpperCase()))
+          p.copyWith(score: event.newScore, wordsFound: [...p.wordsFound, event.word.toUpperCase()])
+        else
+          p,
+    ]);
   }
 
   static List<List<String>> _parseGrid(dynamic raw) {

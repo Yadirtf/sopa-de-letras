@@ -2,13 +2,13 @@ import { Server, Socket } from "socket.io";
 import { RoomEventsHandler, RoomLifecycleListener } from "./room-events.handler";
 import { GameEventsHandler } from "./game-events.handler";
 import { PresenceEventsHandler } from "./presence-events.handler";
-import { RoomManagerService } from "../../../application/services/room-manager.service";
+import { RoomDisconnectHandler } from "./room-disconnect.handler";
 
 export class SocketDispatcher {
   constructor(
     private readonly roomEventsHandler: RoomEventsHandler,
     private readonly gameEventsHandler: GameEventsHandler,
-    private readonly roomManager: RoomManagerService,
+    private readonly disconnectHandler: RoomDisconnectHandler,
     private readonly social?: {
       presenceHandler: PresenceEventsHandler;
       roomLifecycle: RoomLifecycleListener;
@@ -24,26 +24,11 @@ export class SocketDispatcher {
       this.gameEventsHandler.register(io, socket);
       this.social?.presenceHandler.register(io, socket).catch(() => undefined);
 
-      socket.on("disconnect", async () => {
-        const roomCode: string | undefined = socket.data.roomCode;
+      socket.on("disconnect", () => {
         const userId: string | undefined = socket.data.userId;
-        if (roomCode && userId) {
-          this.social?.roomLifecycle.onPlayerLeft(userId);
-          try {
-            // En plena partida se conserva su puesto y puntos: al reconectar vuelve a entrar.
-            const room = await this.roomManager.getRoom(roomCode);
-            if (room && room.status !== "WAITING") return;
-            const { state, newHostId } = await this.roomManager.removePlayer(roomCode, userId);
-            io.to(`room:${roomCode}`).emit("player:left", {
-              userId,
-              newHostId,
-              hostUserId: state.hostUserId,
-              players: state.players,
-            });
-          } catch {
-            // Ignored on disconnect
-          }
-        }
+        if (socket.data.roomCode && userId) this.social?.roomLifecycle.onPlayerLeft(userId);
+        // Perder internet no es abandonar: el jugador conserva su puesto (ver RoomDisconnectHandler).
+        this.disconnectHandler.handle(io, socket).catch(() => undefined);
       });
     });
   }

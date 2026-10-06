@@ -82,14 +82,14 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
-  void submitWord({
+  Future<String?> submitWord({
     required String roomCode,
     required String userId,
     required String word,
     required List<int> startCoord,
     required List<int> endCoord,
   }) {
-    _socketDataSource.submitWord(
+    return _socketDataSource.submitWord(
       roomCode: roomCode,
       userId: userId,
       word: word,
@@ -129,4 +129,7 @@ class GameRepositoryImpl implements GameRepository {
 
   @override
   Stream<Map<String, dynamic>> onRematchStarted() => _socketDataSource.onRematchStarted;
+
+  @override
+  Stream<bool> onConnectionChanged() => _socketDataSource.onConnectionChanged;
 }

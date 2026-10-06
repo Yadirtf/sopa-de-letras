@@ -25,7 +25,11 @@ export class RoomManagerService {
 
     // Reconectar (app en segundo plano, red movil) devuelve al jugador a su sitio.
     const returning = state.players.find((p) => p.userId === player.userId);
-    if (returning) return { state, joinedPlayer: returning };
+    if (returning) {
+      returning.isConnected = true;
+      await this.roomCache.saveRoom(state);
+      return { state, joinedPlayer: returning };
+    }
 
     if (state.status !== 'WAITING') throw new Error('PARTIDA_EN_CURSO');
     if (state.players.length >= state.maxPlayers) throw new Error('SALA_LLENA');
@@ -107,6 +111,8 @@ export class RoomManagerService {
         username: player.username,
         colorHex: player.colorHex,
         timestamp: Date.now(),
+        start: coords.start,
+        end: coords.end,
       };
     }
 

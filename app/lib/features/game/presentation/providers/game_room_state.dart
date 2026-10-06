@@ -17,6 +17,12 @@ class GameRoomState extends Equatable {
   final RematchVoteStateEntity? rematchState;
   final WordFoundEventEntity? latestWordFound;
 
+  /// False mientras el socket esta caido: mostramos "reconectando" sin sacar a nadie.
+  final bool isConnected;
+
+  /// Momento (reloj de este telefono) en que arranco la partida, para el cronometro.
+  final DateTime? gameStartedAt;
+
   const GameRoomState({
     this.room,
     this.isLoading = false,
@@ -29,6 +35,8 @@ class GameRoomState extends Equatable {
     this.claimedWords = const {},
     this.rematchState,
     this.latestWordFound,
+    this.isConnected = true,
+    this.gameStartedAt,
   });
 
   GameRoomState copyWith({
@@ -44,6 +52,8 @@ class GameRoomState extends Equatable {
     Map<String, WordFoundEventEntity>? claimedWords,
     RematchVoteStateEntity? rematchState,
     WordFoundEventEntity? latestWordFound,
+    bool? isConnected,
+    DateTime? gameStartedAt,
   }) {
     return GameRoomState(
       room: room ?? this.room,
@@ -57,6 +67,8 @@ class GameRoomState extends Equatable {
       claimedWords: claimedWords ?? this.claimedWords,
       rematchState: rematchState ?? this.rematchState,
       latestWordFound: latestWordFound ?? this.latestWordFound,
+      isConnected: isConnected ?? this.isConnected,
+      gameStartedAt: gameStartedAt ?? this.gameStartedAt,
     );
   }
 
@@ -73,5 +85,7 @@ class GameRoomState extends Equatable {
         claimedWords,
         rematchState,
         latestWordFound,
+        isConnected,
+        gameStartedAt,
       ];
 }

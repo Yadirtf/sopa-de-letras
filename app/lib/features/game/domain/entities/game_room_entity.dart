@@ -13,6 +13,9 @@ class RoomPlayerEntity extends Equatable {
   final String colorHex;
   final int? rank;
 
+  /// False mientras se le cae el internet: conserva su puesto y vuelve solo al reconectar.
+  final bool isConnected;
+
   const RoomPlayerEntity({
     required this.userId,
     required this.username,
@@ -23,6 +26,7 @@ class RoomPlayerEntity extends Equatable {
     required this.wordsFound,
     required this.colorHex,
     this.rank,
+    this.isConnected = true,
   });
 
   RoomPlayerEntity copyWith({
@@ -30,6 +34,7 @@ class RoomPlayerEntity extends Equatable {
     int? score,
     List<String>? wordsFound,
     int? rank,
+    bool? isConnected,
   }) {
     return RoomPlayerEntity(
       userId: userId,
@@ -41,6 +46,7 @@ class RoomPlayerEntity extends Equatable {
       wordsFound: wordsFound ?? this.wordsFound,
       colorHex: colorHex,
       rank: rank ?? this.rank,
+      isConnected: isConnected ?? this.isConnected,
     );
   }
 
@@ -55,6 +61,7 @@ class RoomPlayerEntity extends Equatable {
         wordsFound,
         colorHex,
         rank,
+        isConnected,
       ];
 }
 

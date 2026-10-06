@@ -11,6 +11,7 @@ class RoomPlayerModel extends RoomPlayerEntity {
     required super.wordsFound,
     required super.colorHex,
     super.rank,
+    super.isConnected,
   });
 
   factory RoomPlayerModel.fromJson(Map<String, dynamic> json) {
@@ -21,12 +22,10 @@ class RoomPlayerModel extends RoomPlayerEntity {
       isHost: json['isHost'] ?? false,
       isReady: json['isReady'] ?? false,
       score: (json['score'] as num?)?.toInt() ?? 0,
-      wordsFound: (json['wordsFound'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      wordsFound: (json['wordsFound'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       colorHex: json['colorHex'] ?? '#7C3AED',
       rank: (json['rank'] as num?)?.toInt(),
+      isConnected: json['isConnected'] != false,
     );
   }
 
@@ -70,15 +69,11 @@ class GameRoomModel extends GameRoomEntity {
     if (statusStr == 'FINISHED') status = RoomStatusEnum.finished;
 
     final rawPlayers = json['players'] as List<dynamic>? ?? [];
-    final players = rawPlayers
-        .map((p) => RoomPlayerModel.fromJson(p as Map<String, dynamic>))
-        .toList();
+    final players = rawPlayers.map((p) => RoomPlayerModel.fromJson(p as Map<String, dynamic>)).toList();
 
     List<List<String>> grid = [];
     if (json['grid'] is List) {
-      grid = (json['grid'] as List)
-          .map((row) => (row as List).map((c) => c.toString()).toList())
-          .toList();
+      grid = (json['grid'] as List).map((row) => (row as List).map((c) => c.toString()).toList()).toList();
     }
 
     List<String> words = [];

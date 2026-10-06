@@ -4,92 +4,131 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/game_room_notifier.dart';
-import '../widgets/live_race_bar_widget.dart';
-import '../widgets/target_words_list_widget.dart';
-import '../widgets/word_search_canvas_widget.dart';
+import '../providers/game_room_state.dart';
+import '../providers/word_attempt.dart';
+import '../providers/game_board_provider.dart';
 import '../widgets/arcade_countdown_overlay.dart';
+import '../widgets/game_play_board_section.dart';
+import '../widgets/game_timer_chip.dart';
+import '../widgets/leave_room_dialog.dart';
 
-class GamePlayPage extends ConsumerWidget {
+class GamePlayPage extends ConsumerStatefulWidget {
   final String roomCode;
 
   const GamePlayPage({super.key, required this.roomCode});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(gameRoomNotifierProvider);
-    final notifier = ref.read(gameRoomNotifierProvider.notifier);
-    final room = state.room;
+  ConsumerState<GamePlayPage> createState() => _GamePlayPageState();
+}
 
-    ref.listen(gameRoomNotifierProvider, (previous, next) {
-      if (next.podium.isNotEmpty && !next.isGameActive) {
-        context.go('/game-podium/$roomCode');
-      }
-    });
+class _GamePlayPageState extends ConsumerState<GamePlayPage> {
+  bool _leaving = false;
 
-    if (room == null) {
-      return const Scaffold(
-        backgroundColor: AppColors.bgPrimary,
-        body: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
+  GameRoomNotifier get _notifier => ref.read(gameRoomNotifierProvider.notifier);
+
+  /// Salir es siempre una decision del jugador: perder el internet nunca lo saca.
+  Future<void> _confirmLeave() async {
+    if (_leaving) return;
+    final leave = await LeaveRoomDialog.confirm(context, inGame: true);
+    if (!leave || !mounted) return;
+    _leaving = true;
+    _notifier.leaveRoom();
+    context.go('/catalog');
+  }
+
+  void _toast(String text, Color color) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(milliseconds: 1400),
+        backgroundColor: color,
+        content: Text(text, style: AppTypography.labelLarge.copyWith(color: Colors.white)),
+      ));
+  }
+
+  bool _onWordTraced(String word, CellCoord start, CellCoord end) {
+    final outcome = _notifier.submitSelection(word, [start.row, start.col], [end.row, end.col]);
+    if (outcome == WordAttemptOutcome.alreadyMine) _toast('Ya encontraste esa palabra', AppColors.accentCyan);
+    return outcome == WordAttemptOutcome.sent;
+  }
+
+  void _onStateChanged(GameRoomState? previous, GameRoomState next) {
+    if (next.podium.isNotEmpty && !next.isGameActive) {
+      context.go('/game-podium/${widget.roomCode}');
+      return;
+    }
+    final found = next.latestWordFound;
+    if (found != null && found != previous?.latestWordFound && found.pointsAwarded > 0) {
+      final mine = found.claimedByUserId == _notifier.currentUserId;
+      _toast(
+        mine
+            ? '¡Encontraste ${found.word}! +${found.pointsAwarded}'
+            : '${found.claimedByUsername} encontró ${found.word}',
+        mine ? AppColors.accentEmerald : AppColors.bgCard,
       );
     }
+    if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+      _toast(next.errorMessage!, AppColors.accentRose);
+    }
+  }
 
-    return Scaffold(
-      backgroundColor: AppColors.bgPrimary,
-      appBar: AppBar(
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(gameRoomNotifierProvider);
+    final room = state.room;
+    ref.listen<GameRoomState>(gameRoomNotifierProvider, _onStateChanged);
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmLeave();
+      },
+      child: Scaffold(
         backgroundColor: AppColors.bgPrimary,
-        elevation: 0,
-        title: Text(room.wordSearchTitle, style: AppTypography.heading2.copyWith(fontSize: 18)),
-        actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: AppColors.bgCard,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderSubtle),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.timer_outlined, size: 16, color: AppColors.accentRose),
-                const SizedBox(width: 4),
-                Text('Realtime', style: AppTypography.bodySmall.copyWith(color: AppColors.accentRose)),
-              ],
-            ),
+        appBar: AppBar(
+          backgroundColor: AppColors.bgPrimary,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          titleSpacing: 16,
+          title: Text(
+            room?.wordSearchTitle ?? 'Partida',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.heading2.copyWith(fontSize: 18),
           ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
+          actions: [
+            GameTimerChip(startedAt: state.gameStartedAt, timeLimitSeconds: room?.timeLimitSeconds),
+            const SizedBox(width: 4),
+            TextButton.icon(
+              key: const ValueKey('game-leave-button'),
+              onPressed: _confirmLeave,
+              icon: const Icon(Icons.logout_rounded, color: AppColors.accentRose, size: 20),
+              label: Text('Abandonar', style: AppTypography.labelLarge.copyWith(color: AppColors.accentRose)),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: room == null
+            ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
+            : Stack(
                 children: [
-                  LiveRaceBarWidget(leaderboard: state.leaderboard),
-                  const SizedBox(height: 12),
-                  TargetWordsListWidget(
-                    words: room.words,
-                    claimedWords: state.claimedWords,
+                  SafeArea(
+                    child: GamePlayBoardSection(
+                      state: state,
+                      currentUserId: _notifier.currentUserId,
+                      onWordTraced: _onWordTraced,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  WordSearchCanvasWidget(
-                    grid: room.grid,
-                    onWordCompleted: (word, start, end) {
-                      notifier.submitWord(
-                        word,
-                        [start.row, start.col],
-                        [end.row, end.col],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
+                  if (state.countdownValue != null)
+                    Positioned.fill(
+                      child: ArcadeCountdownOverlay(
+                        seconds: state.countdownValue!,
+                        onFinished: _notifier.dismissCountdown,
+                      ),
+                    ),
                 ],
               ),
-            ),
-          ),
-          if (state.countdownValue != null)
-            ArcadeCountdownOverlay(count: state.countdownValue!),
-        ],
       ),
     );
   }
