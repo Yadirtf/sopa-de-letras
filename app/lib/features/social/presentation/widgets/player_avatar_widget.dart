@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_avatars.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/avatar_view.dart';
 import '../../domain/entities/social_entities.dart';
 
-/// Avatar circular con icono y, opcionalmente, el puntito de presencia.
+/// Avatar circular y, opcionalmente, el puntito de presencia.
 /// Reutiliza el catálogo de avatares del registro para que cada jugador
 /// se vea igual en su perfil, en la lista de amigos y en las invitaciones.
 class PlayerAvatar extends StatelessWidget {
@@ -22,24 +22,13 @@ class PlayerAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dot = size * 0.3;
-    final avatar = AppAvatars.of(avatarId);
     return SizedBox(
       width: size,
       height: size,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(
-            width: size,
-            height: size,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color.alphaBlend(avatar.color.withValues(alpha: 0.14), AppColors.bgSecondary),
-              shape: BoxShape.circle,
-              border: Border.all(color: avatar.color.withValues(alpha: 0.45)),
-            ),
-            child: Icon(avatar.icon, color: avatar.color, size: size * 0.55),
-          ),
+          AvatarView(avatarId: avatarId, size: size),
           if (status != null)
             Positioned(
               right: -1,

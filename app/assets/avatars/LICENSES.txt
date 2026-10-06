@@ -1,0 +1,19 @@
+Avatares de WordHive
+
+Emoji 3D (Animales, Fantasía, Profesiones): Microsoft Fluent Emoji
+https://github.com/microsoft/fluentui-emoji — Licencia MIT, Copyright (c) Microsoft Corporation.
+
+Generados con DiceBear (https://www.dicebear.com) — código MIT, Florian Körner.
+Diseños de cada estilo:
+- Aventureros: "Adventurer" de Lisa Wischofsky — CC BY 4.0
+- Cómic: "Avataaars" de Pablo Stanley — Free for personal and commercial use
+- Sonrisas: "Big Smile" de Ashley Seo — CC BY 4.0
+- Robots: "Bottts" de Pablo Stanley — Free for personal and commercial use
+- Pixel: "Pixel Art" de DiceBear — CC0 1.0
+- Caritas: "Fun Emoji" de Davis Uche — CC BY 4.0
+- Retratos: "Lorelei" de Lisa Wischofsky — CC0 1.0
+- Bocetos: "Notionists" de Zoish — CC0 1.0
+
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Las imágenes se convirtieron a WebP de 256 px; en algunos estilos se limitaron
+los gestos a expresiones alegres y se añadió un fondo pastel.

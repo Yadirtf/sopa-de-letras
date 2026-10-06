@@ -1,8 +1,9 @@
-﻿/// WordHive — Entry Point
-/// 
+/// WordHive — Entry Point
+///
 /// Inicializa Hive (almacenamiento local), configura Riverpod
 /// y lanza la aplicacion. Sin logica de negocio aqui.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +29,12 @@ Future<void> main() async {
     ),
   );
 
+  // Créditos de los avatares (CC BY 4.0 pide atribución).
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString('assets/avatars/LICENSES.txt');
+    yield LicenseEntryWithLineBreaks(['Avatares WordHive'], text);
+  });
+
   // Inicializar almacenamiento local
   await Hive.initFlutter();
 
@@ -37,4 +44,3 @@ Future<void> main() async {
     ),
   );
 }
-
