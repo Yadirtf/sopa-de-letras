@@ -88,12 +88,13 @@ export async function registerRoutes(fastify: FastifyInstance) {
   const authMiddleware = createAuthMiddleware(tokenService, sessionCache);
 
   // Social Container (Épica 5: Amigos, Presencia, Invitaciones y Notificaciones)
+  const pushSender = createPushSender(env.FIREBASE_SERVICE_ACCOUNT);
   const socialContainer = createSocialContainer({
     prisma: prismaClient,
     redis: redisClient,
     tokenService,
     sessionCache,
-    pushSender: createPushSender(env.FIREBASE_SERVICE_ACCOUNT),
+    pushSender,
   });
 
   // Room Container (Épica 4: Multijugador Realtime)
@@ -125,5 +126,5 @@ export async function registerRoutes(fastify: FastifyInstance) {
     authMiddleware,
   });
 
-  return { socketDispatcher: roomContainer.socketDispatcher };
+  return { socketDispatcher: roomContainer.socketDispatcher, pushEnabled: pushSender.enabled };
 }
