@@ -4,11 +4,20 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/editor_notifier.dart';
+import '../providers/editor_state.dart';
 import '../providers/my_creations_notifier.dart';
+import '../widgets/bulk_words_sheet.dart';
+import '../widgets/category_picker_field.dart';
 import '../widgets/difficulty_selector_widget.dart';
-import '../widgets/word_chips_input_widget.dart';
+import '../widgets/edit_word_dialog.dart';
+import '../widgets/editor_bottom_action.dart';
+import '../widgets/editor_step_card.dart';
+import '../widgets/editor_text_field.dart';
 import '../widgets/interactive_grid_preview.dart';
+import '../widgets/word_entry_bar.dart';
+import '../widgets/word_list_panel.dart';
 
+/// Crear una sopa en cuatro pasos numerados; el botón de abajo siempre dice qué sigue.
 class CreateWordSearchPage extends ConsumerStatefulWidget {
   const CreateWordSearchPage({super.key});
 
@@ -18,128 +27,124 @@ class CreateWordSearchPage extends ConsumerStatefulWidget {
 
 class _CreateWordSearchPageState extends ConsumerState<CreateWordSearchPage> {
   final _titleController = TextEditingController();
-  final _categoryController = TextEditingController(text: 'NATURALEZA');
 
   @override
   void dispose() {
     _titleController.dispose();
-    _categoryController.dispose();
     super.dispose();
   }
 
-  void _handleSubmit() async {
-    final notifier = ref.read(editorNotifierProvider.notifier);
-    notifier.setTitle(_titleController.text);
-    notifier.setCategory(_categoryController.text);
+  Future<void> _pasteList(EditorState state) async {
+    final words = await showBulkWordsSheet(context, existing: state.words);
+    if (words != null) ref.read(editorNotifierProvider.notifier).addWords(words);
+  }
 
+  Future<void> _publish() async {
+    final notifier = ref.read(editorNotifierProvider.notifier);
     final success = await notifier.submit();
-    if (!mounted) return;
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Sopa creada exitosamente!')),
-      );
-      notifier.reset();
-      // Crear es una pestaña: no hay nada debajo a lo que volver. Mostramos
-      // la sopa nueva en "Mis sopas", recargada para que aparezca.
-      ref.read(myCreationsNotifierProvider.notifier).fetchMyCreations();
-      context.go('/my-creations');
-    }
+    if (!mounted || !success) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('¡Tu sopa ya está publicada!')));
+    notifier.reset();
+    _titleController.clear();
+    // Crear es una pestaña: no hay nada debajo a lo que volver. Mostramos
+    // la sopa nueva en "Mis sopas", recargada para que aparezca.
+    ref.read(myCreationsNotifierProvider.notifier).fetchMyCreations();
+    context.go('/my-creations');
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(editorNotifierProvider);
     final notifier = ref.read(editorNotifierProvider.notifier);
+    final longest = state.words.fold<int>(10, (m, w) => w.length > m ? w.length : m);
 
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgPrimary,
-        title: Text('Crear Sopa de Letras', style: AppTypography.heading2.copyWith(fontSize: 18)),
-        elevation: 0,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        children: [
-          _buildTextField('Título de la Sopa', 'Ej. Animales del Bosque', _titleController),
-          const SizedBox(height: 12),
-          _buildTextField('Categoría Temática', 'Ej. CIENCIA, NATURALEZA', _categoryController),
-          const SizedBox(height: 16),
-          DifficultySelectorWidget(
-            selectedDifficulty: state.difficulty,
-            gridSize: state.gridSize,
-            onDifficultyChanged: notifier.setDifficulty,
-            onGridSizeChanged: notifier.setGridSize,
-          ),
-          const SizedBox(height: 16),
-          WordChipsInputWidget(
-            words: state.words,
-            onAddWord: notifier.addWord,
-            onRemoveWord: notifier.removeWord,
-          ),
-          if (state.errorMessage != null) ...[
-            const SizedBox(height: 8),
-            Text(state.errorMessage!, style: AppTypography.caption.copyWith(color: AppColors.accentRose)),
-          ],
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: state.isGeneratingPreview ? null : notifier.generatePreview,
-            icon: state.isGeneratingPreview
-                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Icon(Icons.auto_fix_high_rounded),
-            label: const Text('Generar y Previsualizar Matriz'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.bgCard,
-              foregroundColor: AppColors.accentCyan,
-              side: const BorderSide(color: AppColors.accentCyan),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-          if (state.preview != null) ...[
-            const SizedBox(height: 16),
-            InteractiveGridPreview(preview: state.preview!),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: state.isSubmitting ? null : _handleSubmit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentViolet,
-                foregroundColor: AppColors.textPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      bottomNavigationBar: EditorBottomAction(state: state, onPreview: notifier.generatePreview, onPublish: _publish),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          children: [
+            Text('Crea tu sopa de letras', style: AppTypography.heading2),
+            const SizedBox(height: 4),
+            Text('Cuatro pasos y lista para jugar con tus amigos.',
+                style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+            const SizedBox(height: 18),
+            EditorStepCard(
+              step: 1,
+              title: 'Nombre y tema',
+              done: state.hasTitle && state.category != null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  EditorTextField(
+                    controller: _titleController,
+                    label: 'Nombre de tu sopa',
+                    hint: 'Ej. Animales del bosque',
+                    onChanged: notifier.setTitle,
+                  ),
+                  const SizedBox(height: 12),
+                  CategoryPickerField(selected: state.category, onChanged: notifier.setCategory),
+                ],
               ),
-              child: state.isSubmitting
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('Guardar y Publicar en Catálogo'),
+            ),
+            EditorStepCard(
+              step: 2,
+              title: 'Palabras escondidas',
+              subtitle: 'De ${EditorState.minWords} a ${EditorState.maxWords} palabras, de 3 a 15 letras',
+              done: state.hasEnoughWords,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  WordEntryBar(
+                    isFull: state.words.length >= EditorState.maxWords,
+                    onSubmit: notifier.addFromText,
+                    onPasteList: () => _pasteList(state),
+                  ),
+                  const SizedBox(height: 16),
+                  WordListPanel(
+                    words: state.words,
+                    onEdit: (w) => showEditWordDialog(context, w, (raw) => notifier.replaceWord(w, raw)),
+                    onRemove: notifier.removeWord,
+                    onClear: notifier.clearWords,
+                  ),
+                ],
+              ),
+            ),
+            EditorStepCard(
+              step: 3,
+              title: 'Dificultad y tamaño',
+              done: state.isReadyToPreview,
+              child: DifficultySelectorWidget(
+                selectedDifficulty: state.difficulty,
+                gridSize: state.gridSize,
+                minGridSize: longest,
+                onDifficultyChanged: notifier.setDifficulty,
+                onGridSizeChanged: notifier.setGridSize,
+              ),
+            ),
+            EditorStepCard(
+              step: 4,
+              title: 'Mira cómo queda',
+              done: state.preview != null,
+              child: state.preview == null
+                  ? Text('Cuando tengas todo, toca «Ver cómo queda» abajo.',
+                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary))
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        InteractiveGridPreview(preview: state.preview!),
+                        TextButton.icon(
+                          onPressed: state.isGeneratingPreview ? null : notifier.generatePreview,
+                          icon: const Icon(Icons.shuffle_rounded),
+                          label: const Text('Mezclar de nuevo'),
+                        ),
+                      ],
+                    ),
             ),
           ],
-          const SizedBox(height: 32),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, String hint, TextEditingController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-        const SizedBox(height: 6),
-        TextField(
-          controller: controller,
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: AppTypography.bodySmall.copyWith(color: AppColors.textMuted),
-            filled: true,
-            fillColor: AppColors.bgCard,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.borderSubtle)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.borderSubtle)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.accentCyan)),
-          ),
         ),
-      ],
+      ),
     );
   }
 }

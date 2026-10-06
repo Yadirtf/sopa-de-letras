@@ -77,7 +77,9 @@ export class GameEventsHandler {
           coordinates
         );
 
-        io.to(`room:${upperCode}`).emit("word:found", wordFound);
+        // La sopa de cada jugador es privada: solo quien encontro la palabra la ve
+        // marcada. Los demas solo reciben su avance (cuantas lleva) por el marcador.
+        socket.emit("word:found", wordFound);
 
         const leaderboard = this.roomManager.getLeaderboard(updatedState);
         io.to(`room:${upperCode}`).emit("leaderboard:update", { leaderboard });

@@ -94,16 +94,6 @@ class TargetWordsListWidget extends StatelessWidget {
                             isFound ? TextDecoration.lineThrough : TextDecoration.none,
                       ),
                     ),
-                    if (isFound && claimEvent != null) ...[
-                      const SizedBox(width: 4),
-                      Text(
-                        '(${claimEvent.claimedByUsername})',
-                        style: AppTypography.bodySmall.copyWith(
-                          fontSize: 10,
-                          color: finderColor.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               );

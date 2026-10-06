@@ -6,16 +6,22 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Barra de notificaciones de Android: canal, permiso, avisos locales y toques.
 ///
-/// El canal `wordhive_social` es el mismo que usa el backend al enviar por
-/// FCM, así los avisos llegan con importancia alta (aparecen arriba como
-/// burbuja) y el usuario puede silenciarlos desde Ajustes sin perder el resto.
+/// El canal es el mismo que usa el backend al enviar por FCM, así los avisos
+/// llegan como un mensaje de WhatsApp: sonido, burbuja flotante y visibles en
+/// la pantalla de bloqueo. El usuario puede silenciarlos desde Ajustes.
 class SystemNotifications {
-  static const channelId = 'wordhive_social';
+  /// "_v2": Android no deja subir la importancia de un canal ya creado, así
+  /// que el canal nuevo nace con importancia máxima y el viejo se borra.
+  static const channelId = 'wordhive_social_v2';
+  static const _legacyChannelId = 'wordhive_social';
   static const _channel = AndroidNotificationChannel(
     channelId,
     'Amigos e invitaciones',
     description: 'Cuando un amigo te invita a jugar o te envía una solicitud',
-    importance: Importance.high,
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
+    showBadge: true,
   );
 
   final _plugin = FlutterLocalNotificationsPlugin();
@@ -38,6 +44,7 @@ class SystemNotifications {
         const InitializationSettings(android: AndroidInitializationSettings('ic_stat_wordhive')),
         onDidReceiveNotificationResponse: (r) => _emit(r.payload),
       );
+      await _android?.deleteNotificationChannel(_legacyChannelId);
       await _android?.createNotificationChannel(_channel);
       final launch = await _plugin.getNotificationAppLaunchDetails();
       if (launch?.didNotificationLaunchApp ?? false) _launchPayload = _decode(launch!.notificationResponse?.payload);
@@ -77,8 +84,11 @@ class SystemNotifications {
           _channel.id,
           _channel.name,
           channelDescription: _channel.description,
-          importance: Importance.high,
-          priority: Priority.high,
+          importance: Importance.max,
+          priority: Priority.max,
+          visibility: NotificationVisibility.public,
+          category: AndroidNotificationCategory.social,
+          ticker: title,
           color: const Color(0xFF7C3AED),
           tag: tag,
           styleInformation: BigTextStyleInformation(body),

@@ -35,6 +35,8 @@ import { wordSearchRoutes } from "./word-search.routes";
 import { roomRoutes } from "./room.routes";
 import { createRoomContainer } from "../../di/room.container";
 import { createSocialContainer } from "../../di/social.container";
+import { createCategoryContainer } from "../../di/category.container";
+import { categoryRoutes } from "./category.routes";
 import { friendsRoutes } from "./friends.routes";
 import { notificationsRoutes } from "./notifications.routes";
 import { env } from "../../../config/env";
@@ -88,12 +90,13 @@ export async function registerRoutes(fastify: FastifyInstance) {
   const authMiddleware = createAuthMiddleware(tokenService, sessionCache);
 
   // Social Container (Épica 5: Amigos, Presencia, Invitaciones y Notificaciones)
+  const pushSender = createPushSender(env.FIREBASE_SERVICE_ACCOUNT);
   const socialContainer = createSocialContainer({
     prisma: prismaClient,
     redis: redisClient,
     tokenService,
     sessionCache,
-    pushSender: createPushSender(env.FIREBASE_SERVICE_ACCOUNT),
+    pushSender,
   });
 
   // Room Container (Épica 4: Multijugador Realtime)
@@ -106,6 +109,11 @@ export async function registerRoutes(fastify: FastifyInstance) {
     prefix: "/api/v1/word-searches",
     catalogController,
     editorController,
+    authMiddleware,
+  });
+  await fastify.register(categoryRoutes, {
+    prefix: "/api/v1/categories",
+    categoryController: createCategoryContainer(prismaClient).categoryController,
     authMiddleware,
   });
   await fastify.register(roomRoutes, {
@@ -125,5 +133,5 @@ export async function registerRoutes(fastify: FastifyInstance) {
     authMiddleware,
   });
 
-  return { socketDispatcher: roomContainer.socketDispatcher };
+  return { socketDispatcher: roomContainer.socketDispatcher, pushEnabled: pushSender.enabled };
 }

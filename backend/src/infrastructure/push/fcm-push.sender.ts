@@ -2,8 +2,12 @@ import { App, cert, initializeApp } from "firebase-admin/app";
 import { getMessaging, Messaging } from "firebase-admin/messaging";
 import { IPushSender, PushMessage, PushSendReport } from "../../domain/services/push-sender.interface";
 
-/** Canal Android que la app crea al arrancar (debe coincidir con el de Flutter). */
-export const ANDROID_SOCIAL_CHANNEL = "wordhive_social";
+/**
+ * Canal Android que la app crea al arrancar (debe coincidir con el de Flutter).
+ * Es "_v2" porque Android no deja subir la importancia de un canal ya creado:
+ * el nuevo nace con importancia maxima (sonido + aviso flotante tipo WhatsApp).
+ */
+export const ANDROID_SOCIAL_CHANNEL = "wordhive_social_v2";
 
 // Errores con los que FCM dice "este telefono ya no existe para ti".
 const DEAD_TOKEN_CODES = new Set([
@@ -37,6 +41,14 @@ export class FcmPushSender implements IPushSender {
           notification: {
             channelId: ANDROID_SOCIAL_CHANNEL,
             tag: message.tag,
+            // Como un mensaje de WhatsApp: sonido, vibracion, aviso flotante
+            // y visible completo en la pantalla de bloqueo.
+            priority: "max",
+            visibility: "public",
+            defaultSound: true,
+            defaultVibrateTimings: true,
+            defaultLightSettings: true,
+            notificationCount: 1,
             icon: "ic_stat_wordhive",
             color: "#7C3AED",
             clickAction: "FLUTTER_NOTIFICATION_CLICK",

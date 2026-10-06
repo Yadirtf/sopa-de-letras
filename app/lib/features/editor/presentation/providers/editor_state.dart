@@ -1,11 +1,15 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/preview_word_search_entity.dart';
 import '../../domain/entities/my_word_search_entity.dart';
+import '../../domain/entities/category_entity.dart';
 
 class EditorState extends Equatable {
+  static const minWords = 5;
+  static const maxWords = 20;
+
   final String title;
   final String description;
-  final String category;
+  final CategoryEntity? category;
   final String difficulty;
   final int gridSize;
   final List<String> words;
@@ -20,7 +24,7 @@ class EditorState extends Equatable {
   const EditorState({
     this.title = '',
     this.description = '',
-    this.category = 'NATURALEZA',
+    this.category,
     this.difficulty = 'MEDIUM',
     this.gridSize = 12,
     this.words = const [],
@@ -36,7 +40,7 @@ class EditorState extends Equatable {
   EditorState copyWith({
     String? title,
     String? description,
-    String? category,
+    CategoryEntity? category,
     String? difficulty,
     int? gridSize,
     List<String>? words,
@@ -44,6 +48,7 @@ class EditorState extends Equatable {
     bool? isGeneratingPreview,
     bool? isSubmitting,
     PreviewWordSearchEntity? preview,
+    bool clearPreview = false,
     MyWordSearchEntity? createdResult,
     String? errorMessage,
     String? successMessage,
@@ -58,12 +63,16 @@ class EditorState extends Equatable {
       isPublic: isPublic ?? this.isPublic,
       isGeneratingPreview: isGeneratingPreview ?? this.isGeneratingPreview,
       isSubmitting: isSubmitting ?? this.isSubmitting,
-      preview: preview ?? this.preview,
+      preview: clearPreview ? null : preview ?? this.preview,
       createdResult: createdResult ?? this.createdResult,
       errorMessage: errorMessage,
       successMessage: successMessage,
     );
   }
+
+  bool get hasTitle => title.trim().length >= 3;
+  bool get hasEnoughWords => words.length >= minWords;
+  bool get isReadyToPreview => hasTitle && category != null && hasEnoughWords;
 
   @override
   List<Object?> get props => [

@@ -51,11 +51,19 @@ async function bootstrap() {
     redis: redisClient,
   });
 
-  // Health check — necesario para Render.com
-  app.get("/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
+  // Health check — necesario para Render.com. `push` dice si los avisos con
+  // la app cerrada estan activos (FIREBASE_SERVICE_ACCOUNT bien configurada).
+  let pushEnabled = false;
+  app.get("/health", async () => ({
+    status: "ok",
+    push: pushEnabled ? "activo" : "sin credenciales de Firebase",
+    timestamp: new Date().toISOString(),
+  }));
 
   // Registrar todas las rutas HTTP
-  const { socketDispatcher } = await registerRoutes(app);
+  const routes = await registerRoutes(app);
+  const { socketDispatcher } = routes;
+  pushEnabled = routes.pushEnabled;
 
   // Inicializar Socket.IO con el servidor HTTP de Fastify
   initializeSocketServer(app.server, socketDispatcher);

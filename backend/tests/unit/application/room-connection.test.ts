@@ -85,13 +85,21 @@ describe("Caidas de internet en la sala", () => {
     expect(await connection.shouldRelease("ABC123", "beto")).toBe(false);
   });
 
-  it("la palabra reclamada guarda sus coordenadas para repintarla al reconectar", async () => {
+  it("cada sopa es privada: guarda donde marco cada quien y gana el primero en completarla", async () => {
     const room = (await cache.getRoom("ABC123"))!;
     room.status = "IN_PROGRESS";
+    room.words = ["PERRO", "ERR"];
     await cache.saveRoom(room);
-    await manager.submitWord("ABC123", "beto", "PERRO", { start: [0, 0], end: [0, 4] });
-    const claim = (await cache.getRoom("ABC123"))!.claimedWords.PERRO;
-    expect(claim.start).toEqual([0, 0]);
-    expect(claim.end).toEqual([0, 4]);
+
+    const first = await manager.submitWord("ABC123", "beto", "PERRO", { start: [0, 0], end: [0, 4] });
+    expect(first.allCompleted).toBe(false);
+    // Otra persona puede encontrar la misma palabra en su propia sopa.
+    const other = await manager.submitWord("ABC123", "host", "PERRO", { start: [0, 0], end: [0, 4] });
+    expect(other.allCompleted).toBe(false);
+    const done = await manager.submitWord("ABC123", "beto", "ERR", { start: [0, 1], end: [0, 3] });
+    expect(done.allCompleted).toBe(true);
+
+    const beto = (await cache.getRoom("ABC123"))!.players.find((p) => p.userId === "beto")!;
+    expect(beto.wordCoords!.PERRO).toEqual({ start: [0, 0], end: [0, 4] });
   });
 });

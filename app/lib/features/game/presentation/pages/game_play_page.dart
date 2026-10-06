@@ -29,7 +29,8 @@ class _GamePlayPageState extends ConsumerState<GamePlayPage> {
   /// Salir es siempre una decision del jugador: perder el internet nunca lo saca.
   Future<void> _confirmLeave() async {
     if (_leaving) return;
-    final leave = await LeaveRoomDialog.confirm(context, inGame: true);
+    final solo = (ref.read(gameRoomNotifierProvider).room?.players.length ?? 0) <= 1;
+    final leave = await LeaveRoomDialog.confirm(context, inGame: true, solo: solo);
     if (!leave || !mounted) return;
     _leaving = true;
     _notifier.leaveRoom();
@@ -60,13 +61,7 @@ class _GamePlayPageState extends ConsumerState<GamePlayPage> {
     }
     final found = next.latestWordFound;
     if (found != null && found != previous?.latestWordFound && found.pointsAwarded > 0) {
-      final mine = found.claimedByUserId == _notifier.currentUserId;
-      _toast(
-        mine
-            ? '¡Encontraste ${found.word}! +${found.pointsAwarded}'
-            : '${found.claimedByUsername} encontró ${found.word}',
-        mine ? AppColors.accentEmerald : AppColors.bgCard,
-      );
+      _toast('¡Encontraste ${found.word}! +${found.pointsAwarded}', AppColors.accentEmerald);
     }
     if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
       _toast(next.errorMessage!, AppColors.accentRose);

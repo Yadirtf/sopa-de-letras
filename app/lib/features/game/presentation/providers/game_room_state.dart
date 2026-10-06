@@ -13,6 +13,7 @@ class GameRoomState extends Equatable {
   final bool isGameActive;
   final List<LeaderboardEntryEntity> leaderboard;
   final List<PodiumEntryEntity> podium;
+  /// Palabras que encontre YO (con donde las marque). Las del oponente no llegan aqui.
   final Map<String, WordFoundEventEntity> claimedWords;
   final RematchVoteStateEntity? rematchState;
   final WordFoundEventEntity? latestWordFound;
