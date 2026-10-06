@@ -1,27 +1,31 @@
-﻿# WordHive — render.yaml
-# Configuracion de despliegue en Render.com
+# WordHive — render.yaml
+# Configuracion oficial de Blueprint para Render.com
 # Documentacion: https://render.com/docs/blueprint-spec
 
 services:
+  # 1. API Backend (Node.js + Fastify + Socket.IO)
   - type: web
     name: wordhive-api
     runtime: node
     rootDir: backend
-    buildCommand: npm ci && npx prisma generate && npm run build
-    startCommand: npx prisma migrate deploy && node dist/app.js
+    plan: free
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma db push --accept-data-loss && node dist/app.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
       - key: DATABASE_URL
         fromDatabase:
           name: wordhive-db
           property: connectionString
       - key: REDIS_URL
         fromService:
+          type: keyvalue
           name: wordhive-redis
-          type: redis
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
@@ -29,14 +33,39 @@ services:
         value: 7d
       - key: JWT_REFRESH_EXPIRY
         value: 30d
-      - key: PORT
-        value: 3000
+      - key: SMTP_HOST
+        value: smtp.example.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        value: noreply@wordhive.com
+      - key: SMTP_PASS
+        value: changeme
+      - key: SMTP_FROM
+        value: noreply@wordhive.com
+      - key: APP_URL
+        fromService:
+          type: web
+          name: wordhive-api
+          property: url
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: wordhive-landing
+          property: url
 
+  # 2. Key Value Cache (Redis / Valkey compatible en Render)
+  - type: keyvalue
+    name: wordhive-redis
+    plan: free
+    ipAllowList: []
+
+  # 3. Landing Page Web (Vite Static Site)
   - type: web
     name: wordhive-landing
     runtime: static
     rootDir: web
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     headers:
       - path: /*
@@ -54,11 +83,8 @@ services:
         destination: /index.html
 
 databases:
+  # 4. Base de Datos Relacional PostgreSQL (Managed por Render)
   - name: wordhive-db
     databaseName: wordhive
     user: wordhive_user
-    plan: free
-
-  - name: wordhive-redis
-    type: redis
     plan: free

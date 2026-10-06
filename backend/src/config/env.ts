@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Validacion y tipado de variables de entorno usando Zod.
  * Falla rapido en arranque si falta alguna variable requerida.
  */
@@ -13,13 +13,13 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRY: z.string().default("7d"),
   JWT_REFRESH_EXPIRY: z.string().default("30d"),
-  SMTP_HOST: z.string(),
+  SMTP_HOST: z.string().default("smtp.example.com"),
   SMTP_PORT: z.coerce.number().default(587),
-  SMTP_USER: z.string().email(),
-  SMTP_PASS: z.string(),
-  SMTP_FROM: z.string(),
-  APP_URL: z.string().url(),
-  FRONTEND_URL: z.string().url(),
+  SMTP_USER: z.string().default("noreply@wordhive.com"),
+  SMTP_PASS: z.string().default("changeme"),
+  SMTP_FROM: z.string().default("noreply@wordhive.com"),
+  APP_URL: z.string().default("https://wordhive-api.onrender.com"),
+  FRONTEND_URL: z.string().default("https://wordhive-landing.onrender.com"),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -31,4 +31,3 @@ if (!parsed.success) {
 
 export const env = parsed.data;
 export type Env = typeof env;
-
