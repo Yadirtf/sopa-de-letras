@@ -56,13 +56,13 @@ describe("RoomEntity", () => {
         wordSearchId: "ws-1",
         hostUserId: "user-1",
         status: "WAITING",
-        maxPlayers: 12,
+        maxPlayers: 25,
         timeLimitSeconds: 180,
         isPrivate: false,
         players: [],
         createdAt: new Date(),
       })
-    ).toThrow("La capacidad de jugadores debe estar entre 2 y 8");
+    ).toThrow("La capacidad de jugadores debe estar entre 2 y 20");
   });
 
   it("debe cambiar de estado al iniciar y finalizar", () => {

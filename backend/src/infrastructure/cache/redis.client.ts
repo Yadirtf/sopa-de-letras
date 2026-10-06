@@ -2,21 +2,24 @@ import Redis from "ioredis";
 import { env } from "../../config/env";
 
 /**
- * Cliente Redis con reconexion automatica y backoff exponencial.
+ * Cliente Redis con reconexion automatica, timeout estricto y fallback.
+ * enableOfflineQueue: false evita que las peticiones se queden congeladas
+ * cuando Redis no esta disponible en desarrollo local.
  */
 export const redisClient = new Redis(env.REDIS_URL, {
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: 2,
+  enableOfflineQueue: false,
+  connectTimeout: 2500,
   retryStrategy(times) {
-    const delay = Math.min(times * 100, 3000);
-    return delay;
+    if (times > 5) return null; // Deja de reintentar para no saturar si esta caido
+    return Math.min(times * 200, 2000);
   },
   lazyConnect: true,
 });
 
 redisClient.on("error", (err) => {
-  // Evitar que errores no capturados de red colapsen el servidor en dev
   if (process.env.NODE_ENV !== "production") {
-    console.warn("[Redis Warn] Advertencia de conexion Redis:", err.message);
+    console.warn("[Redis Warn] Advertencia de conexion Redis (usando fallback en memoria):", err.message);
   } else {
     console.error("[Redis Error]", err);
   }

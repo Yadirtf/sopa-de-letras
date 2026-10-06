@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../catalog/presentation/providers/catalog_notifier.dart';
 import '../providers/game_room_notifier.dart';
+import '../providers/game_room_state.dart';
 import '../widgets/room_created_card_widget.dart';
+import '../widgets/room_info_card_widget.dart';
 
 class CreateRoomPage extends ConsumerStatefulWidget {
   final String wordSearchId;
@@ -22,14 +25,20 @@ class CreateRoomPage extends ConsumerStatefulWidget {
 class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
   int _maxPlayers = 4;
   int _timeLimitMinutes = 3;
+  bool _hasTimeLimit = true;
   bool _isPrivate = false;
 
-  void _handleCreate() async {
-    final notifier = ref.read(gameRoomNotifierProvider.notifier);
-    await notifier.createRoom(
-      wordSearchId: widget.wordSearchId,
+  void _handleCreate(String wordSearchId) async {
+    if (wordSearchId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una sopa de letras primero')),
+      );
+      return;
+    }
+    await ref.read(gameRoomNotifierProvider.notifier).createRoom(
+      wordSearchId: wordSearchId,
       maxPlayers: _maxPlayers,
-      timeLimitSeconds: _timeLimitMinutes * 60,
+      timeLimitSeconds: _hasTimeLimit ? _timeLimitMinutes * 60 : null,
       isPrivate: _isPrivate,
     );
   }
@@ -37,7 +46,21 @@ class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(gameRoomNotifierProvider);
-    final room = state.room;
+    final catalog = ref.watch(catalogNotifierProvider);
+    final targetId = widget.wordSearchId.isNotEmpty
+        ? widget.wordSearchId
+        : (catalog.items.isNotEmpty ? catalog.items.first.id : '');
+    final targetTitle = widget.wordSearchId.isNotEmpty
+        ? widget.wordSearchTitle
+        : (catalog.items.isNotEmpty ? catalog.items.first.title : 'Sopa de letras');
+
+    ref.listen<GameRoomState>(gameRoomNotifierProvider, (prev, next) {
+      if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(backgroundColor: AppColors.accentRose, content: Text(next.errorMessage!)),
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
@@ -48,54 +71,47 @@ class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: room == null ? _buildConfigForm(state.isLoading) : RoomCreatedCardWidget(room: room),
+        child: state.room == null
+            ? _buildForm(targetId, targetTitle, state)
+            : RoomCreatedCardWidget(room: state.room!),
       ),
     );
   }
 
-  Widget _buildConfigForm(bool isLoading) {
+  Widget _buildForm(String targetId, String targetTitle, GameRoomState state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.bgCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Sopa seleccionada', style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
-              const SizedBox(height: 4),
-              Text(widget.wordSearchTitle, style: AppTypography.heading2.copyWith(fontSize: 20)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text('Capacidad de Jugadores: $_maxPlayers', style: AppTypography.labelLarge),
+        RoomInfoCardWidget(title: targetTitle),
+        const SizedBox(height: 16),
+        Text('Capacidad de Jugadores: $_maxPlayers (Máx 20)', style: AppTypography.labelLarge),
         Slider(
           value: _maxPlayers.toDouble(),
           min: 2,
-          max: 8,
-          divisions: 6,
+          max: 20,
+          divisions: 18,
           activeColor: AppColors.accentViolet,
           inactiveColor: AppColors.bgCard,
           onChanged: (v) => setState(() => _maxPlayers = v.round()),
         ),
-        const SizedBox(height: 12),
-        Text('Tiempo Límite: $_timeLimitMinutes min', style: AppTypography.labelLarge),
-        Slider(
-          value: _timeLimitMinutes.toDouble(),
-          min: 1,
-          max: 5,
-          divisions: 4,
-          activeColor: AppColors.accentCyan,
-          inactiveColor: AppColors.bgCard,
-          onChanged: (v) => setState(() => _timeLimitMinutes = v.round()),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          activeThumbColor: AppColors.accentCyan,
+          title: Text('Límite de Tiempo', style: AppTypography.bodyLarge),
+          subtitle: Text(_hasTimeLimit ? '$_timeLimitMinutes min' : 'Sin límite (Libre)', style: AppTypography.bodySmall),
+          value: _hasTimeLimit,
+          onChanged: (v) => setState(() => _hasTimeLimit = v),
         ),
-        const SizedBox(height: 12),
+        if (_hasTimeLimit)
+          Slider(
+            value: _timeLimitMinutes.toDouble(),
+            min: 1,
+            max: 10,
+            divisions: 9,
+            activeColor: AppColors.accentCyan,
+            inactiveColor: AppColors.bgCard,
+            onChanged: (v) => setState(() => _timeLimitMinutes = v.round()),
+          ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           activeThumbColor: AppColors.accentViolet,
@@ -104,15 +120,19 @@ class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
           value: _isPrivate,
           onChanged: (v) => setState(() => _isPrivate = v),
         ),
-        const SizedBox(height: 24),
+        if (state.errorMessage != null) ...[
+          const SizedBox(height: 8),
+          Text(state.errorMessage!, style: const TextStyle(color: AppColors.accentRose, fontSize: 13)),
+        ],
+        const SizedBox(height: 16),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.accentViolet,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
-          onPressed: isLoading ? null : _handleCreate,
-          child: isLoading
+          onPressed: state.isLoading ? null : () => _handleCreate(targetId),
+          child: state.isLoading
               ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
               : Text('Generar Sala y Código QR', style: AppTypography.labelLarge.copyWith(color: Colors.white)),
         ),

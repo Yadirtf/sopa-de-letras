@@ -1,15 +1,32 @@
+import 'package:flutter/foundation.dart';
+
 abstract class ApiEndpoints {
-  // Base URL configurable con fallback por defecto al backend en Render.com
-  static const String baseUrl = String.fromEnvironment(
-    'API_URL',
-    defaultValue: 'https://wordhive-api.onrender.com/api/v1',
-  );
+  static const String _envApiUrl = String.fromEnvironment('API_URL');
+  static const String _envSocketUrl = String.fromEnvironment('SOCKET_URL');
+
+  // Base URL configurable: prioridad a variable de entorno, luego localhost/10.0.2.2 en debug, y Render en prod
+  static String get baseUrl {
+    if (_envApiUrl.isNotEmpty) return _envApiUrl;
+    if (kDebugMode) {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        return 'http://10.0.2.2:3000/api/v1';
+      }
+      return 'http://localhost:3000/api/v1';
+    }
+    return 'https://wordhive-api.onrender.com/api/v1';
+  }
 
   // WebSocket Server URL para tiempo real
-  static const String socketUrl = String.fromEnvironment(
-    'SOCKET_URL',
-    defaultValue: 'https://wordhive-api.onrender.com',
-  );
+  static String get socketUrl {
+    if (_envSocketUrl.isNotEmpty) return _envSocketUrl;
+    if (kDebugMode) {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        return 'http://10.0.2.2:3000';
+      }
+      return 'http://localhost:3000';
+    }
+    return 'https://wordhive-api.onrender.com';
+  }
 
   // Autenticación
   static const String register = '/auth/register';

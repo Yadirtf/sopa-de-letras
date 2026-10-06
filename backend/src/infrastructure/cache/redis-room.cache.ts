@@ -8,7 +8,7 @@ export interface CachedRoomState {
   hostUserId: string;
   status: 'WAITING' | 'COUNTDOWN' | 'IN_PROGRESS' | 'FINISHED';
   maxPlayers: number;
-  timeLimitSeconds: number;
+  timeLimitSeconds?: number | null;
   isPrivate: boolean;
   grid: string[][];
   words: string[];

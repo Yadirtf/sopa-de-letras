@@ -15,23 +15,42 @@ class SecureStorageService {
     required String refreshToken,
     required String userId,
   }) async {
-    await Future.wait([
-      _storage.write(key: _keyAccessToken, value: accessToken),
-      _storage.write(key: _keyRefreshToken, value: refreshToken),
-      _storage.write(key: _keyUserId, value: userId),
-    ]);
+    try {
+      await Future.wait([
+        _storage.write(key: _keyAccessToken, value: accessToken),
+        _storage.write(key: _keyRefreshToken, value: refreshToken),
+        _storage.write(key: _keyUserId, value: userId),
+      ]);
+    } catch (_) {}
   }
 
-  Future<String?> getAccessToken() async =>
-      await _storage.read(key: _keyAccessToken);
+  Future<String?> getAccessToken() async {
+    try {
+      return await _storage.read(key: _keyAccessToken);
+    } catch (_) {
+      return null;
+    }
+  }
 
-  Future<String?> getRefreshToken() async =>
-      await _storage.read(key: _keyRefreshToken);
+  Future<String?> getRefreshToken() async {
+    try {
+      return await _storage.read(key: _keyRefreshToken);
+    } catch (_) {
+      return null;
+    }
+  }
 
-  Future<String?> getUserId() async =>
-      await _storage.read(key: _keyUserId);
+  Future<String?> getUserId() async {
+    try {
+      return await _storage.read(key: _keyUserId);
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<void> clearAll() async {
-    await _storage.deleteAll();
+    try {
+      await _storage.deleteAll();
+    } catch (_) {}
   }
 }

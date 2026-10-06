@@ -8,7 +8,7 @@ import {
 export class JwtTokenService implements ITokenService {
   constructor(
     private readonly secret: string,
-    private readonly accessExpiry: string = "7d",
+    private readonly accessExpiry: string = "24h",
     private readonly refreshExpiry: string = "30d"
   ) {}
 
@@ -25,8 +25,8 @@ export class JwtTokenService implements ITokenService {
       { expiresIn: this.refreshExpiry as any }
     );
 
-    // 7 días en segundos
-    const expiresIn = 7 * 24 * 60 * 60;
+    // 24 horas en segundos (86400s)
+    const expiresIn = 24 * 60 * 60;
 
     return { accessToken, refreshToken, expiresIn };
   }

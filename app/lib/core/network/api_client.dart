@@ -27,10 +27,22 @@ class ApiClient {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+          // ignore: avoid_print
+          print('[ApiClient] --> ${options.method} ${options.uri}');
           return handler.next(options);
         },
+        onResponse: (response, handler) {
+          // ignore: avoid_print
+          print('[ApiClient] <-- ${response.statusCode} ${response.requestOptions.uri}');
+          return handler.next(response);
+        },
         onError: (DioException error, handler) async {
-          // Si el token expira (401), se puede gatillar flujo de refresh o logout
+          // ignore: avoid_print
+          print('[ApiClient] ERROR: ${error.type} (${error.response?.statusCode}) on ${error.requestOptions.uri}');
+          if (error.response?.data != null) {
+            // ignore: avoid_print
+            print('[ApiClient] Response: ${error.response?.data}');
+          }
           return handler.next(error);
         },
       ),

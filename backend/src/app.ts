@@ -18,13 +18,18 @@ import { redisClient } from "./infrastructure/cache/redis.client";
 import { env } from "./config/env";
 
 const app = Fastify({
+  ignoreTrailingSlash: true,
   logger: {
-    level: env.NODE_ENV === "production" ? "warn" : "info",
+    level: env.NODE_ENV === "production" ? "info" : "info",
     transport:
       env.NODE_ENV !== "production"
         ? { target: "pino-pretty", options: { colorize: true } }
         : undefined,
   },
+});
+
+app.addHook("onRequest", async (request) => {
+  app.log.info(`[HTTP ${request.method}] ${request.url}`);
 });
 
 async function bootstrap() {

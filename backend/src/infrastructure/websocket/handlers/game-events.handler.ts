@@ -36,7 +36,9 @@ export class GameEventsHandler {
 
           currentState.status = 'IN_PROGRESS';
           currentState.startedAt = Date.now();
-          currentState.endsAt = currentState.startedAt + currentState.timeLimitSeconds * 1000;
+          currentState.endsAt = currentState.timeLimitSeconds && currentState.timeLimitSeconds > 0
+            ? currentState.startedAt + currentState.timeLimitSeconds * 1000
+            : null;
 
           io.to(`room:${upperCode}`).emit("game:started", {
             startedAt: currentState.startedAt,
@@ -45,14 +47,16 @@ export class GameEventsHandler {
             words: currentState.words,
           });
 
-          // Timer for game duration
-          setTimeout(async () => {
-            const endingState = await this.roomManager.getRoom(upperCode);
-            if (endingState && endingState.status === 'IN_PROGRESS') {
-              const result = await this.finishGame.execute(upperCode);
-              io.to(`room:${upperCode}`).emit("game:ended", result);
-            }
-          }, currentState.timeLimitSeconds * 1000);
+          // Timer for game duration (solo si tiene limite de tiempo)
+          if (currentState.timeLimitSeconds && currentState.timeLimitSeconds > 0) {
+            setTimeout(async () => {
+              const endingState = await this.roomManager.getRoom(upperCode);
+              if (endingState && endingState.status === 'IN_PROGRESS') {
+                const result = await this.finishGame.execute(upperCode);
+                io.to(`room:${upperCode}`).emit("game:ended", result);
+              }
+            }, currentState.timeLimitSeconds * 1000);
+          }
         }, countdownSeconds * 1000);
       } catch (err: any) {
         socket.emit("room:error", { message: err.message });

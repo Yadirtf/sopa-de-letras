@@ -45,6 +45,29 @@ void main() {
       expect(model, isA<GameRoomEntity>());
     });
 
+    test('GameRoomModel soporta limite de tiempo opcional (null) y hasta 20 jugadores', () {
+      final json = {
+        'id': 'room-2',
+        'code': 'MAX20',
+        'wordSearchId': 'ws-999',
+        'wordSearchTitle': 'Sin limite',
+        'hostUserId': 'host-2',
+        'status': 'WAITING',
+        'maxPlayers': 20,
+        'timeLimitSeconds': null,
+        'isPrivate': true,
+        'players': [],
+        'grid': [],
+        'words': [],
+      };
+
+      final model = GameRoomModel.fromJson(json);
+
+      expect(model.maxPlayers, 20);
+      expect(model.timeLimitSeconds, isNull);
+      expect(model.isPrivate, isTrue);
+    });
+
     test('WordFoundEventModel debe deserializar payload de Socket.IO', () {
       final json = {
         'word': 'LEON',

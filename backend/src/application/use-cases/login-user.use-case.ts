@@ -60,7 +60,7 @@ export class LoginUserUseCase {
         isGuest: user.isGuest,
       });
 
-      await this.sessionCache.setSession(user.id, tokens.accessToken, 7 * 24 * 3600);
+      await this.sessionCache.setSession(user.id, tokens.accessToken, 24 * 3600);
 
       return ok({
         user: {

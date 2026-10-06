@@ -56,7 +56,7 @@ export class RegisterUserUseCase {
         isGuest: false,
       });
 
-      await this.sessionCache.setSession(user.id, tokens.accessToken, 7 * 24 * 3600);
+      await this.sessionCache.setSession(user.id, tokens.accessToken, 24 * 3600);
 
       // Envio de correo transaccional no bloqueante
       this.mailService.sendWelcomeEmail(user.email, user.name.value).catch(console.error);

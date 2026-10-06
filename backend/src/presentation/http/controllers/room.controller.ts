@@ -12,18 +12,22 @@ export class RoomController {
     try {
       const user = (req as any).user;
       if (!user) {
+        req.log.warn("[RoomController.create] Intento no autorizado");
         reply.status(401).send({ error: 'No autorizado' });
         return;
       }
 
       const body = req.body as any;
       if (!body.wordSearchId) {
+        req.log.warn("[RoomController.create] Falta wordSearchId en payload");
         reply.status(400).send({ error: 'El ID de la sopa de letras es obligatorio' });
         return;
       }
 
+      req.log.info({ userId: user.userId || user.id, body }, "[RoomController.create] Creando sala...");
+
       const result = await this.createRoomUseCase.execute(
-        { id: user.id, name: user.name || 'Anfitrión', avatarUrl: user.avatarUrl },
+        { id: user.userId || user.id, name: user.name || 'Anfitrión', avatarUrl: user.avatarUrl },
         {
           wordSearchId: body.wordSearchId,
           maxPlayers: body.maxPlayers,
@@ -32,8 +36,10 @@ export class RoomController {
         }
       );
 
+      req.log.info({ roomCode: result.code }, "[RoomController.create] Sala creada exitosamente");
       reply.status(201).send({ status: 'success', data: result });
     } catch (err: any) {
+      req.log.error(err, "[RoomController.create] Error al crear la sala");
       reply.status(400).send({ error: err.message || 'Error al crear la sala' });
     }
   }

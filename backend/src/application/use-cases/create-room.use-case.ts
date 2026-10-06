@@ -23,8 +23,10 @@ export class CreateRoomUseCase {
 
     const code = this.generateRoomCode();
     const roomId = randomBytes(16).toString('hex');
-    const maxPlayers = Math.min(Math.max(dto.maxPlayers || 8, 2), 8);
-    const timeLimitSeconds = Math.min(Math.max(dto.timeLimitSeconds || 180, 60), 600);
+    const maxPlayers = Math.min(Math.max(dto.maxPlayers || 4, 2), 20);
+    const timeLimitSeconds = dto.timeLimitSeconds && dto.timeLimitSeconds > 0
+      ? Math.min(Math.max(dto.timeLimitSeconds, 30), 1800)
+      : null;
     const isPrivate = dto.isPrivate ?? false;
 
     const hostColor = '#7C3AED';

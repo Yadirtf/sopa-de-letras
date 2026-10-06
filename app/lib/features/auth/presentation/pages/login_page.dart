@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/auth_notifier.dart';
+import '../providers/auth_state.dart';
 import '../widgets/pin_pad_widget.dart';
+import '../widgets/login_footer_widget.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -47,6 +49,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+
+    ref.listen<AuthState>(authNotifierProvider, (prev, next) {
+      if (next.status == AuthStatus.authenticated && mounted) {
+        context.go('/home');
+      }
+    });
+
+    if (authState.status == AuthStatus.authenticated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.go('/home');
+      });
+      return const Scaffold(
+        backgroundColor: AppColors.bgPrimary,
+        body: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
+      );
+    }
+
+    if (authState.status == AuthStatus.initial) {
+      return const Scaffold(
+        backgroundColor: AppColors.bgPrimary,
+        body: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -106,34 +131,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ],
 
-              const SizedBox(height: 24),
-              OutlinedButton.icon(
-                onPressed: _onGuestPlay,
-                icon: const Icon(Icons.bolt, color: AppColors.accentAmber),
-                label: const Text('Jugar como Invitado (Sin Registro)'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.accentAmber),
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('¿No tienes cuenta? ', style: AppTypography.bodyMedium),
-                  GestureDetector(
-                    onTap: () => context.push('/register'),
-                    child: Text('Regístrate', style: TextStyle(color: AppColors.accentViolet, fontWeight: FontWeight.bold)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () => context.push('/forgot-pin'),
-                child: Text('¿Olvidaste tu PIN?', style: AppTypography.bodyMedium),
-              ),
+              LoginFooterWidget(onGuestPlay: _onGuestPlay),
             ],
           ),
         ),

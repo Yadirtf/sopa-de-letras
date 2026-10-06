@@ -1,7 +1,7 @@
 export interface CreateRoomDto {
   wordSearchId: string;
   maxPlayers?: number;
-  timeLimitSeconds?: number;
+  timeLimitSeconds?: number | null;
   isPrivate?: boolean;
 }
 
@@ -25,7 +25,7 @@ export interface RoomResponseDto {
   hostUserId: string;
   status: string;
   maxPlayers: number;
-  timeLimitSeconds: number;
+  timeLimitSeconds?: number | null;
   isPrivate: boolean;
   players: RoomPlayerDto[];
   shareUrl: string;

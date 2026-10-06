@@ -3,8 +3,10 @@ import { WordValidationHelper } from "./word-validation.helper";
 import { LeaderboardEntryDto, WordFoundResultDto } from "../dtos/room.dto";
 
 const PLAYER_COLORS = [
-  '#7C3AED', '#06B6D4', '#10B981', '#F59E0B',
-  '#F43F5E', '#8B5CF6', '#EC4899', '#14B8A6',
+  '#7C3AED', '#06B6D4', '#10B981', '#F59E0B', '#F43F5E',
+  '#8B5CF6', '#EC4899', '#14B8A6', '#3B82F6', '#EAB308',
+  '#D946EF', '#6366F1', '#0EA5E9', '#84CC16', '#F97316',
+  '#A855F7', '#22C55E', '#0284C7', '#FB7185', '#2DD4BF',
 ];
 
 export class RoomManagerService {

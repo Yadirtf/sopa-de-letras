@@ -63,7 +63,7 @@ export class FinishGameUseCase {
 
     const durationSeconds = state.startedAt
       ? Math.max(1, Math.round((now - state.startedAt) / 1000))
-      : state.timeLimitSeconds;
+      : (state.timeLimitSeconds || 0);
 
     return {
       podium,

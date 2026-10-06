@@ -19,7 +19,7 @@ export interface RoomProps {
   hostUserId: string;
   status: RoomStatus;
   maxPlayers: number;
-  timeLimitSeconds: number;
+  timeLimitSeconds?: number | null;
   isPrivate: boolean;
   players: RoomPlayerProps[];
   startedAt?: Date | null;
@@ -34,8 +34,8 @@ export class RoomEntity {
     if (!props.code || props.code.length < 4) {
       throw new Error('El código de sala debe tener al menos 4 caracteres');
     }
-    if (props.maxPlayers < 2 || props.maxPlayers > 8) {
-      throw new Error('La capacidad de jugadores debe estar entre 2 y 8');
+    if (props.maxPlayers < 2 || props.maxPlayers > 20) {
+      throw new Error('La capacidad de jugadores debe estar entre 2 y 20');
     }
     return new RoomEntity(props);
   }
@@ -46,7 +46,7 @@ export class RoomEntity {
   public get hostUserId(): string { return this.props.hostUserId; }
   public get status(): RoomStatus { return this.props.status; }
   public get maxPlayers(): number { return this.props.maxPlayers; }
-  public get timeLimitSeconds(): number { return this.props.timeLimitSeconds; }
+  public get timeLimitSeconds(): number | null | undefined { return this.props.timeLimitSeconds; }
   public get isPrivate(): boolean { return this.props.isPrivate; }
   public get players(): RoomPlayerProps[] { return this.props.players; }
   public get startedAt(): Date | null | undefined { return this.props.startedAt; }

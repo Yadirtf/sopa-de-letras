@@ -66,7 +66,7 @@ class GameRoomEntity extends Equatable {
   final String hostUserId;
   final RoomStatusEnum status;
   final int maxPlayers;
-  final int timeLimitSeconds;
+  final int? timeLimitSeconds;
   final bool isPrivate;
   final List<RoomPlayerEntity> players;
   final List<List<String>> grid;
@@ -83,7 +83,7 @@ class GameRoomEntity extends Equatable {
     required this.hostUserId,
     required this.status,
     required this.maxPlayers,
-    required this.timeLimitSeconds,
+    this.timeLimitSeconds,
     required this.isPrivate,
     required this.players,
     this.grid = const [],
