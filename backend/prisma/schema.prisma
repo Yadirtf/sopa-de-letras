@@ -124,10 +124,12 @@ model Friendship {
   userBId   String   @map("user_b_id")
   createdAt DateTime @default(now()) @map("created_at")
 
-  userA User @relation("FriendshipUserA", fields: [userAId], references: [id])
-  userB User @relation("FriendshipUserB", fields: [userBId], references: [id])
+  userA User @relation("FriendshipUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User @relation("FriendshipUserB", fields: [userBId], references: [id], onDelete: Cascade)
 
+  // Par canonico (userAId < userBId) garantizado por FriendPair en el dominio
   @@unique([userAId, userBId])
+  @@index([userBId])
   @@map("friendships")
 }
 
@@ -139,10 +141,11 @@ model FriendRequest {
   createdAt   DateTime            @default(now()) @map("created_at")
   updatedAt   DateTime            @updatedAt @map("updated_at")
 
-  sender    User @relation("FriendRequestSender", fields: [senderId], references: [id])
-  recipient User @relation("FriendRequestRecipient", fields: [recipientId], references: [id])
+  sender    User @relation("FriendRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User @relation("FriendRequestRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@unique([senderId, recipientId])
+  @@index([recipientId, status])
   @@map("friend_requests")
 }
 
@@ -162,14 +165,17 @@ model Notification {
   createdAt   DateTime         @default(now()) @map("created_at")
 
   recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
-  sender    User? @relation("NotificationSender", fields: [senderId], references: [id])
+  sender    User? @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
 
+  @@index([recipientId, createdAt])
+  @@index([recipientId, isRead])
   @@map("notifications")
 }
 
 enum NotificationType {
   ROOM_INVITE
   FRIEND_REQUEST
+  FRIEND_ACCEPTED
   GAME_START
   GAME_END
 }

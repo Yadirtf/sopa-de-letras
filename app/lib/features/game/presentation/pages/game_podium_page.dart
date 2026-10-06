@@ -104,7 +104,11 @@ class GamePodiumPage extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
-                onPressed: () => context.go('/catalog'),
+                onPressed: () {
+                  // Salir de la sala devuelve al jugador a "En línea" para sus amigos (EP-05).
+                  notifier.leaveRoom();
+                  context.go('/catalog');
+                },
                 child: Text('Salir al Catálogo', style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary)),
               ),
             ],

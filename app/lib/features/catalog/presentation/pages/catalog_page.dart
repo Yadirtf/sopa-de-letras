@@ -10,6 +10,8 @@ import '../widgets/catalog_card_widget.dart';
 import '../widgets/catalog_skeleton_widget.dart';
 import '../widgets/catalog_empty_state.dart';
 import '../widgets/word_search_detail_sheet.dart';
+import '../widgets/home_quick_actions.dart';
+import '../../../notifications/presentation/widgets/notification_bell_button.dart';
 
 class CatalogPage extends ConsumerStatefulWidget {
   const CatalogPage({super.key});
@@ -80,17 +82,9 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
         elevation: 0,
         title: Text('Explorar Sopas', style: AppTypography.heading2.copyWith(fontSize: 20)),
         actions: [
+          const NotificationBellButton(),
           IconButton(
-            icon: const Icon(Icons.group_add_rounded, color: AppColors.accentEmerald),
-            tooltip: 'Unirse a Sala',
-            onPressed: () => context.push('/join-room'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.auto_awesome_motion_rounded, color: AppColors.accentAmber),
-            tooltip: 'Mis Creaciones',
-            onPressed: () => context.push('/my-creations'),
-          ),
-          IconButton(
+            tooltip: 'Mi perfil',
             icon: const Icon(Icons.person_outline_rounded, color: AppColors.accentCyan),
             onPressed: () => context.push('/profile'),
           ),
@@ -109,6 +103,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
             initialValue: state.searchQuery,
             onSearchChanged: notifier.setSearch,
           ),
+          const HomeQuickActions(),
           CatalogFilterChips(
             selectedCategory: state.selectedCategory,
             selectedDifficulty: state.selectedDifficulty,

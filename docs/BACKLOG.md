@@ -440,18 +440,18 @@ graph TD
 
 ---
 
-### ÉPICA 5: Ecosistema Social y Notificaciones (EP-05)
+### ÉPICA 5: Ecosistema Social y Notificaciones (EP-05) — [ESTADO: ✅ IMPLEMENTADA]
 
 #### US-22: Búsqueda y Solicitudes de Amistad
 - **ID:** `US-22`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* usuario, *quiero* buscar a otros jugadores por su username y enviarles una solicitud de amistad, *para* construir mi red de rivales habituales.
 - **Criterios de Aceptación:**
   - **Dado** que un usuario busca un término en la pestaña social.
   - **Cuando** encuentra al usuario y pulsa "Agregar".
   - **Entonces** se crea una relación `friends` en estado `PENDING` y se notifica al destinatario en tiempo real si está conectado.
 - **Tareas Técnicas:**
-  - `backend/`: Endpoints `POST /api/v1/friends/request`, `POST /api/v1/friends/accept`, `DELETE /api/v1/friends/reject`.
+  - `backend/`: Endpoints `GET /api/v1/friends/search?q=`, `POST /api/v1/friends/requests` (enviar; si el otro ya te había enviado, la amistad es instantánea), `PATCH /api/v1/friends/requests/:requestId` con `action` = `ACCEPT` | `REJECT` | `CANCEL`, `GET /api/v1/friends/requests` y `DELETE /api/v1/friends/:userId`.
   - `app/`: Pestaña "Amigos" con buscador reactivo y lista de solicitudes entrantes con botones de Aceptar/Rechazar.
 - **Trazabilidad:** RF-25, RF-26, RF-27.
 
@@ -459,14 +459,14 @@ graph TD
 
 #### US-23: Lista de Amigos con Indicador de Estado Online en Tiempo Real
 - **ID:** `US-23`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador, *quiero* ver cuáles de mis amigos están conectados, en partida o desconectados, *para* saber con quién puedo jugar ahora mismo.
 - **Criterios de Aceptación:**
   - **Dado** un cambio de presencia de un usuario (se conecta o desconecta el socket).
   - **Cuando** el servidor detecta el evento de conexión en Redis (`presence:{userId}`).
   - **Entonces** se notifica a los sockets de sus amigos suscritos y la lista actualiza el punto verde/gris en tiempo real.
 - **Tareas Técnicas:**
-  - `backend/`: Mecanismo de presencia en Redis con heartbeat y TTL de 60 segundos.
+  - `backend/`: Presencia en Redis (`presence:{userId}`) con heartbeat cada 25 s y TTL de 60 s. El socket social se autentica con el JWT en el handshake; `friend:presence` solo se difunde a los amigos.
   - `app/`: Lista con avatares, badge de estado animado (Online / Jugando / Offline).
 - **Trazabilidad:** RF-28, RNF-03.
 
@@ -474,14 +474,14 @@ graph TD
 
 #### US-24: Invitaciones Directas a Salas de Juego
 - **ID:** `US-24`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* anfitrión de una sala, *quiero* invitar a un amigo conectado con un solo toque, *para* que reciba una alerta en su pantalla y se una con un clic.
 - **Criterios de Aceptación:**
   - **Dado** que el Host pulsa "Invitar" al lado del nombre de un amigo en línea.
   - **Cuando** el backend despacha el evento `room:invite_received`.
   - **Entonces** el amigo recibe un banner interactivo in-app con los botones "Unirse" o "Rechazar".
 - **Tareas Técnicas:**
-  - `backend/`: Evento Socket.IO directo a la sala privada de usuario `user:{friendId}`.
+  - `backend/`: `POST /api/v1/friends/:userId/invite` `{ roomCode }` valida amistad, sala y cupo, aplica anti-spam de 15 s en Redis y emite `room:invite_received` a la sala privada `user:{friendId}`.
   - `app/`: Diálogo flotante tipo snackbar de alta prioridad con sonido sutil y cuenta regresiva de expiración de 15s.
 - **Trazabilidad:** RF-29.
 
@@ -489,14 +489,14 @@ graph TD
 
 #### US-25: Centro de Notificaciones In-App y Campana
 - **ID:** `US-25`
-- **Prioridad:** Could Have (`C`) | **Story Points:** 3 SP
+- **Prioridad:** Could Have (`C`) | **Story Points:** 3 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* usuario, *quiero* un centro de notificaciones con historial de solicitudes de amistad y logros, *para* no perderme ninguna novedad.
 - **Criterios de Aceptación:**
   - **Dado** que un usuario abre la campana de notificaciones.
   - **Cuando** se listan las notificaciones.
   - **Entonces** puede marcarlas como leídas y ejecutar acciones directas desde cada tarjeta.
 - **Tareas Técnicas:**
-  - `backend/`: Tabla `notifications`, endpoints REST de listado y actualización de estado de lectura.
+  - `backend/`: Tabla `notifications`, `GET /api/v1/notifications?limit=&cursor=`, `PATCH /api/v1/notifications/:id/read`, `PATCH /api/v1/notifications/read-all` y evento `notification:new` con el contador de no leídas. El podio (1º–3º) genera notificaciones `GAME_END` como logros.
   - `app/`: Badge con contador no leído en la barra superior y drawer/pantalla dedicada.
 - **Trazabilidad:** RF-30.
 
@@ -504,14 +504,14 @@ graph TD
 
 #### US-26: Notificaciones Transaccionales por Correo Electrónico
 - **ID:** `US-26`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* usuario, *quiero* recibir correos de bienvenida al registrarme y alertas de seguridad si mi PIN cambia, *para* tener confianza en la plataforma.
 - **Criterios de Aceptación:**
   - **Dado** un evento de seguridad (registro exitoso, cambio de PIN).
   - **Cuando** se ejecuta el caso de uso en el backend.
   - **Entonces** se despacha asíncronamente un correo HTML elegante usando Nodemailer con plantilla prediseñada WordHive sin bloquear el hilo principal de Node.js.
 - **Tareas Técnicas:**
-  - `backend/`: Módulo `NotificationService` con cola simple en memoria o Redis BullMQ para envío asíncrono no bloqueante.
+  - `backend/`: `MailQueue` en memoria (no bloqueante, 3 intentos con backoff exponencial) y plantillas HTML WordHive con texto plano alternativo para bienvenida, OTP y cambio de PIN.
 - **Trazabilidad:** RF-31, RNF-06.
 
 ---

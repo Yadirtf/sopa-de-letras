@@ -1,8 +1,17 @@
 import { Server, Socket } from "socket.io";
 import { RoomManagerService } from "../../../application/services/room-manager.service";
 
+/** Ganchos opcionales para que otros modulos (presencia EP-05) sepan quien entra y sale de salas. */
+export interface RoomLifecycleListener {
+  onPlayerJoined(userId: string, roomCode: string): void;
+  onPlayerLeft(userId: string): void;
+}
+
 export class RoomEventsHandler {
-  constructor(private readonly roomManager: RoomManagerService) {}
+  constructor(
+    private readonly roomManager: RoomManagerService,
+    private readonly lifecycle?: RoomLifecycleListener
+  ) {}
 
   public register(io: Server, socket: Socket): void {
     socket.on("room:join", async (payload: { roomCode: string; userId: string; username: string; avatarUrl?: string }, ack) => {
@@ -18,6 +27,7 @@ export class RoomEventsHandler {
         socket.join(`room:${upperCode}`);
         (socket as any).roomCode = upperCode;
         (socket as any).userId = userId;
+        this.lifecycle?.onPlayerJoined(userId, upperCode);
 
         io.to(`room:${upperCode}`).emit("player:joined", {
           player: joinedPlayer,
@@ -43,6 +53,7 @@ export class RoomEventsHandler {
         const upperCode = roomCode.toUpperCase();
         const { state, newHostId } = await this.roomManager.removePlayer(upperCode, userId);
         socket.leave(`room:${upperCode}`);
+        this.lifecycle?.onPlayerLeft(userId);
 
         io.to(`room:${upperCode}`).emit("player:left", {
           userId,
