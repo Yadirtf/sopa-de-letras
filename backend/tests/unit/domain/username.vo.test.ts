@@ -16,6 +16,10 @@ describe("Username Value Object", () => {
     expect(() => Username.create("a".repeat(26))).toThrowError(InvalidUsernameError);
   });
 
+  it("acepta tildes y ñ, como en los nombres en español", () => {
+    expect(Username.create("José Muñoz").value).toBe("José Muñoz");
+  });
+
   it("debe rechazar caracteres no permitidos", () => {
     expect(() => Username.create("User@#$")).toThrowError(InvalidUsernameError);
   });

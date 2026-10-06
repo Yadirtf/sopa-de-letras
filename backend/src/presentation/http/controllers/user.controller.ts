@@ -3,6 +3,7 @@ import { GetProfileUseCase } from "../../../application/use-cases/get-profile.us
 import { UpdateProfileUseCase } from "../../../application/use-cases/update-profile.use-case";
 import { UpdatePinUseCase } from "../../../application/use-cases/update-pin.use-case";
 import { updatePinSchema, updateProfileSchema } from "../schemas/auth.schemas";
+import { parseOrReply, sendResult } from "./result-reply.helper";
 
 export class UserController {
   constructor(
@@ -12,40 +13,19 @@ export class UserController {
   ) {}
 
   getProfile = async (req: FastifyRequest, reply: FastifyReply) => {
-    const userId = req.user!.userId;
-    const result = await this.getProfileUseCase.execute(userId);
-    if (result.isFailure) {
-      return reply.status(result.error.statusCode).send({
-        code: result.error.code,
-        message: result.error.message,
-      });
-    }
-    return reply.status(200).send(result.value);
+    return sendResult(reply, await this.getProfileUseCase.execute(req.user!.userId));
   };
 
+  // parseOrReply: un nombre corto responde 400 legible, no un 500 por ZodError.
   updateProfile = async (req: FastifyRequest, reply: FastifyReply) => {
-    const userId = req.user!.userId;
-    const body = updateProfileSchema.parse(req.body);
-    const result = await this.updateProfileUseCase.execute({ userId, ...body });
-    if (result.isFailure) {
-      return reply.status(result.error.statusCode).send({
-        code: result.error.code,
-        message: result.error.message,
-      });
-    }
-    return reply.status(200).send(result.value);
+    const body = parseOrReply(reply, updateProfileSchema, req.body);
+    if (!body) return reply;
+    return sendResult(reply, await this.updateProfileUseCase.execute({ userId: req.user!.userId, ...body }));
   };
 
   updatePin = async (req: FastifyRequest, reply: FastifyReply) => {
-    const userId = req.user!.userId;
-    const body = updatePinSchema.parse(req.body);
-    const result = await this.updatePinUseCase.execute({ userId, ...body });
-    if (result.isFailure) {
-      return reply.status(result.error.statusCode).send({
-        code: result.error.code,
-        message: result.error.message,
-      });
-    }
-    return reply.status(200).send(result.value);
+    const body = parseOrReply(reply, updatePinSchema, req.body);
+    if (!body) return reply;
+    return sendResult(reply, await this.updatePinUseCase.execute({ userId: req.user!.userId, ...body }));
   };
 }

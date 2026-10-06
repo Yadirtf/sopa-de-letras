@@ -14,6 +14,7 @@ import '../../features/game/presentation/pages/game_play_page.dart';
 import '../../features/game/presentation/pages/game_podium_page.dart';
 import '../../features/social/presentation/pages/friends_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/home/presentation/pages/home_shell_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
@@ -30,25 +31,30 @@ final appRouter = GoRouter(
       path: '/forgot-pin',
       builder: (context, state) => const ForgotPinPage(),
     ),
-    GoRoute(
-      path: '/home',
-      builder: (context, state) => const CatalogPage(),
+    // Pantallas con barra inferior. El orden de las ramas es el de
+    // HomeBottomBar: Unirme, Mis sopas, Inicio (casita) y Perfil.
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) => HomeShellPage(navigationShell: navigationShell),
+      branches: [
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/join-room', builder: (context, state) => const JoinRoomPage()),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/my-creations', builder: (context, state) => const MyCreationsPage()),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/home', builder: (context, state) => const CatalogPage()),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
+        ]),
+      ],
     ),
-    GoRoute(
-      path: '/catalog',
-      builder: (context, state) => const CatalogPage(),
-    ),
+    // Alias antiguo: la sala y el podio vuelven aquí al terminar.
+    GoRoute(path: '/catalog', redirect: (context, state) => '/home'),
     GoRoute(
       path: '/create-word-search',
       builder: (context, state) => const CreateWordSearchPage(),
-    ),
-    GoRoute(
-      path: '/my-creations',
-      builder: (context, state) => const MyCreationsPage(),
-    ),
-    GoRoute(
-      path: '/profile',
-      builder: (context, state) => const ProfilePage(),
     ),
     GoRoute(
       path: '/create-room',
@@ -59,10 +65,6 @@ final appRouter = GoRouter(
           wordSearchTitle: extra['wordSearchTitle'] ?? 'Sopa de Letras',
         );
       },
-    ),
-    GoRoute(
-      path: '/join-room',
-      builder: (context, state) => const JoinRoomPage(),
     ),
     GoRoute(
       path: '/lobby/:code',
@@ -95,5 +97,3 @@ final appRouter = GoRouter(
     ),
   ],
 );
-
-

@@ -31,6 +31,13 @@ class AuthLocalDataSource {
     await box.put(_authTimestampKey, DateTime.now().millisecondsSinceEpoch);
   }
 
+  /// Reemplaza el usuario guardado (tras editar el perfil) sin tocar los
+  /// tokens ni reiniciar el reloj de la sesión.
+  Future<void> updateCachedUser(UserModel user) async {
+    final box = await Hive.openBox(_userBoxName);
+    await box.put(_currentUserKey, user.toJson());
+  }
+
   Future<UserModel?> getCachedUser() async {
     final box = await Hive.openBox(_userBoxName);
     final data = box.get(_currentUserKey);
@@ -48,8 +55,7 @@ class AuthLocalDataSource {
 
     final secureToken = await _storageService.getAccessToken();
     final hiveToken = box.get(_tokenKey) as String?;
-    if ((secureToken == null || secureToken.isEmpty) &&
-        (hiveToken == null || hiveToken.isEmpty)) {
+    if ((secureToken == null || secureToken.isEmpty) && (hiveToken == null || hiveToken.isEmpty)) {
       await clearAuthData();
       return null;
     }

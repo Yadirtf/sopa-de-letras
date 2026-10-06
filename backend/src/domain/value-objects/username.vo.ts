@@ -2,12 +2,12 @@ import { InvalidUsernameError } from "../errors/auth.errors";
 
 /**
  * Value Object para Nombre de Usuario / Display Name.
- * Minimo 3 caracteres, maximo 25, alfanumerico con guiones o espacios permitidos.
+ * Minimo 3 caracteres, maximo 25, letras (con tildes y ñ), numeros, guiones o espacios.
  */
 export class Username {
   private static readonly MIN_LENGTH = 3;
   private static readonly MAX_LENGTH = 25;
-  private static readonly USERNAME_REGEX = /^[a-zA-Z0-9_ -]+$/;
+  private static readonly USERNAME_REGEX = /^[\p{L}\p{N}_ -]+$/u;
   private readonly _value: string;
 
   private constructor(value: string) {
@@ -23,7 +23,7 @@ export class Username {
       throw new InvalidUsernameError(`No puede superar ${Username.MAX_LENGTH} caracteres`);
     }
     if (!Username.USERNAME_REGEX.test(trimmed)) {
-      throw new InvalidUsernameError("Solo caracteres alfanumericos, guiones o espacios");
+      throw new InvalidUsernameError("Solo letras, numeros, guiones o espacios");
     }
     return new Username(trimmed);
   }

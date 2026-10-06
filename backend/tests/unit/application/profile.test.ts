@@ -55,4 +55,15 @@ describe("Profile Use Cases", () => {
     }
     expect(userRepoMock.update).toHaveBeenCalledOnce();
   });
+
+  it("devuelve el perfil completo tras actualizar, para que la app no pierda el correo", async () => {
+    const result = await updateProfileUseCase.execute({ userId: "user-profile", name: "José Peña" });
+
+    expect(result.isSuccess).toBe(true);
+    if (result.isSuccess) {
+      expect(result.value.name).toBe("José Peña");
+      expect(result.value.email).toBe("profile@wordhive.com");
+      expect(result.value.age).toBe(19);
+    }
+  });
 });

@@ -3,6 +3,7 @@ import '../../../../core/network/api_client.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/datasources/auth_local_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
@@ -13,8 +14,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(remoteDs, localDs);
 });
 
-final authNotifierProvider =
-    StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repo = ref.watch(authRepositoryProvider);
   return AuthNotifier(repo);
 });
@@ -126,6 +126,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       },
     );
   }
+
+  /// Tras editar el perfil: el resto de la app (saludo, avatar) se repinta solo.
+  void replaceUser(UserEntity user) => state = state.copyWith(user: user);
 
   Future<void> logout() async {
     await _repo.logout();

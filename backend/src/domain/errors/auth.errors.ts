@@ -93,3 +93,31 @@ export class UnauthorizedError extends DomainError {
     super(message);
   }
 }
+
+/** PIN actual equivocado al cambiarlo. 400 y no 401: la sesion sigue siendo valida. */
+export class WrongCurrentPinError extends DomainError {
+  readonly code = "WRONG_CURRENT_PIN";
+  readonly statusCode = 400;
+
+  constructor() {
+    super("El PIN actual no es correcto");
+  }
+}
+
+export class SamePinError extends DomainError {
+  readonly code = "SAME_PIN";
+  readonly statusCode = 400;
+
+  constructor() {
+    super("El nuevo PIN debe ser diferente al actual");
+  }
+}
+
+export class GuestNotAllowedError extends DomainError {
+  readonly code = "GUEST_NOT_ALLOWED";
+  readonly statusCode = 403;
+
+  constructor(action: string) {
+    super(`Las cuentas de invitado no pueden ${action}. Completa tu registro primero`);
+  }
+}

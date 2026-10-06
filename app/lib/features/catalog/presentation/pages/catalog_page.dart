@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../providers/catalog_notifier.dart';
 import '../widgets/catalog_search_bar.dart';
 import '../widgets/catalog_filter_chips.dart';
-import '../widgets/catalog_card_widget.dart';
+import '../widgets/catalog_grid_delegate.dart';
+import '../widgets/word_search_tile_card.dart';
+import '../widgets/home_friends_button.dart';
+import '../widgets/home_greeting_title.dart';
 import '../widgets/catalog_skeleton_widget.dart';
 import '../widgets/catalog_empty_state.dart';
 import '../widgets/word_search_detail_sheet.dart';
-import '../widgets/home_quick_actions.dart';
 import '../../../notifications/presentation/widgets/notification_bell_button.dart';
 
 class CatalogPage extends ConsumerStatefulWidget {
@@ -37,8 +38,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 250) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 250) {
       ref.read(catalogNotifierProvider.notifier).loadMore();
     }
   }
@@ -80,66 +80,61 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
       appBar: AppBar(
         backgroundColor: AppColors.bgPrimary,
         elevation: 0,
-        title: Text('Explorar Sopas', style: AppTypography.heading2.copyWith(fontSize: 20)),
-        actions: [
-          const NotificationBellButton(),
-          IconButton(
-            tooltip: 'Mi perfil',
-            icon: const Icon(Icons.person_outline_rounded, color: AppColors.accentCyan),
-            onPressed: () => context.push('/profile'),
-          ),
-        ],
+        automaticallyImplyLeading: false,
+        titleSpacing: 16,
+        title: const HomeGreetingTitle(),
+        actions: const [HomeFriendsButton(), NotificationBellButton(), SizedBox(width: 8)],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.accentViolet,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Crear Sopa'),
-        onPressed: () => context.push('/create-word-search'),
-      ),
-      body: Column(
-        children: [
-          CatalogSearchBar(
-            initialValue: state.searchQuery,
-            onSearchChanged: notifier.setSearch,
-          ),
-          const HomeQuickActions(),
-          CatalogFilterChips(
-            selectedCategory: state.selectedCategory,
-            selectedDifficulty: state.selectedDifficulty,
-            onCategorySelected: notifier.setCategory,
-            onDifficultySelected: notifier.setDifficulty,
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: state.isLoading
-                ? const CatalogSkeletonWidget()
-                : state.items.isEmpty
-                    ? CatalogEmptyState(onClearFilters: notifier.clearFilters)
-                    : RefreshIndicator(
-                        color: AppColors.accentCyan,
-                        backgroundColor: AppColors.bgCard,
-                        onRefresh: notifier.fetchInitialCatalog,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index == state.items.length) {
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16),
-                                child: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
-                              );
-                            }
-                            final item = state.items[index];
-                            return CatalogCardWidget(
-                              item: item,
-                              onTap: () => _openDetail(item.id),
-                            );
-                          },
-                        ),
-                      ),
-          ),
-        ],
+      body: RefreshIndicator(
+        color: AppColors.accentCyan,
+        backgroundColor: AppColors.bgCard,
+        onRefresh: notifier.fetchInitialCatalog,
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: CatalogSearchBar(initialValue: state.searchQuery, onSearchChanged: notifier.setSearch),
+            ),
+            SliverToBoxAdapter(
+              child: CatalogFilterChips(
+                selectedCategory: state.selectedCategory,
+                selectedDifficulty: state.selectedDifficulty,
+                onCategorySelected: notifier.setCategory,
+                onDifficultySelected: notifier.setDifficulty,
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            if (state.isLoading)
+              const CatalogSkeletonWidget()
+            else if (state.items.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: CatalogEmptyState(onClearFilters: notifier.clearFilters),
+              )
+            else
+              SliverPadding(
+                padding: catalogGridPadding,
+                sliver: SliverGrid(
+                  gridDelegate: catalogGridDelegate,
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: state.items.length,
+                    (context, index) {
+                      final item = state.items[index];
+                      return WordSearchTileCard(item: item, onTap: () => _openDetail(item.id));
+                    },
+                  ),
+                ),
+              ),
+            if (state.isLoadingMore)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 24),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

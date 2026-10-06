@@ -3,11 +3,12 @@ import { IUserRepository } from "../../domain/repositories/user.repository.inter
 import { UserNotFoundError, DomainError } from "../../domain/errors/auth.errors";
 import { UpdateProfileDto } from "../dtos/auth.dtos";
 import { Result, ok, fail } from "../common/result";
+import { toUserProfile, UserProfileResponse } from "../common/user-profile.mapper";
 
 export class UpdateProfileUseCase {
   constructor(private readonly userRepo: IUserRepository) {}
 
-  async execute(dto: UpdateProfileDto): Promise<Result<{ id: string; name: string; avatarUrl: string | null }, DomainError>> {
+  async execute(dto: UpdateProfileDto): Promise<Result<UserProfileResponse, DomainError>> {
     try {
       const user = await this.userRepo.findById(dto.userId);
       if (!user) {
@@ -20,11 +21,8 @@ export class UpdateProfileUseCase {
       user.updateProfile(updatedName, updatedAvatar);
       await this.userRepo.update(user);
 
-      return ok({
-        id: user.id,
-        name: user.name.value,
-        avatarUrl: user.avatarUrl,
-      });
+      // Perfil completo: la app lo guarda tal cual como su usuario en cache.
+      return ok(toUserProfile(user));
     } catch (error) {
       return fail(error as DomainError);
     }
