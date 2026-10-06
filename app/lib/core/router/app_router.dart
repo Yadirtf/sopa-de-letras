@@ -12,6 +12,8 @@ import '../../features/game/presentation/pages/join_room_page.dart';
 import '../../features/game/presentation/pages/room_lobby_page.dart';
 import '../../features/game/presentation/pages/game_play_page.dart';
 import '../../features/game/presentation/pages/game_podium_page.dart';
+import '../../features/social/presentation/pages/friends_page.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
@@ -73,6 +75,17 @@ final appRouter = GoRouter(
       builder: (context, state) => GamePlayPage(
         roomCode: state.pathParameters['code'] ?? '',
       ),
+    ),
+    GoRoute(
+      path: '/friends',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>? ?? {};
+        return FriendsPage(initialTab: extra['tab'] as int? ?? 0);
+      },
+    ),
+    GoRoute(
+      path: '/notifications',
+      builder: (context, state) => const NotificationsPage(),
     ),
     GoRoute(
       path: '/game-podium/:code',

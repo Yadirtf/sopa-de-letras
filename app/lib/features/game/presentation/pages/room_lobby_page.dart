@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_notifier.dart';
 import '../providers/game_room_notifier.dart';
 import '../widgets/room_player_slot_widget.dart';
+import '../../../social/presentation/widgets/invite_friends_sheet.dart';
 
 class RoomLobbyPage extends ConsumerWidget {
   final String roomCode;
@@ -77,6 +78,21 @@ class RoomLobbyPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  if (room.players.length < room.maxPlayers)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: TextButton.icon(
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.accentAmber,
+                          minimumSize: const Size.fromHeight(48),
+                          backgroundColor: AppColors.accentAmber.withValues(alpha: 0.1),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        onPressed: () => InviteFriendsSheet.show(context, room.code),
+                        icon: const Icon(Icons.person_add_alt_1_rounded),
+                        label: Text('Invitar amigos', style: AppTypography.labelLarge.copyWith(color: AppColors.accentAmber)),
+                      ),
+                    ),
                   Row(
                     children: [
                       Expanded(

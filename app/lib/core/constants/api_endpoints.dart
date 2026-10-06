@@ -44,5 +44,15 @@ abstract class ApiEndpoints {
 
   // Salas Multijugador (Épica 4)
   static const String rooms = '/rooms';
-}
 
+  // Ecosistema Social y Notificaciones (Épica 5)
+  static const String friends = '/friends';
+  static const String friendsSearch = '/friends/search';
+  static const String friendRequests = '/friends/requests';
+  static String friendRequest(String requestId) => '/friends/requests/$requestId';
+  static String friend(String userId) => '/friends/$userId';
+  static String inviteFriend(String userId) => '/friends/$userId/invite';
+  static const String notifications = '/notifications';
+  static const String notificationsReadAll = '/notifications/read-all';
+  static String notificationRead(String id) => '/notifications/$id/read';
+}
