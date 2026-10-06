@@ -22,12 +22,20 @@ class _WordChipsInputWidgetState extends State<WordChipsInputWidget> {
   final TextEditingController _controller = TextEditingController();
 
   void _handleAdd() {
-    final text = _controller.text.trim().toUpperCase();
+    String text = _controller.text.trim().toUpperCase();
+    text = text
+        .replaceAll(RegExp(r'[ÁÀÄÂ]'), 'A')
+        .replaceAll(RegExp(r'[ÉÈËÊ]'), 'E')
+        .replaceAll(RegExp(r'[ÍÌÏÎ]'), 'I')
+        .replaceAll(RegExp(r'[ÓÒÖÔ]'), 'O')
+        .replaceAll(RegExp(r'[ÚÙÜÛ]'), 'U')
+        .replaceAll(RegExp(r'[^A-ZÑ]'), '');
     if (text.length >= 3 && text.length <= 15) {
       widget.onAddWord(text);
       _controller.clear();
     }
   }
+
 
   @override
   void dispose() {

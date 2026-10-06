@@ -1,6 +1,5 @@
 import {
   DirectionVector,
-  DirectionType,
   PlacedWord,
   GeneratorOptions,
   GeneratedResult,
@@ -10,6 +9,7 @@ import {
   WordSearchGenerationFailedError,
   InvalidWordListError,
 } from "../errors/generator.errors";
+import { sanitizeWordsList } from "./word-search-sanitizer";
 
 export class WordSearchGeneratorService {
   private static readonly DIRECTIONS: Record<string, DirectionVector[]> = {
@@ -40,7 +40,6 @@ export class WordSearchGeneratorService {
     const words = this.validateAndNormalizeWords(options.words, gridSize);
     const directions = WordSearchGeneratorService.DIRECTIONS[difficulty] || WordSearchGeneratorService.DIRECTIONS.MEDIUM;
 
-    // Ordenar palabras de mayor a menor longitud para maximizar cruces
     const sortedWords = [...words].sort((a, b) => b.length - a.length);
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -72,24 +71,16 @@ export class WordSearchGeneratorService {
   }
 
   private validateAndNormalizeWords(rawWords: string[], gridSize: number): string[] {
-    if (!rawWords || rawWords.length < 5 || rawWords.length > 20) {
-      throw new InvalidWordListError("Debes ingresar entre 5 y 20 palabras");
+    const sanitized = sanitizeWordsList(rawWords);
+    if (sanitized.length < 5 || sanitized.length > 20) {
+      throw new InvalidWordListError("Debes ingresar entre 5 y 20 palabras válidas (de 3 a 15 letras)");
     }
-
-    return rawWords.map((w) => {
-      const cleaned = w.trim().toUpperCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remover tildes
-      if (!/^[A-ZÑ]+$/.test(cleaned)) {
-        throw new InvalidWordListError(`La palabra '${w}' contiene caracteres inválidos. Solo se admiten letras.`);
+    for (const word of sanitized) {
+      if (word.length > gridSize) {
+        throw new InvalidWordListError(`La palabra '${word}' es más larga que la cuadrícula (${gridSize}).`);
       }
-      if (cleaned.length < 3 || cleaned.length > 15) {
-        throw new InvalidWordListError(`La palabra '${cleaned}' debe tener entre 3 y 15 letras.`);
-      }
-      if (cleaned.length > gridSize) {
-        throw new InvalidWordListError(`La palabra '${cleaned}' es más larga que la cuadrícula (${gridSize}).`);
-      }
-      return cleaned;
-    });
+    }
+    return sanitized;
   }
 
   private findValidPositions(

@@ -67,16 +67,23 @@ describe("WordSearchGeneratorService (Backtracking Algorithm)", () => {
   it("debe rechazar listas con menos de 5 o más de 20 palabras", () => {
     expect(() =>
       service.generate({ words: ["UNO", "DOS"], gridSize: 10, difficulty: "EASY" })
-    ).toThrow("Debes ingresar entre 5 y 20 palabras");
+    ).toThrow("palabras válidas");
   });
 
-  it("debe rechazar palabras con números o caracteres extraños", () => {
-    expect(() =>
-      service.generate({
-        words: ["H0LA", "MUND0", "TEST1", "TEST2", "TEST3"],
-        gridSize: 10,
-        difficulty: "EASY",
-      })
-    ).toThrow("caracteres inválidos");
+  it("debe sanitizar automáticamente palabras con minúsculas y tildes", () => {
+    const result = service.generate({
+      words: ["abeja", "colména", "míel", "reína", "avíspa"],
+      gridSize: 10,
+      difficulty: "EASY",
+    });
+
+    expect(result.placedWords.length).toBe(5);
+    const placed = result.placedWords.map((p) => p.word);
+    expect(placed).toContain("ABEJA");
+    expect(placed).toContain("COLMENA");
+    expect(placed).toContain("MIEL");
+    expect(placed).toContain("REINA");
+    expect(placed).toContain("AVISPA");
   });
 });
+

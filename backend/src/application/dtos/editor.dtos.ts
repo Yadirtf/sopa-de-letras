@@ -15,13 +15,14 @@ export interface PreviewWordSearchResponseDto {
 
 export interface CreateWordSearchDto {
   title: string;
-  description?: string;
+  description?: string | null;
   category: string;
   difficulty: WordSearchDifficulty;
   gridSize: number;
   words: string[];
   isPublic?: boolean;
 }
+
 
 export interface UpdateWordSearchDto {
   title?: string;
