@@ -1,5 +1,6 @@
 import '../entities/game_room_entity.dart';
 import '../entities/game_event_entities.dart';
+import '../entities/room_lobby_entities.dart';
 
 abstract class GameRepository {
   Future<GameRoomEntity> createRoom({
@@ -14,7 +15,8 @@ abstract class GameRepository {
   void connectSocket();
   void disconnectSocket();
 
-  void joinRoom({
+  /// Entra por socket y devuelve quien esta en la sala; lanza [RoomFlowException] si no se pudo.
+  Future<RoomPlayersSnapshot> joinRoom({
     required String roomCode,
     required String userId,
     required String username,
@@ -42,9 +44,8 @@ abstract class GameRepository {
   void voteRematch({required String roomCode, required String userId});
 
   // Socket Streams
-  Stream<RoomPlayerEntity> onPlayerJoined();
-  Stream<Map<String, dynamic>> onPlayerLeft();
-  Stream<Map<String, dynamic>> onPlayerReadyChanged();
+  Stream<RoomPlayersSnapshot> onPlayersChanged();
+  Stream<RoomFlowException> onRoomError();
   Stream<Map<String, dynamic>> onGameCountdown();
   Stream<Map<String, dynamic>> onGameStarted();
   Stream<WordFoundEventEntity> onWordFound();

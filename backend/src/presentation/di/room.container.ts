@@ -4,6 +4,7 @@ import { PrismaRoomRepository } from "../../infrastructure/database/repositories
 import { PrismaWordSearchRepository } from "../../infrastructure/database/repositories/prisma-word-search.repository";
 import { RedisRoomCache } from "../../infrastructure/cache/redis-room.cache";
 import { RoomManagerService } from "../../application/services/room-manager.service";
+import { RoomLifecycleService } from "../../application/services/room-lifecycle.service";
 import { RoomRematchService } from "../../application/services/room-rematch.service";
 import { WordSearchGeneratorService } from "../../domain/services/word-search-generator.service";
 import { CreateRoomUseCase } from "../../application/use-cases/create-room.use-case";
@@ -23,6 +24,7 @@ export function createRoomContainer(prisma: PrismaClient, redis: Redis, social?:
 
   const roomManager = new RoomManagerService(roomCache);
   const rematchService = new RoomRematchService(roomCache, generatorService);
+  const roomLifecycle = new RoomLifecycleService(roomCache);
 
   const createRoomUseCase = new CreateRoomUseCase(roomRepo, wordSearchRepo, roomCache);
   const getRoomByCodeUseCase = new GetRoomByCodeUseCase(roomCache, roomRepo);
@@ -31,8 +33,8 @@ export function createRoomContainer(prisma: PrismaClient, redis: Redis, social?:
 
   const roomController = new RoomController(createRoomUseCase, getRoomByCodeUseCase);
 
-  const roomEventsHandler = new RoomEventsHandler(roomManager, social?.socketBindings.roomLifecycle);
-  const gameEventsHandler = new GameEventsHandler(roomManager, finishGameUseCase, rematchService);
+  const roomEventsHandler = new RoomEventsHandler(roomManager, roomLifecycle, social?.socketBindings.roomLifecycle);
+  const gameEventsHandler = new GameEventsHandler(roomManager, finishGameUseCase, rematchService, roomLifecycle);
   const socketDispatcher = new SocketDispatcher(
     roomEventsHandler,
     gameEventsHandler,

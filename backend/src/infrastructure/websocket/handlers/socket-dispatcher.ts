@@ -25,15 +25,19 @@ export class SocketDispatcher {
       this.social?.presenceHandler.register(io, socket).catch(() => undefined);
 
       socket.on("disconnect", async () => {
-        const roomCode = (socket as any).roomCode;
-        const userId = (socket as any).userId;
+        const roomCode: string | undefined = socket.data.roomCode;
+        const userId: string | undefined = socket.data.userId;
         if (roomCode && userId) {
           this.social?.roomLifecycle.onPlayerLeft(userId);
           try {
+            // En plena partida se conserva su puesto y puntos: al reconectar vuelve a entrar.
+            const room = await this.roomManager.getRoom(roomCode);
+            if (room && room.status !== "WAITING") return;
             const { state, newHostId } = await this.roomManager.removePlayer(roomCode, userId);
             io.to(`room:${roomCode}`).emit("player:left", {
               userId,
               newHostId,
+              hostUserId: state.hostUserId,
               players: state.players,
             });
           } catch {
