@@ -22,8 +22,17 @@ export interface CachedRoomState {
     score: number;
     wordsFound: string[];
     colorHex: string;
+    /** false mientras se le cae el internet; ausente equivale a conectado. */
+    isConnected?: boolean;
   }>;
-  claimedWords: Record<string, { userId: string; username: string; colorHex: string; timestamp: number }>;
+  claimedWords: Record<string, {
+    userId: string;
+    username: string;
+    colorHex: string;
+    timestamp: number;
+    start?: [number, number];
+    end?: [number, number];
+  }>;
   rematchVotes: string[];
   startedAt?: number | null;
   endsAt?: number | null;

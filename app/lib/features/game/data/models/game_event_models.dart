@@ -8,10 +8,13 @@ class WordFoundEventModel extends WordFoundEventEntity {
     required super.colorHex,
     required super.pointsAwarded,
     required super.newScore,
+    super.start,
+    super.end,
   });
 
   factory WordFoundEventModel.fromJson(Map<String, dynamic> json) {
-    final claimedBy = json['claimedBy'] as Map<String, dynamic>? ?? {};
+    final claimedBy = json['claimedBy'] is Map ? Map<String, dynamic>.from(json['claimedBy']) : <String, dynamic>{};
+    final coords = json['coordinates'] is Map ? json['coordinates'] as Map : const {};
     return WordFoundEventModel(
       word: json['word'] ?? '',
       claimedByUserId: claimedBy['userId'] ?? '',
@@ -19,7 +22,28 @@ class WordFoundEventModel extends WordFoundEventEntity {
       colorHex: claimedBy['colorHex'] ?? '#7C3AED',
       pointsAwarded: (json['pointsAwarded'] as num?)?.toInt() ?? 0,
       newScore: (json['newScore'] as num?)?.toInt() ?? 0,
+      start: _cell(coords['start']),
+      end: _cell(coords['end']),
     );
+  }
+
+  /// Palabra ya reclamada que trae la sala al reconectar (claimedWords del servidor).
+  factory WordFoundEventModel.fromClaim(String word, Map<String, dynamic> claim) {
+    return WordFoundEventModel(
+      word: word,
+      claimedByUserId: claim['userId'] ?? '',
+      claimedByUsername: claim['username'] ?? 'Jugador',
+      colorHex: claim['colorHex'] ?? '#7C3AED',
+      pointsAwarded: 0,
+      newScore: 0,
+      start: _cell(claim['start']),
+      end: _cell(claim['end']),
+    );
+  }
+
+  static List<int>? _cell(dynamic raw) {
+    if (raw is! List || raw.length != 2) return null;
+    return raw.map((n) => (n as num).toInt()).toList();
   }
 }
 
@@ -88,10 +112,7 @@ class RematchVoteStateModel extends RematchVoteStateEntity {
       totalPlayers: (json['totalPlayers'] as num?)?.toInt() ?? 1,
       requiredVotes: (json['requiredVotes'] as num?)?.toInt() ?? 1,
       hasQuorum: json['hasQuorum'] ?? false,
-      votedUserIds: (json['votedUserIds'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      votedUserIds: (json['votedUserIds'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 }

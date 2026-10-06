@@ -104,13 +104,15 @@ class RoomPlayerSlotWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: player!.isReady
-                  ? AppColors.accentEmerald.withValues(alpha: 0.15)
-                  : AppColors.bgSecondary,
+              color: player!.isReady ? AppColors.accentEmerald.withValues(alpha: 0.15) : AppColors.bgSecondary,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              player!.isHost ? 'Anfitrión' : (player!.isReady ? 'Listo' : 'Esperando'),
+              !player!.isConnected
+                  ? 'Reconectando...'
+                  : player!.isHost
+                      ? 'Anfitrión'
+                      : (player!.isReady ? 'Listo' : 'Esperando'),
               style: AppTypography.bodySmall.copyWith(
                 fontSize: 10,
                 color: player!.isReady ? AppColors.accentEmerald : AppColors.textMuted,

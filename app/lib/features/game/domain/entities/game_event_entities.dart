@@ -8,6 +8,10 @@ class WordFoundEventEntity extends Equatable {
   final int pointsAwarded;
   final int newScore;
 
+  /// Celdas [fila, columna] de la primera y ultima letra, para pintar la palabra en el tablero.
+  final List<int>? start;
+  final List<int>? end;
+
   const WordFoundEventEntity({
     required this.word,
     required this.claimedByUserId,
@@ -15,6 +19,8 @@ class WordFoundEventEntity extends Equatable {
     required this.colorHex,
     required this.pointsAwarded,
     required this.newScore,
+    this.start,
+    this.end,
   });
 
   @override
@@ -25,6 +31,8 @@ class WordFoundEventEntity extends Equatable {
         colorHex,
         pointsAwarded,
         newScore,
+        start,
+        end,
       ];
 }
 

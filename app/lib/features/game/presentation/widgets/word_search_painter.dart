@@ -1,59 +1,90 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../providers/game_board_provider.dart';
 
+/// Una palabra ya encontrada: se pinta como una "capsula" del color de quien la hallo.
+class FoundStroke {
+  final CellCoord start;
+  final CellCoord end;
+  final Color color;
+  const FoundStroke(this.start, this.end, this.color);
+}
+
+/// Dibuja el tablero completo en una sola pasada: capsulas de palabras
+/// encontradas, el trazo que el dedo esta haciendo y las letras encima.
 class WordSearchPainter extends CustomPainter {
-  final int rows;
-  final int cols;
+  final List<List<String>> grid;
+  final double cellSize;
+  final List<FoundStroke> found;
   final List<CellCoord> selectedCells;
   final Color selectionColor;
 
   WordSearchPainter({
-    required this.rows,
-    required this.cols,
+    required this.grid,
+    required this.cellSize,
+    required this.found,
     required this.selectedCells,
     this.selectionColor = AppColors.accentViolet,
   });
 
+  Offset _center(CellCoord c) => Offset((c.col + 0.5) * cellSize, (c.row + 0.5) * cellSize);
+
+  void _capsule(Canvas canvas, CellCoord a, CellCoord b, Color color, {required bool active}) {
+    final width = cellSize * 0.78;
+    final p1 = _center(a);
+    final p2 = _center(b);
+    canvas.drawLine(
+      p1,
+      p2,
+      Paint()
+        ..color = color.withValues(alpha: active ? 0.55 : 0.32)
+        ..strokeWidth = width
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawLine(
+      p1,
+      p2,
+      Paint()
+        ..color = color.withValues(alpha: active ? 1 : 0.7)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = active ? 3 : 1.5
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    if (selectedCells.isEmpty || rows == 0 || cols == 0) return;
+    for (final s in found) {
+      _capsule(canvas, s.start, s.end, s.color, active: false);
+    }
+    if (selectedCells.isNotEmpty) {
+      _capsule(canvas, selectedCells.first, selectedCells.last, selectionColor, active: true);
+    }
 
-    final cellWidth = size.width / cols;
-    final cellHeight = size.height / rows;
-
-    final glowPaint = Paint()
-      ..color = selectionColor.withValues(alpha: 0.35)
-      ..style = PaintingStyle.fill
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-
-    final fillPaint = Paint()
-      ..color = selectionColor.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill;
-
-    final borderPaint = Paint()
-      ..color = selectionColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    for (final cell in selectedCells) {
-      final rect = Rect.fromLTWH(
-        cell.col * cellWidth + 2,
-        cell.row * cellHeight + 2,
-        cellWidth - 4,
-        cellHeight - 4,
-      );
-      final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(8));
-
-      canvas.drawRRect(rrect, glowPaint);
-      canvas.drawRRect(rrect, fillPaint);
-      canvas.drawRRect(rrect, borderPaint);
+    final selected = selectedCells.toSet();
+    final fontSize = (cellSize * 0.52).clamp(10.0, 30.0);
+    for (var r = 0; r < grid.length; r++) {
+      for (var c = 0; c < grid[r].length; c++) {
+        final isSelected = selected.contains(CellCoord(r, c));
+        final text = TextPainter(
+          text: TextSpan(
+            text: grid[r][c].toUpperCase(),
+            style: AppTypography.pinKey.copyWith(
+              fontSize: isSelected ? fontSize * 1.12 : fontSize,
+              fontWeight: FontWeight.w700,
+              color: isSelected ? Colors.white : AppColors.textPrimary,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        final center = _center(CellCoord(r, c));
+        text.paint(canvas, center - Offset(text.width / 2, text.height / 2));
+      }
     }
   }
 
   @override
-  bool shouldRepaint(covariant WordSearchPainter oldDelegate) {
-    return oldDelegate.selectedCells != selectedCells ||
-        oldDelegate.selectionColor != selectionColor;
-  }
+  bool shouldRepaint(covariant WordSearchPainter old) =>
+      old.selectedCells != selectedCells || old.found != found || old.cellSize != cellSize || old.grid != grid;
 }

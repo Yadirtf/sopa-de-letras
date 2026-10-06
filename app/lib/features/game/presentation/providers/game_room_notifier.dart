@@ -4,6 +4,7 @@ import '../../domain/repositories/game_repository.dart';
 import '../../data/repositories/game_repository_impl.dart';
 import 'game_room_state.dart';
 import 'game_room_socket_listener.dart';
+import 'word_attempt.dart';
 
 final gameRepositoryProvider = Provider<GameRepository>((ref) {
   return GameRepositoryImpl();
@@ -45,11 +46,7 @@ class GameRoomNotifier extends StateNotifier<GameRoomState> {
     state = state.copyWith(isLoading: true);
     try {
       final room = await _repository.createRoom(
-        wordSearchId: wordSearchId,
-        maxPlayers: maxPlayers,
-        timeLimitSeconds: timeLimitSeconds,
-        isPrivate: isPrivate,
-      );
+          wordSearchId: wordSearchId, maxPlayers: maxPlayers, timeLimitSeconds: timeLimitSeconds, isPrivate: isPrivate);
       state = state.copyWith(isLoading: false, room: room);
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
@@ -71,12 +68,8 @@ class GameRoomNotifier extends StateNotifier<GameRoomState> {
     try {
       final room = await _repository.getRoomByCode(upper);
       state = state.copyWith(room: room);
-      final snapshot = await _repository.joinRoom(
-        roomCode: upper,
-        userId: userId,
-        username: username,
-        avatarUrl: avatarUrl,
-      );
+      final snapshot =
+          await _repository.joinRoom(roomCode: upper, userId: userId, username: username, avatarUrl: avatarUrl);
       _joinedCode = upper;
       state = state.copyWith(
         isLoading: false,
@@ -106,16 +99,24 @@ class GameRoomNotifier extends StateNotifier<GameRoomState> {
     _repository.startGame(roomCode: state.room!.code, userId: _currentUserId!);
   }
 
-  void submitWord(String word, List<int> start, List<int> end) {
-    if (state.room == null || _currentUserId == null) return;
-    _repository.submitWord(
-      roomCode: state.room!.code,
-      userId: _currentUserId!,
-      word: word,
-      startCoord: start,
-      endCoord: end,
-    );
+  /// Revisa el trazo en el telefono y, si es una palabra de la lista, la manda al servidor.
+  WordAttemptOutcome submitSelection(String formed, List<int> start, List<int> end) {
+    final room = state.room;
+    final me = _currentUserId;
+    if (room == null || me == null) return WordAttemptOutcome.notInList;
+    final mine = room.players.where((p) => p.userId == me).expand((p) => p.wordsFound);
+    final attempt = WordAttempt.evaluate(formed, room.words, mine);
+    if (attempt.outcome != WordAttemptOutcome.sent) return attempt.outcome;
+    _repository
+        .submitWord(roomCode: room.code, userId: me, word: attempt.word!, startCoord: start, endCoord: end)
+        .then((error) {
+      if (error != null && mounted) state = state.copyWith(errorMessage: WordAttempt.friendlyRejection(error));
+    });
+    return WordAttemptOutcome.sent;
   }
+
+  /// La animacion 3-2-1 termino: quitamos la capa y se puede jugar.
+  void dismissCountdown() => state = state.copyWith(clearCountdown: true);
 
   void voteRematch() {
     if (state.room == null || _currentUserId == null) return;

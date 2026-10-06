@@ -33,7 +33,8 @@ abstract class GameRepository {
 
   void startGame({required String roomCode, required String userId});
 
-  void submitWord({
+  /// null si la palabra fue aceptada; si no, el codigo de error del servidor.
+  Future<String?> submitWord({
     required String roomCode,
     required String userId,
     required String word,
@@ -53,4 +54,7 @@ abstract class GameRepository {
   Stream<List<PodiumEntryEntity>> onGameEnded();
   Stream<RematchVoteStateEntity> onRematchUpdate();
   Stream<Map<String, dynamic>> onRematchStarted();
+
+  /// true al conectar o reconectar; false cuando se cae el internet.
+  Stream<bool> onConnectionChanged();
 }
