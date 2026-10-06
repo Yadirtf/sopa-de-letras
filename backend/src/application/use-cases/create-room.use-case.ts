@@ -54,11 +54,22 @@ export class CreateRoomUseCase {
 
     await this.roomRepo.create(roomEntity);
 
-    // Extract solutions if available
+    // Extract solutions if available (soporta tanto strings como objetos PlacedWord)
     const solutionsMap: Record<string, any> = {};
-    const rawWords = wordSearch.words || [];
-    for (const w of rawWords) {
-      solutionsMap[w.toUpperCase()] = { word: w.toUpperCase() };
+    const rawWords = Array.isArray(wordSearch.words) ? wordSearch.words : [];
+    const normalizedWords: string[] = [];
+
+    for (const item of rawWords) {
+      const wordStr = typeof item === 'string'
+        ? item.trim().toUpperCase()
+        : (item && typeof (item as any).word === 'string'
+            ? (item as any).word.trim().toUpperCase()
+            : '');
+      if (!wordStr) continue;
+      normalizedWords.push(wordStr);
+      solutionsMap[wordStr] = typeof item === 'object' && item !== null
+        ? { ...(item as Record<string, any>), word: wordStr }
+        : { word: wordStr };
     }
 
     const cachedState: CachedRoomState = {
@@ -72,7 +83,7 @@ export class CreateRoomUseCase {
       timeLimitSeconds,
       isPrivate,
       grid: wordSearch.grid || [],
-      words: rawWords.map((w) => w.toUpperCase()),
+      words: normalizedWords,
       solutions: solutionsMap,
       players: roomEntity.players,
       claimedWords: {},

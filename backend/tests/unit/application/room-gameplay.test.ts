@@ -98,4 +98,36 @@ describe("WordValidationHelper & RoomManagerService", () => {
       service.submitWord("CODE12", "guest-2", "MANZANA", { start: [0, 0], end: [0, 6] })
     ).rejects.toThrow("PALABRA_YA_ENCONTRADA");
   });
+
+  it("CreateRoomUseCase debe admitir palabras guardadas como objetos PlacedWord y strings sin fallar con toUpperCase", async () => {
+    const { CreateRoomUseCase } = await import("../../../src/application/use-cases/create-room.use-case");
+    const mockRoomRepo = { create: vi.fn().mockResolvedValue(undefined) } as any;
+    const mockWordSearchRepo = {
+      findById: vi.fn().mockResolvedValue({
+        id: "ws-test-1",
+        title: "Animales",
+        grid: [["L", "E", "O", "N"]],
+        words: [
+          { word: "LEON", startRow: 0, startCol: 0, endRow: 0, endCol: 3, direction: "RIGHT" },
+          "TIGRE",
+        ],
+      }),
+    } as any;
+    const mockCache = { saveRoom: vi.fn().mockResolvedValue(undefined) } as any;
+
+    const useCase = new CreateRoomUseCase(mockRoomRepo, mockWordSearchRepo, mockCache);
+    const result = await useCase.execute(
+      { id: "user-1", name: "Host" },
+      { wordSearchId: "ws-test-1", maxPlayers: 10, timeLimitSeconds: 120 }
+    );
+
+    expect(result.code).toHaveLength(6);
+    expect(result.maxPlayers).toBe(10);
+    expect(mockRoomRepo.create).toHaveBeenCalledOnce();
+    expect(mockCache.saveRoom).toHaveBeenCalledWith(
+      expect.objectContaining({
+        words: ["LEON", "TIGRE"],
+      })
+    );
+  });
 });
