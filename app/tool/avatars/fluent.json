@@ -1,0 +1,260 @@
+{
+ "animales": [
+  [
+   "Honeybee",
+   "Abeja"
+  ],
+  [
+   "Dog face",
+   "Perro"
+  ],
+  [
+   "Cat face",
+   "Gato"
+  ],
+  [
+   "Fox",
+   "Zorro"
+  ],
+  [
+   "Panda",
+   "Panda"
+  ],
+  [
+   "Lion",
+   "León"
+  ],
+  [
+   "Tiger face",
+   "Tigre"
+  ],
+  [
+   "Koala",
+   "Koala"
+  ],
+  [
+   "Monkey face",
+   "Mono"
+  ],
+  [
+   "Rabbit face",
+   "Conejo"
+  ],
+  [
+   "Bear",
+   "Oso"
+  ],
+  [
+   "Frog",
+   "Rana"
+  ],
+  [
+   "Owl",
+   "Búho"
+  ],
+  [
+   "Penguin",
+   "Pingüino"
+  ],
+  [
+   "Hamster",
+   "Hámster"
+  ],
+  [
+   "Wolf",
+   "Lobo"
+  ],
+  [
+   "Cow face",
+   "Vaca"
+  ],
+  [
+   "Pig face",
+   "Cerdito"
+  ],
+  [
+   "Mouse face",
+   "Ratón"
+  ],
+  [
+   "Unicorn",
+   "Unicornio"
+  ],
+  [
+   "Dragon face",
+   "Dragón"
+  ],
+  [
+   "Hatching chick",
+   "Pollito"
+  ],
+  [
+   "Octopus",
+   "Pulpo"
+  ],
+  [
+   "Turtle",
+   "Tortuga"
+  ],
+  [
+   "Dolphin",
+   "Delfín"
+  ]
+ ],
+ "fantasia": [
+  [
+   "Alien",
+   "Alien"
+  ],
+  [
+   "Alien monster",
+   "Marciano"
+  ],
+  [
+   "Robot",
+   "Robot"
+  ],
+  [
+   "Ghost",
+   "Fantasma"
+  ],
+  [
+   "Person mage",
+   "Mago"
+  ],
+  [
+   "Woman fairy",
+   "Hada"
+  ],
+  [
+   "Man genie",
+   "Genio"
+  ],
+  [
+   "Woman superhero",
+   "Superheroína"
+  ],
+  [
+   "Man superhero",
+   "Superhéroe"
+  ],
+  [
+   "Man supervillain",
+   "Villano"
+  ],
+  [
+   "Woman vampire",
+   "Vampira"
+  ],
+  [
+   "Woman zombie",
+   "Zombi"
+  ],
+  [
+   "Man elf",
+   "Elfo"
+  ],
+  [
+   "Ninja",
+   "Ninja"
+  ],
+  [
+   "Troll",
+   "Trol"
+  ],
+  [
+   "Clown face",
+   "Payaso"
+  ],
+  [
+   "Jack-o-lantern",
+   "Calabaza"
+  ],
+  [
+   "Ogre",
+   "Ogro"
+  ],
+  [
+   "Goblin",
+   "Duende"
+  ],
+  [
+   "Smiling face with sunglasses",
+   "Genial"
+  ]
+ ],
+ "profesiones": [
+  [
+   "Astronaut",
+   "Astronauta"
+  ],
+  [
+   "Artist",
+   "Artista"
+  ],
+  [
+   "Scientist",
+   "Científica"
+  ],
+  [
+   "Firefighter",
+   "Bombero"
+  ],
+  [
+   "Cook",
+   "Chef"
+  ],
+  [
+   "Police officer",
+   "Policía"
+  ],
+  [
+   "Teacher",
+   "Profe"
+  ],
+  [
+   "Farmer",
+   "Granjero"
+  ],
+  [
+   "Health worker",
+   "Doctora"
+  ],
+  [
+   "Pilot",
+   "Piloto"
+  ],
+  [
+   "Technologist",
+   "Programador"
+  ],
+  [
+   "Singer",
+   "Cantante"
+  ],
+  [
+   "Detective",
+   "Detective"
+  ],
+  [
+   "Mechanic",
+   "Mecánico"
+  ],
+  [
+   "Student",
+   "Estudiante"
+  ],
+  [
+   "Judge",
+   "Juez"
+  ],
+  [
+   "Construction worker",
+   "Constructor"
+  ],
+  [
+   "Office worker",
+   "Oficinista"
+  ]
+ ]
+}

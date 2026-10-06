@@ -4,7 +4,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/user_entity.dart';
 import '../providers/profile_actions.dart';
-import 'avatar_selector_widget.dart';
+import '../../../../core/avatars/app_avatars.dart';
+import '../../../../core/widgets/avatar_view.dart';
+import 'avatar_picker_sheet.dart';
 
 /// "Mis datos": nombre y avatar. El botón Guardar solo se enciende cuando
 /// hay algo distinto que guardar, así nadie duda de si ya se guardó.
@@ -55,6 +57,11 @@ class _ProfileEditCardState extends ConsumerState<ProfileEditCard> {
     }
   }
 
+  Future<void> _pickAvatar() async {
+    final picked = await showAvatarPickerSheet(context, currentId: _avatar);
+    if (picked != null && mounted) setState(() => _avatar = picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -83,7 +90,7 @@ class _ProfileEditCardState extends ConsumerState<ProfileEditCard> {
           const SizedBox(height: 16),
           Text('Tu avatar', style: AppTypography.labelBold),
           const SizedBox(height: 8),
-          AvatarSelectorWidget(selectedAvatar: _avatar, onAvatarSelected: (id) => setState(() => _avatar = id)),
+          _AvatarRow(avatarId: _avatar, onTap: _pickAvatar),
           if (_error != null) ...[
             const SizedBox(height: 12),
             Text(_error!, style: AppTypography.bodyMedium.copyWith(color: AppColors.accentRose)),
@@ -100,6 +107,36 @@ class _ProfileEditCardState extends ConsumerState<ProfileEditCard> {
                   : const Icon(Icons.check_rounded),
               label: Text(_saving ? 'Guardando…' : 'Guardar cambios'),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Avatar actual + botón para cambiarlo: el selector completo se abre en
+/// una hoja aparte para no alargar la pantalla del perfil.
+class _AvatarRow extends StatelessWidget {
+  final String? avatarId;
+  final VoidCallback onTap;
+
+  const _AvatarRow({required this.avatarId, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = AppAvatars.of(avatarId);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Row(
+        children: [
+          AvatarView(avatarId: avatar.id, size: 64),
+          const SizedBox(width: 12),
+          Expanded(child: Text('${avatar.category.name} · ${avatar.name}', style: AppTypography.bodyMedium)),
+          OutlinedButton.icon(
+            onPressed: onTap,
+            icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+            label: const Text('Cambiar'),
           ),
         ],
       ),

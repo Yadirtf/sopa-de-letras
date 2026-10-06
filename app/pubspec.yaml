@@ -56,5 +56,18 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    # Avatares (ver tool/avatars/README.md para regenerarlos y sus licencias)
+    - assets/avatars/animales/
+    - assets/avatars/aventureros/
+    - assets/avatars/fantasia/
+    - assets/avatars/profesiones/
+    - assets/avatars/comic/
+    - assets/avatars/sonrisas/
+    - assets/avatars/robots/
+    - assets/avatars/pixel/
+    - assets/avatars/caritas/
+    - assets/avatars/retratos/
+    - assets/avatars/bocetos/
+    - assets/avatars/LICENSES.txt
 
 
