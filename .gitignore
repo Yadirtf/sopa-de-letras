@@ -1,5 +1,35 @@
-node_modules/
-dist/
-.env
-*.log
+﻿# Node / Backend
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
+# Flutter / App
+app/.dart_tool/
+app/build/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/pubspec.lock
+app/.packages
+app/.pub-cache/
+
+# Web
+web/node_modules/
+web/dist/
+web/.env
+
+# Sistema
 .DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.cache
+
+# IDE
+.vscode/settings.json
+.idea/
+*.iml
+
+# Prisma
+backend/src/infrastructure/database/prisma/migrations/*.sql.lock

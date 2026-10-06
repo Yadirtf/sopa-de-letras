@@ -1,0 +1,175 @@
+// schema.prisma — WordHive PostgreSQL Database Model
+// SSoT Mode: Clean Architecture & Persistent Identity
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  age         Int
+  email       String   @unique
+  pinHash     String   @map("pin_hash")
+  avatarUrl   String?  @map("avatar_url")
+  isOnline    Boolean  @default(false) @map("is_online")
+  isGuest     Boolean  @default(false) @map("is_guest")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  wordSearches           WordSearch[]
+  hostedRooms            Room[]                @relation("RoomHost")
+  roomParticipants       RoomPlayer[]
+  sentNotifications      Notification[]        @relation("NotificationSender")
+  receivedNotifications  Notification[]        @relation("NotificationRecipient")
+  sentFriendRequests     FriendRequest[]       @relation("FriendRequestSender")
+  receivedFriendRequests FriendRequest[]       @relation("FriendRequestRecipient")
+  friendshipsA           Friendship[]          @relation("FriendshipUserA")
+  friendshipsB           Friendship[]          @relation("FriendshipUserB")
+  passwordResetTokens    PasswordResetToken[]
+
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  otpCode   String    @map("otp_code")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model WordSearch {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  category    String
+  difficulty  Difficulty @default(MEDIUM)
+  language    String     @default("es")
+  grid        Json
+  words       Json
+  gridSize    Int        @map("grid_size")
+  creatorId   String     @map("creator_id")
+  playCount   Int        @default(0) @map("play_count")
+  isPublic    Boolean    @default(true) @map("is_public")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  creator User   @relation(fields: [creatorId], references: [id])
+  rooms   Room[]
+
+  @@map("word_searches")
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Room {
+  id           String     @id @default(uuid())
+  code         String     @unique
+  wordSearchId String     @map("word_search_id")
+  hostUserId   String     @map("host_user_id")
+  status       RoomStatus @default(WAITING)
+  startedAt    DateTime?  @map("started_at")
+  endedAt      DateTime?  @map("ended_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  wordSearch WordSearch   @relation(fields: [wordSearchId], references: [id])
+  host       User         @relation("RoomHost", fields: [hostUserId], references: [id])
+  players    RoomPlayer[]
+
+  @@map("rooms")
+}
+
+enum RoomStatus {
+  WAITING
+  IN_PROGRESS
+  FINISHED
+}
+
+model RoomPlayer {
+  id          String    @id @default(uuid())
+  roomId      String    @map("room_id")
+  userId      String    @map("user_id")
+  wordsFound  Json      @default("[]") @map("words_found")
+  score       Int       @default(0)
+  rank        Int?
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+  finishedAt  DateTime? @map("finished_at")
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([roomId, userId])
+  @@map("room_players")
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  userAId   String   @map("user_a_id")
+  userBId   String   @map("user_b_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userA User @relation("FriendshipUserA", fields: [userAId], references: [id])
+  userB User @relation("FriendshipUserB", fields: [userBId], references: [id])
+
+  @@unique([userAId, userBId])
+  @@map("friendships")
+}
+
+model FriendRequest {
+  id          String              @id @default(uuid())
+  senderId    String              @map("sender_id")
+  recipientId String              @map("recipient_id")
+  status      FriendRequestStatus @default(PENDING)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  sender    User @relation("FriendRequestSender", fields: [senderId], references: [id])
+  recipient User @relation("FriendRequestRecipient", fields: [recipientId], references: [id])
+
+  @@unique([senderId, recipientId])
+  @@map("friend_requests")
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String           @map("recipient_id")
+  senderId    String?          @map("sender_id")
+  type        NotificationType
+  payload     Json
+  isRead      Boolean          @default(false) @map("is_read")
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User? @relation("NotificationSender", fields: [senderId], references: [id])
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  ROOM_INVITE
+  FRIEND_REQUEST
+  GAME_START
+  GAME_END
+}
