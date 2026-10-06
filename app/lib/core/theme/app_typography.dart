@@ -57,4 +57,25 @@ abstract class AppTypography {
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
   );
+
+  // Variantes y alias semánticos
+  static TextStyle get heading2 => titleLarge;
+  static TextStyle get heading3 => titleMedium;
+  static TextStyle get bodySmall => GoogleFonts.inter(
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+        color: AppColors.textSecondary,
+        height: 1.4,
+      );
+  static TextStyle get caption => GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textSecondary,
+      );
+  static TextStyle get button => GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      );
 }
+

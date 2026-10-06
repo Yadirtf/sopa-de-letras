@@ -193,11 +193,11 @@ graph TD
 
 ---
 
-### ÉPICA 2: Catálogo y Descubrimiento de Sopas (EP-02)
+### ÉPICA 2: Catálogo y Descubrimiento de Sopas (EP-02) — [ESTADO: ✅ IMPLEMENTADA]
 
 #### US-07: Exploración del Catálogo con Scroll Infinito
 - **ID:** `US-07`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador, *quiero* ver una lista de sopas de letras disponibles con paginación fluida, *para* explorar y elegir fácilmente qué jugar.
 - **Criterios de Aceptación:**
   - **Dado** un usuario en la pestaña de catálogo.
@@ -215,7 +215,7 @@ graph TD
 
 #### US-08: Filtrado por Dificultad, Categoría y Búsqueda Lexicográfica
 - **ID:** `US-08`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador, *quiero* filtrar las sopas por nivel de dificultad (Fácil, Medio, Difícil), categoría temática o texto, *para* encontrar retos que se ajusten a mis preferencias.
 - **Criterios de Aceptación:**
   - **Dado** un usuario que selecciona un chip de filtro (ej: "Astronomía", "Medio").
@@ -230,7 +230,7 @@ graph TD
 
 #### US-09: Vista Detallada de Sopa y Ficha Informativa
 - **ID:** `US-09`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 3 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 3 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* usuario, *quiero* ver la ficha técnica de una sopa antes de iniciar (autor, cantidad de palabras, dimensiones, récord de tiempo), *para* decidir si acepto el reto.
 - **Criterios de Aceptación:**
   - **Dado** un tap sobre una tarjeta de sopa.
@@ -245,7 +245,7 @@ graph TD
 
 #### US-10: Vista Previa Segura Anti-Spoilers (Spoiler-Free Preview)
 - **ID:** `US-10`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador, *quiero* ver una previsualización de la sopa en el catálogo sin que se revelen las palabras ni sus ubicaciones exactas, *para* mantener el factor sorpresa y la competitividad.
 - **Criterios de Aceptación:**
   - **Dado** un usuario visualizando el detalle o tarjeta de una sopa en el catálogo.
@@ -255,6 +255,7 @@ graph TD
   - `backend/`: DTO `WordSearchSummaryDto` que omite `grid_data` y coordenadas de palabras en endpoints públicos.
   - `app/`: Componente visual de mini-matriz decorativa con efecto de desenfoque y partículas sutiles.
 - **Trazabilidad:** RF-11, RNF-08.
+
 
 ---
 

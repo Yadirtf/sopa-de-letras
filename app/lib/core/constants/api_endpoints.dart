@@ -21,4 +21,8 @@ abstract class ApiEndpoints {
   // Perfil de Usuario
   static const String me = '/users/me';
   static const String updatePin = '/users/me/pin';
+
+  // Catálogo de Sopas (Épica 2)
+  static const String wordSearches = '/word-searches';
 }
+

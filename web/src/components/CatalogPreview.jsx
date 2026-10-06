@@ -1,45 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { sound } from '../services/sound.service';
-
-const CATALOG_ITEMS = [
-  { id: 1, title: 'Bioluminiscencia Marina', category: 'Naturaleza', size: '12x12', words: 8, diff: 'Fácil', plays: '3.4k' },
-  { id: 2, title: 'Lenguajes de Programación', category: 'Tecnología', size: '14x14', words: 12, diff: 'Medio', plays: '7.8k' },
-  { id: 3, title: 'Planetas & Galaxias', category: 'Ciencia', size: '15x15', words: 14, diff: 'Medio', plays: '5.1k' },
-  { id: 4, title: 'Películas de Ciencia Ficción', category: 'Cine', size: '16x16', words: 15, diff: 'Difícil', plays: '4.2k' },
-  { id: 5, title: 'Ecosistema de Redis & WebSockets', category: 'Tecnología', size: '14x14', words: 10, diff: 'Difícil', plays: '2.9k' },
-  { id: 6, title: 'Animales de la Selva Amazónica', category: 'Naturaleza', size: '12x12', words: 9, diff: 'Fácil', plays: '6.0k' },
-];
-
-const CATEGORIES = ['Todos', 'Tecnología', 'Ciencia', 'Naturaleza', 'Cine'];
+import { api } from '../services/api.service';
+import { FALLBACK_ITEMS, CATEGORIES } from './catalog.constants';
 
 export function CatalogPreview() {
   const { isAuthenticated, openAuth, showToast } = useAuth();
-  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [activeCategory, setActiveCategory] = useState('TODAS');
+  const [items, setItems] = useState(FALLBACK_ITEMS);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const filtered = activeCategory === 'Todos'
-    ? CATALOG_ITEMS
-    : CATALOG_ITEMS.filter((item) => item.category === activeCategory);
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCatalog = async () => {
+      try {
+        const params = activeCategory === 'TODAS' ? {} : { category: activeCategory };
+        const data = await api.get('/word-searches', params);
+        if (isMounted && data.items && data.items.length > 0) {
+          setItems(data.items);
+        }
+      } catch {
+        if (isMounted) {
+          setItems(
+            activeCategory === 'TODAS'
+              ? FALLBACK_ITEMS
+              : FALLBACK_ITEMS.filter((i) => i.category === activeCategory)
+          );
+        }
+      }
+    };
+    fetchCatalog();
+    return () => { isMounted = false; };
+  }, [activeCategory]);
 
   const handlePlayCard = (item) => {
     sound.playClick();
     if (!isAuthenticated) {
       openAuth('register');
     } else {
-      showToast(`¡Cargando la sopa "${item.title}"! Preparando la sala...`, 'success');
+      setSelectedItem(item);
     }
   };
 
   return (
     <section className="section catalog-section" id="explorar" aria-labelledby="catalog-title">
       <div className="section-header">
-        <span className="section-tag">Explora sin Compromiso</span>
+        <span className="section-tag">Explora sin Límites</span>
         <h2 className="section-title" id="catalog-title">Catálogo de Sopas</h2>
         <p className="section-subtitle">
-          Miles de sopas creadas por la comunidad y generadas en tiempo real.
+          Miles de sopas con scroll infinito, filtrado instantáneo y protección anti-spoilers.
         </p>
 
-        {/* Filtros de Categoría */}
         <div className="category-filters" role="tablist">
           {CATEGORIES.map((cat) => (
             <button
@@ -50,36 +61,99 @@ export function CatalogPreview() {
               className={`category-chip ${activeCategory === cat ? 'category-chip--active' : ''}`}
               onClick={() => { sound.playClick(); setActiveCategory(cat); }}
             >
-              {cat}
+              {cat === 'TODAS' ? 'Todas' : cat}
             </button>
           ))}
         </div>
       </div>
 
       <div className="catalog-grid">
-        {filtered.map((item) => (
-          <div className="catalog-card" key={item.id}>
+        {items.map((item) => (
+          <div className="catalog-card" key={item.id} onClick={() => handlePlayCard(item)}>
             <div className="catalog-card__header">
-              <span className={`diff-badge diff-badge--${item.diff.toLowerCase()}`}>{item.diff}</span>
-              <span className="catalog-card__plays">👁️ {item.plays} partidas</span>
+              <span className={`diff-badge diff-badge--${item.difficulty.toLowerCase()}`}>{item.difficulty}</span>
+              <span className="catalog-card__plays">👁️ {item.playCount} jugadas</span>
             </div>
             <h3 className="catalog-card__title">{item.title}</h3>
             <div className="catalog-card__meta">
-              <span>📐 {item.size}</span>
-              <span>🔤 {item.words} palabras</span>
+              <span>📐 {item.gridSize}x{item.gridSize}</span>
+              <span>🔤 {item.wordCount} palabras</span>
               <span>🏷️ {item.category}</span>
             </div>
             <button
               type="button"
               className="btn btn--outline btn--block btn--sm"
-              onClick={() => handlePlayCard(item)}
+              onClick={(e) => { e.stopPropagation(); handlePlayCard(item); }}
             >
-              <span>{isAuthenticated ? 'Jugar Sopa' : 'Desbloquear y Jugar'}</span>
+              <span>{isAuthenticated ? 'Ver Ficha & Jugar' : 'Desbloquear y Jugar'}</span>
               <span>→</span>
             </button>
           </div>
         ))}
       </div>
+
+      {selectedItem && (
+        <div className="modal-backdrop" onClick={() => setSelectedItem(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">{selectedItem.title}</h3>
+              <button type="button" className="modal-close" onClick={() => setSelectedItem(null)}>✕</button>
+            </div>
+            <p style={{ color: 'var(--c-cyan)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+              Categoría: {selectedItem.category} • Dificultad: {selectedItem.difficulty}
+            </p>
+            <div style={{
+              position: 'relative',
+              height: '130px',
+              borderRadius: '12px',
+              background: 'rgba(15, 22, 35, 0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              border: '1px solid var(--c-glow-violet)',
+              marginBottom: '1rem'
+            }}>
+              <div style={{ filter: 'blur(5px)', opacity: 0.4, letterSpacing: '8px', fontSize: '18px', userSelect: 'none' }}>
+                WORDHIVEMATRIXSPOILERFREEZONE
+              </div>
+              <div style={{
+                position: 'absolute',
+                background: 'rgba(21, 29, 46, 0.9)',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                border: '1px solid var(--c-cyan)',
+                color: 'var(--c-cyan)',
+                fontSize: '0.8rem',
+                fontWeight: 600
+              }}>
+                🔒 Anti-Spoilers: Soluciones Ocultas
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn btn--primary btn--block"
+              style={{ marginBottom: '8px' }}
+              onClick={() => {
+                showToast(`¡Iniciando partida en solitario: ${selectedItem.title}!`, 'success');
+                setSelectedItem(null);
+              }}
+            >
+              ▶️ Jugar en Solitario
+            </button>
+            <button
+              type="button"
+              className="btn btn--outline btn--block"
+              onClick={() => {
+                showToast(`¡Creando sala multijugador para: ${selectedItem.title}!`, 'info');
+                setSelectedItem(null);
+              }}
+            >
+              👥 Crear Sala Multijugador
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
