@@ -13,6 +13,7 @@ import '../widgets/catalog_skeleton_widget.dart';
 import '../widgets/catalog_empty_state.dart';
 import '../widgets/word_search_detail_sheet.dart';
 import '../../../notifications/presentation/widgets/notification_bell_button.dart';
+import '../../../game/presentation/helpers/solo_game_starter.dart';
 
 class CatalogPage extends ConsumerStatefulWidget {
   const CatalogPage({super.key});
@@ -55,9 +56,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
         detail: detail,
         onPlaySolo: () {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Modo Solitario próximamente en Épica 3')),
-          );
+          startSoloGame(context, ref, detail.id);
         },
         onCreateMultiplayer: () {
           Navigator.of(context).pop();

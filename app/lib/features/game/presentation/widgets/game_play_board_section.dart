@@ -43,7 +43,7 @@ class GamePlayBoardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final room = state.room!;
-    final standings = computeRaceStandings(room.players, currentUserId);
+    final standings = computeRaceStandings(room.players, currentUserId, state.leaderboard);
     final myWords = standings.where((s) => s.isMe).map((s) => s.wordsCount).firstOrNull ?? 0;
 
     return Padding(

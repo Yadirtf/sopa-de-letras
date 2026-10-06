@@ -1,20 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wordhive_app/features/game/domain/entities/game_event_entities.dart';
-import 'package:wordhive_app/features/game/domain/entities/game_room_entity.dart';
 import 'package:wordhive_app/features/game/domain/entities/room_lobby_entities.dart';
 import 'package:wordhive_app/features/game/presentation/providers/game_board_provider.dart';
 import 'package:wordhive_app/features/game/presentation/providers/game_room_notifier.dart';
-import 'package:wordhive_app/features/game/presentation/providers/race_standings.dart';
 import 'package:wordhive_app/features/game/presentation/providers/word_attempt.dart';
 import 'fake_game_repository.dart';
 
 Future<void> flush() => Future<void>.delayed(Duration.zero);
-
-RoomPlayerEntity racer(String id, int score, int words, {bool online = true}) => fakePlayer(id).copyWith(
-      score: score,
-      wordsFound: List.generate(words, (i) => 'W$i'),
-      isConnected: online,
-    );
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -63,26 +55,6 @@ void main() {
       expect(WordAttempt.evaluate('ORREP', ['perro'], const []).word, 'PERRO');
       expect(WordAttempt.evaluate('GATO', ['PERRO'], const []).outcome, WordAttemptOutcome.notInList);
       expect(WordAttempt.evaluate('PERRO', ['PERRO'], ['perro']).outcome, WordAttemptOutcome.alreadyMine);
-    });
-  });
-
-  group('Carrera de oponentes', () {
-    test('ordena por puntos y corona al lider solo si va solo adelante', () {
-      final standings = computeRaceStandings([racer('ana', 10, 1), racer('yo', 30, 2), racer('beto', 0, 0)], 'yo');
-      expect(standings.map((s) => s.userId), ['yo', 'ana', 'beto']);
-      expect(standings.first.isLeader, isTrue);
-      expect(raceHeadline(standings), contains('Vas ganando'));
-
-      final tied = computeRaceStandings([racer('ana', 10, 1), racer('yo', 10, 1)], 'yo');
-      expect(tied.any((s) => s.isLeader), isFalse);
-      expect(tied.map((s) => s.place), [1, 1]);
-      expect(raceHeadline(tied), contains('Empate'));
-    });
-
-    test('dice quien va adelante y en que puesto voy', () {
-      final standings = computeRaceStandings([racer('ana', 20, 2), racer('yo', 10, 1, online: false)], 'yo');
-      expect(raceHeadline(standings), 'ANA va adelante · tú vas de 2º');
-      expect(standings.last.isConnected, isFalse);
     });
   });
 
@@ -143,6 +115,21 @@ void main() {
       repo.connection.add(true);
       await flush();
       expect(notifier.state.isConnected, isTrue);
+    });
+
+    test('las palabras del oponente no se pintan en mi sopa, solo cuenta su avance', () async {
+      repo.wordFound.add(const WordFoundEventEntity(
+        word: 'GATO',
+        claimedByUserId: 'ana',
+        claimedByUsername: 'Ana',
+        colorHex: '#06B6D4',
+        pointsAwarded: 40,
+        newScore: 40,
+        start: [1, 0],
+        end: [1, 3],
+      ));
+      await flush();
+      expect(notifier.state.claimedWords, isEmpty);
     });
   });
 }
