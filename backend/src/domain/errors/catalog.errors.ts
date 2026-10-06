@@ -17,3 +17,12 @@ export class InvalidCatalogQueryError extends DomainError {
     super(message);
   }
 }
+
+export class InvalidCategoryNameError extends DomainError {
+  readonly code = "INVALID_CATEGORY";
+  readonly statusCode = 400;
+
+  constructor() {
+    super("El tema debe tener entre 2 y 40 letras");
+  }
+}

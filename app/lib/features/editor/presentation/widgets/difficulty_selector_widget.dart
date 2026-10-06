@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 
+/// Dificultad explicada con palabras sencillas y tamaño de la cuadrícula.
 class DifficultySelectorWidget extends StatelessWidget {
   final String selectedDifficulty;
   final int gridSize;
+  final int minGridSize;
   final ValueChanged<String> onDifficultyChanged;
   final ValueChanged<int> onGridSizeChanged;
 
-  static const options = [
-    {'value': 'EASY', 'label': 'Fácil', 'dir': '2 dir (Horizontal/Vertical)', 'color': AppColors.accentEmerald},
-    {'value': 'MEDIUM', 'label': 'Medio', 'dir': '4 dir (+ Diagonales)', 'color': AppColors.accentAmber},
-    {'value': 'HARD', 'label': 'Difícil', 'dir': '8 dir (Inversas y Cruzadas)', 'color': AppColors.accentRose},
+  static const _easy = (label: 'Fácil', hint: 'De lado y hacia abajo', icon: Icons.sentiment_satisfied_alt_rounded);
+  static const _medium = (label: 'Medio', hint: 'También en diagonal', icon: Icons.local_fire_department_rounded);
+  static const _hard = (label: 'Difícil', hint: 'Al revés y en todas direcciones', icon: Icons.bolt_rounded);
+  static const _options = [
+    (value: 'EASY', look: _easy, color: AppColors.accentEmerald),
+    (value: 'MEDIUM', look: _medium, color: AppColors.accentAmber),
+    (value: 'HARD', look: _hard, color: AppColors.accentRose),
   ];
 
   const DifficultySelectorWidget({
@@ -20,64 +25,47 @@ class DifficultySelectorWidget extends StatelessWidget {
     required this.gridSize,
     required this.onDifficultyChanged,
     required this.onGridSizeChanged,
+    this.minGridSize = 10,
   });
+
+  String get _sizeName => gridSize <= 12
+      ? 'Pequeña'
+      : gridSize <= 16
+          ? 'Mediana'
+          : 'Grande';
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Dificultad de Juego', style: AppTypography.heading3.copyWith(fontSize: 15)),
-        const SizedBox(height: 8),
         Row(
-          children: options.map((opt) {
-            final isSelected = selectedDifficulty == opt['value'];
-            final color = opt['color'] as Color;
-
-            return Expanded(
-              child: GestureDetector(
-                onTap: () => onDifficultyChanged(opt['value'] as String),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? color.withValues(alpha: 0.2) : AppColors.bgCard,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? color : AppColors.borderSubtle,
-                      width: isSelected ? 1.5 : 1.0,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        opt['label'] as String,
-                        style: AppTypography.caption.copyWith(
-                          color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        (opt['value'] as String) == 'EASY' ? '2 dir' : (opt['value'] as String) == 'MEDIUM' ? '4 dir' : '8 dir',
-                        style: AppTypography.caption.copyWith(
-                          fontSize: 10,
-                          color: isSelected ? color : AppColors.textMuted,
-                        ),
-                      ),
-                    ],
+          children: [
+            for (final opt in _options)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: _DifficultyOption(
+                    label: opt.look.label,
+                    hint: opt.look.hint,
+                    icon: opt.look.icon,
+                    color: opt.color,
+                    selected: selectedDifficulty == opt.value,
+                    onTap: () => onDifficultyChanged(opt.value),
                   ),
                 ),
               ),
-            );
-          }).toList(),
+          ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Tamaño de Cuadrícula', style: AppTypography.heading3.copyWith(fontSize: 15)),
-            Text('${gridSize}x$gridSize', style: AppTypography.caption.copyWith(color: AppColors.accentCyan, fontWeight: FontWeight.bold)),
+            const Icon(Icons.grid_on_rounded, color: AppColors.accentCyan, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+                child:
+                    Text('Tamaño: $_sizeName', style: AppTypography.labelBold.copyWith(color: AppColors.textPrimary))),
+            Text('$gridSize × $gridSize letras', style: AppTypography.caption.copyWith(color: AppColors.accentCyan)),
           ],
         ),
         Slider(
@@ -86,11 +74,70 @@ class DifficultySelectorWidget extends StatelessWidget {
           max: 20,
           divisions: 10,
           activeColor: AppColors.accentCyan,
-          inactiveColor: AppColors.bgCard,
-          label: '${gridSize}x$gridSize',
-          onChanged: (val) => onGridSizeChanged(val.toInt()),
+          inactiveColor: AppColors.bgSecondary,
+          label: '$gridSize × $gridSize',
+          semanticFormatterCallback: (v) => 'Cuadrícula de ${v.toInt()} por ${v.toInt()}',
+          // No deja achicarla tanto que la palabra más larga no quepa.
+          onChanged: (val) => onGridSizeChanged(val.toInt() < minGridSize ? minGridSize : val.toInt()),
         ),
+        if (minGridSize > 10)
+          Text('Mínimo $minGridSize para que quepa tu palabra más larga.',
+              style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
       ],
+    );
+  }
+}
+
+class _DifficultyOption extends StatelessWidget {
+  final String label;
+  final String hint;
+  final IconData icon;
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _DifficultyOption({
+    required this.label,
+    required this.hint,
+    required this.icon,
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: 'Dificultad $label: $hint',
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          constraints: const BoxConstraints(minHeight: 112),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+          decoration: BoxDecoration(
+            color: selected ? color.withValues(alpha: 0.2) : AppColors.bgSecondary,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: selected ? color : AppColors.borderSubtle, width: selected ? 2 : 1),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: selected ? color : AppColors.textSecondary, size: 28),
+              const SizedBox(height: 6),
+              Text(label,
+                  style: AppTypography.labelBold
+                      .copyWith(color: selected ? AppColors.textPrimary : AppColors.textSecondary)),
+              const SizedBox(height: 4),
+              Text(hint,
+                  textAlign: TextAlign.center,
+                  style:
+                      AppTypography.caption.copyWith(fontSize: 11, color: selected ? color : AppColors.textSecondary)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

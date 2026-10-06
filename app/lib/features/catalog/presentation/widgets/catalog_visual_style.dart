@@ -18,6 +18,10 @@ class CatalogVisualStyle {
     'HISTORIA': CatalogVisualStyle(Icons.account_balance_rounded, AppColors.accentAmber, 'Historia'),
     'ARTE': CatalogVisualStyle(Icons.palette_rounded, AppColors.accentRose, 'Arte'),
     'DEPORTES': CatalogVisualStyle(Icons.sports_soccer_rounded, AppColors.accentEmerald, 'Deportes'),
+    'ANIMALES': CatalogVisualStyle(Icons.pets_rounded, AppColors.accentAmber, 'Animales'),
+    'COMIDA': CatalogVisualStyle(Icons.restaurant_rounded, AppColors.accentRose, 'Comida'),
+    'GEOGRAFIA': CatalogVisualStyle(Icons.public_rounded, AppColors.accentCyan, 'Geografía'),
+    'MUSICA': CatalogVisualStyle(Icons.music_note_rounded, AppColors.accentViolet, 'Música'),
   };
 
   static const _difficulties = {
