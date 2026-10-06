@@ -26,6 +26,7 @@ class GameRoomNotifier extends StateNotifier<GameRoomState> {
         repository: _repository,
         getState: () => state,
         setState: (s) => state = s,
+        currentUserId: () => _currentUserId,
       ),
     );
   }

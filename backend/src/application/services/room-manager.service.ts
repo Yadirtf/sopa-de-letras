@@ -103,6 +103,7 @@ export class RoomManagerService {
     const scoreAwarded = WordValidationHelper.calculateWordScore(cleanWord.length, isFirstClaim);
 
     player.wordsFound.push(cleanWord);
+    player.wordCoords = { ...player.wordCoords, [cleanWord]: coords };
     player.score += scoreAwarded;
 
     if (isFirstClaim) {
@@ -111,15 +112,13 @@ export class RoomManagerService {
         username: player.username,
         colorHex: player.colorHex,
         timestamp: Date.now(),
-        start: coords.start,
-        end: coords.end,
       };
     }
 
     await this.roomCache.saveRoom(state);
 
-    const distinctFound = Object.keys(state.claimedWords).length;
-    const allCompleted = distinctFound >= state.words.length;
+    // Cada quien tiene su propia sopa: gana la carrera el primero en completarla.
+    const allCompleted = player.wordsFound.length >= state.words.length;
 
     const wordFound: WordFoundResultDto = {
       word: cleanWord,

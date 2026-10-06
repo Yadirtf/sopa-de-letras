@@ -4,7 +4,7 @@ import '../../../../core/theme/app_typography.dart';
 
 /// Pregunta antes de abandonar: un toque accidental no debe sacar a nadie de la partida.
 class LeaveRoomDialog {
-  static Future<bool> confirm(BuildContext context, {required bool inGame}) async {
+  static Future<bool> confirm(BuildContext context, {required bool inGame, bool solo = false}) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -13,9 +13,11 @@ class LeaveRoomDialog {
         icon: const Icon(Icons.logout_rounded, color: AppColors.accentRose, size: 36),
         title: Text('¿Abandonar la sala?', style: AppTypography.heading2.copyWith(fontSize: 20)),
         content: Text(
-          inGame
-              ? 'Saldrás de la partida y perderás tu lugar en la carrera.'
-              : 'Saldrás de la sala y tu lugar quedará libre para otro jugador.',
+          solo
+              ? 'Saldrás de la partida. Podrás volver a jugar esta sopa cuando quieras.'
+              : inGame
+                  ? 'Saldrás de la partida y perderás tu lugar en la carrera.'
+                  : 'Saldrás de la sala y tu lugar quedará libre para otro jugador.',
           style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,

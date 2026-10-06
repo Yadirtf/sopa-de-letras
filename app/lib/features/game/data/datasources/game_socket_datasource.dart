@@ -45,7 +45,7 @@ class GameSocketDataSource {
       if (join == null) return;
       _emitJoin(join).then((ack) {
         streams.pushPlayers(ack['room']);
-        streams.pushClaimedWords(ack['room']);
+        streams.pushMyWords(ack['room'], join['userId']);
       });
     });
   }

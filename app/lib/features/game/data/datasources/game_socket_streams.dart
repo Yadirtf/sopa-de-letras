@@ -66,12 +66,16 @@ class GameSocketStreams {
     if (snapshot != null) _playersCtrl.add(snapshot);
   }
 
-  /// Al volver de una caida, la sala trae las palabras ya reclamadas: las
-  /// re-emitimos para que el tablero pinte lo que se encontro mientras tanto.
-  void pushClaimedWords(dynamic room) {
-    if (room is! Map || room['claimedWords'] is! Map) return;
-    (room['claimedWords'] as Map).forEach((word, claim) {
-      if (claim is Map) _wordFoundCtrl.add(WordFoundEventModel.fromClaim(word.toString(), asMap(claim)));
+  /// Al volver de una caida, la sala trae donde marco cada palabra este
+  /// jugador: las re-emitimos para repintar SU sopa (la de los demas es privada).
+  void pushMyWords(dynamic room, dynamic userId) {
+    if (room is! Map || room['players'] is! List) return;
+    final me = (room['players'] as List).whereType<Map>().where((p) => p['userId'] == userId).firstOrNull;
+    final coords = me?['wordCoords'];
+    if (me == null || coords is! Map) return;
+    final claim = {'userId': me['userId'], 'username': me['username'], 'colorHex': me['colorHex']};
+    coords.forEach((word, c) {
+      if (c is Map) _wordFoundCtrl.add(WordFoundEventModel.fromClaim(word.toString(), {...claim, ...asMap(c)}));
     });
   }
 

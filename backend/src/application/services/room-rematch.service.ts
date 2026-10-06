@@ -71,6 +71,7 @@ export class RoomRematchService {
     for (const p of state.players) {
       p.score = 0;
       p.wordsFound = [];
+      p.wordCoords = {};
       p.isReady = p.isHost;
     }
 

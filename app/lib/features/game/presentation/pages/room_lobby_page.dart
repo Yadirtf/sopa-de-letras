@@ -7,6 +7,7 @@ import '../../../auth/presentation/providers/auth_notifier.dart';
 import '../../domain/entities/room_lobby_entities.dart';
 import '../providers/game_room_notifier.dart';
 import '../providers/game_room_state.dart';
+import '../providers/solo_game_launcher.dart';
 import '../widgets/connection_lost_banner.dart';
 import '../widgets/leave_room_dialog.dart';
 import '../widgets/lobby_action_bar_widget.dart';
@@ -27,7 +28,7 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureJoined());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureJoined().then((_) => _autoStartSolo()));
   }
 
   /// El anfitrion llega aqui desde "Crear sala" sin haber entrado por socket:
@@ -38,6 +39,12 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
     final user = ref.read(authNotifierProvider).user;
     if (user == null) return;
     await notifier.joinRoom(code: widget.roomCode, userId: user.id, username: user.name, avatarUrl: user.avatarUrl);
+  }
+
+  /// Sala solitaria (p. ej. "otra vez" desde el podio): arranca sola, sin esperar a nadie.
+  void _autoStartSolo() {
+    if (!mounted || ref.read(soloRoomCodeProvider) != widget.roomCode.toUpperCase()) return;
+    ref.read(gameRoomNotifierProvider.notifier).startGame();
   }
 
   /// Solo sale quien lo pide: si se cae el internet, el servidor le guarda el puesto.

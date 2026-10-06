@@ -9,6 +9,7 @@ class GameRoomSocketListener {
     required GameRepository repository,
     required GameRoomState Function() getState,
     required void Function(GameRoomState) setState,
+    required String? Function() currentUserId,
   }) {
     void update(GameRoomState Function(GameRoomState s) change) => setState(change(getState()));
 
@@ -39,6 +40,8 @@ class GameRoomSocketListener {
             return s.copyWith(
               isGameActive: true,
               gameStartedAt: DateTime.now(),
+              claimedWords: const {},
+              leaderboard: const [],
               room: s.room?.copyWith(
                 status: RoomStatusEnum.inProgress,
                 grid: grid.isNotEmpty ? grid : null,
@@ -47,8 +50,9 @@ class GameRoomSocketListener {
             );
           })),
 
-      // La primera persona en encontrar la palabra se queda con su color en el tablero.
-      repository.onWordFound().listen((event) => update((s) {
+      // Mi sopa es privada: solo pinto lo que encontre yo. Del oponente solo se ve
+      // cuantas lleva (marcador), nunca cuales ni donde.
+      repository.onWordFound().where((e) => e.claimedByUserId == currentUserId()).listen((event) => update((s) {
             final claimed = Map.of(s.claimedWords)..putIfAbsent(event.word.toUpperCase(), () => event);
             return s.copyWith(
               claimedWords: claimed,

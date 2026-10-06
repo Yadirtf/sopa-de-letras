@@ -24,14 +24,14 @@ export interface CachedRoomState {
     colorHex: string;
     /** false mientras se le cae el internet; ausente equivale a conectado. */
     isConnected?: boolean;
+    /** Donde marco cada palabra: solo se le devuelve a el al reconectar (su sopa es privada). */
+    wordCoords?: Record<string, { start: [number, number]; end: [number, number] }>;
   }>;
   claimedWords: Record<string, {
     userId: string;
     username: string;
     colorHex: string;
     timestamp: number;
-    start?: [number, number];
-    end?: [number, number];
   }>;
   rematchVotes: string[];
   startedAt?: number | null;
