@@ -7,6 +7,7 @@ import { IWordSearchRepository } from "../../domain/repositories/word-search.rep
 import { ICatalogCacheService } from "../../domain/services/catalog-cache.service.interface";
 import { WordSearchGeneratorService } from "../../domain/services/word-search-generator.service";
 import { CreateWordSearchDto, MyWordSearchItemDto } from "../dtos/editor.dtos";
+import { categoryKey } from "../../domain/services/category-normalizer";
 
 export class CreateWordSearchUseCase {
   constructor(
@@ -27,7 +28,7 @@ export class CreateWordSearchUseCase {
         id: randomUUID(),
         title: dto.title.trim(),
         description: dto.description?.trim() || null,
-        category: dto.category.trim().toUpperCase(),
+        category: categoryKey(dto.category),
         difficulty: dto.difficulty,
         language: "es",
         gridSize: dto.gridSize,

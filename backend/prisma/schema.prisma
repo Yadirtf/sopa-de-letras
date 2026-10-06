@@ -73,6 +73,18 @@ model WordSearch {
   @@map("word_searches")
 }
 
+// Temas con los que se agrupan las sopas. WordSearch.category guarda la "key"
+// (mayusculas, sin tildes) para que "Ciencia" y "CIENCIA" no se dupliquen.
+model Category {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  label       String
+  createdById String?  @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("categories")
+}
+
 enum Difficulty {
   EASY
   MEDIUM

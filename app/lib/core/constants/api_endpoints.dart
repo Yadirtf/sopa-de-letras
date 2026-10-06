@@ -41,6 +41,7 @@ abstract class ApiEndpoints {
 
   // Catálogo de Sopas (Épica 2)
   static const String wordSearches = '/word-searches';
+  static const String categories = '/categories';
 
   // Salas Multijugador (Épica 4)
   static const String rooms = '/rooms';

@@ -1,3 +1,5 @@
+import { categoryKey } from "../services/category-normalizer";
+
 export type WordSearchDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
 export interface WordSearchProps {
@@ -69,7 +71,7 @@ export class WordSearch {
       this.props.description = details.description;
     }
     if (details.category !== undefined) {
-      this.props.category = details.category.trim().toUpperCase();
+      this.props.category = categoryKey(details.category);
     }
     if (details.isPublic !== undefined) {
       this.props.isPublic = details.isPublic;
