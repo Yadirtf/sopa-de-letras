@@ -50,10 +50,10 @@ async function bootstrap() {
   app.get("/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
 
   // Registrar todas las rutas HTTP
-  await registerRoutes(app);
+  const { socketDispatcher } = await registerRoutes(app);
 
   // Inicializar Socket.IO con el servidor HTTP de Fastify
-  initializeSocketServer(app.server);
+  initializeSocketServer(app.server, socketDispatcher);
 
   // Conectar a base de datos
   await prismaClient.$connect();

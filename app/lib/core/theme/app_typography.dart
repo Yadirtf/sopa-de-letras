@@ -59,8 +59,11 @@ abstract class AppTypography {
   );
 
   // Variantes y alias semánticos
+  static TextStyle get heading1 => hero;
   static TextStyle get heading2 => titleLarge;
   static TextStyle get heading3 => titleMedium;
+  static TextStyle get displayLarge => hero;
+  static TextStyle get labelLarge => labelBold;
   static TextStyle get bodySmall => GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.normal,

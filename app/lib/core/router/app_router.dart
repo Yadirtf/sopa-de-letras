@@ -7,6 +7,12 @@ import '../../features/catalog/presentation/pages/catalog_page.dart';
 import '../../features/editor/presentation/pages/create_word_search_page.dart';
 import '../../features/editor/presentation/pages/my_creations_page.dart';
 
+import '../../features/game/presentation/pages/create_room_page.dart';
+import '../../features/game/presentation/pages/join_room_page.dart';
+import '../../features/game/presentation/pages/room_lobby_page.dart';
+import '../../features/game/presentation/pages/game_play_page.dart';
+import '../../features/game/presentation/pages/game_podium_page.dart';
+
 final appRouter = GoRouter(
   initialLocation: '/login',
   routes: [
@@ -41,6 +47,38 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfilePage(),
+    ),
+    GoRoute(
+      path: '/create-room',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>? ?? {};
+        return CreateRoomPage(
+          wordSearchId: extra['wordSearchId'] ?? '',
+          wordSearchTitle: extra['wordSearchTitle'] ?? 'Sopa de Letras',
+        );
+      },
+    ),
+    GoRoute(
+      path: '/join-room',
+      builder: (context, state) => const JoinRoomPage(),
+    ),
+    GoRoute(
+      path: '/lobby/:code',
+      builder: (context, state) => RoomLobbyPage(
+        roomCode: state.pathParameters['code'] ?? '',
+      ),
+    ),
+    GoRoute(
+      path: '/game/:code',
+      builder: (context, state) => GamePlayPage(
+        roomCode: state.pathParameters['code'] ?? '',
+      ),
+    ),
+    GoRoute(
+      path: '/game-podium/:code',
+      builder: (context, state) => GamePodiumPage(
+        roomCode: state.pathParameters['code'] ?? '',
+      ),
     ),
   ],
 );

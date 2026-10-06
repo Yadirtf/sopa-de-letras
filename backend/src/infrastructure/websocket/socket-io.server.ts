@@ -1,16 +1,20 @@
 import { Server as HttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { env } from "../../config/env";
+import { SocketDispatcher } from "./handlers/socket-dispatcher";
 
 let io: SocketIOServer | null = null;
 
-/**
- * Inicializador del servidor Socket.IO para comunicacion en tiempo real.
- */
-export function initializeSocketServer(server: HttpServer): SocketIOServer {
+export function initializeSocketServer(
+  server: HttpServer,
+  dispatcher?: SocketDispatcher
+): SocketIOServer {
   io = new SocketIOServer(server, {
     cors: {
-      origin: env.FRONTEND_URL,
+      origin: (origin, callback) => {
+        // Permitir conexiones de app móvil (sin origin) y frontends
+        callback(null, true);
+      },
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -18,12 +22,9 @@ export function initializeSocketServer(server: HttpServer): SocketIOServer {
     pingTimeout: 5000,
   });
 
-  io.on("connection", (socket) => {
-    // Registro de conexion inicial
-    socket.on("disconnect", () => {
-      // Manejo de desconexion
-    });
-  });
+  if (dispatcher) {
+    dispatcher.initialize(io);
+  }
 
   return io;
 }

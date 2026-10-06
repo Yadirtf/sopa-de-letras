@@ -311,11 +311,11 @@ graph TD
 
 ---
 
-### ÉPICA 4: Multijugador Realtime, Salas y Mecánicas de Juego (EP-04)
+### ÉPICA 4: Multijugador Realtime, Salas y Mecánicas de Juego (EP-04) — [ESTADO: ✅ IMPLEMENTADA]
 
 #### US-14: Creación de Salas Multijugador y Generación de Enlace/QR
 - **ID:** `US-14`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador anfitrión, *quiero* crear una sala de juego pública o privada y obtener un código alfanumérico de 6 dígitos junto con un código QR, *para* invitar a mis amigos fácilmente.
 - **Criterios de Aceptación:**
   - **Dado** un usuario que selecciona una sopa y pulsa "Crear Sala".
@@ -330,7 +330,7 @@ graph TD
 
 #### US-15: Unirse a Sala y Lobby en Tiempo Real
 - **ID:** `US-15`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* invitado, *quiero* unirme a una sala ingresando el código de 6 dígitos o mediante enlace, *para* ver a los participantes conectados y prepararme para jugar.
 - **Criterios de Aceptación:**
   - **Dado** que un jugador ingresa un código válido.
@@ -348,7 +348,7 @@ graph TD
 
 #### US-16: Inicio Síncrono de Partida con Cuenta Regresiva
 - **ID:** `US-16`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador en una sala, *quiero* que la partida inicie con una cuenta regresiva sincronizada (3, 2, 1, ¡Ya!), *para* que todos los competidores comiencen exactamente al mismo tiempo y con justicia.
 - **Criterios de Aceptación:**
   - **Dado** que el Host presiona "Iniciar Juego".
@@ -363,7 +363,7 @@ graph TD
 
 #### US-17: Tablero Interactivo y Detección Gestual de Trazos
 - **ID:** `US-17`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador, *quiero* deslizar mi dedo sobre las letras de la matriz de forma continua y fluida, *para* seleccionar palabras con respuesta visual y háptica inmediata.
 - **Criterios de Aceptación:**
   - **Dado** un gesto táctil (`GestureDetector` / `Listener`) sobre la matriz.
@@ -380,7 +380,7 @@ graph TD
 
 #### US-18: Validación de Palabras en Tiempo Real y Broadcast Multijugador
 - **ID:** `US-18`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 8 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador en partida, *quiero* que cuando encuentre una palabra válida se confirme instantáneamente y se anuncie a los rivales, *para* alimentar la emoción competitiva.
 - **Criterios de Aceptación:**
   - **Dado** que un jugador completa el trazo de una palabra correcta.
@@ -397,7 +397,7 @@ graph TD
 
 #### US-19: Marcador en Vivo y Barra de Progreso Dinámica
 - **ID:** `US-19`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador, *quiero* ver una barra lateral o superior con el puntaje y progreso de mis oponentes en tiempo real, *para* saber en qué posición voy y sentir la adrenalina de la carrera.
 - **Criterios de Aceptación:**
   - **Dado** un cambio en el puntaje de cualquier jugador.
@@ -412,7 +412,7 @@ graph TD
 
 #### US-20: Finalización de Partida, Podio y Cálculo de Trofeos
 - **ID:** `US-20`
-- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP
+- **Prioridad:** Must Have (`M`) | **Story Points:** 5 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* jugador al terminar la partida (por tiempo o porque se encontraron todas las palabras), *quiero* ver el podio con los ganadores y mis puntos/trofeos obtenidos, *para* celebrar mi victoria o aprender de la derrota.
 - **Criterios de Aceptación:**
   - **Dado** que el temporizador llega a cero o se descubren el 100% de las palabras.
@@ -427,7 +427,7 @@ graph TD
 
 #### US-21: Sistema de Revancha Rápida (Instant Rematch)
 - **ID:** `US-21`
-- **Prioridad:** Should Have (`S`) | **Story Points:** 3 SP
+- **Prioridad:** Should Have (`S`) | **Story Points:** 3 SP | **Estado:** ✅ Completado
 - **Descripción:** *Como* competidor que acaba de terminar una partida, *quiero* votar por una revancha inmediata sin salir de la sala, *para* continuar jugando sin fricción.
 - **Criterios de Aceptación:**
   - **Dado** que la partida finalizó.

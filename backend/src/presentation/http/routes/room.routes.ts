@@ -1,0 +1,22 @@
+import { FastifyInstance } from "fastify";
+import { RoomController } from "../controllers/room.controller";
+
+export async function roomRoutes(
+  fastify: FastifyInstance,
+  options: { roomController: RoomController; authMiddleware: any }
+): Promise<void> {
+  const { roomController, authMiddleware } = options;
+
+  // Crear sala (requiere autenticación)
+  fastify.post(
+    "/",
+    { preHandler: [authMiddleware] },
+    async (request, reply) => roomController.create(request, reply)
+  );
+
+  // Obtener info pública / preliminar de sala por código (público para unirse con link/QR)
+  fastify.get(
+    "/:code",
+    async (request, reply) => roomController.getByCode(request, reply)
+  );
+}

@@ -32,9 +32,11 @@ import { createAuthMiddleware } from "../middlewares/auth.middleware";
 import { authRoutes } from "./auth.routes";
 import { userRoutes } from "./user.routes";
 import { wordSearchRoutes } from "./word-search.routes";
+import { roomRoutes } from "./room.routes";
+import { createRoomContainer } from "../../di/room.container";
 import { env } from "../../../config/env";
 
-export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
+export async function registerRoutes(fastify: FastifyInstance) {
   // Repositorios e infraestructura
   const userRepo = new PrismaUserRepository(prismaClient);
   const wordSearchRepo = new PrismaWordSearchRepository(prismaClient);
@@ -81,6 +83,9 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
   );
   const authMiddleware = createAuthMiddleware(tokenService, sessionCache);
 
+  // Room Container (Épica 4: Multijugador Realtime)
+  const roomContainer = createRoomContainer(prismaClient, redisClient);
+
   // Registro de rutas con prefijo de API v1
   await fastify.register(authRoutes, { prefix: "/api/v1/auth", authController });
   await fastify.register(userRoutes, { prefix: "/api/v1/users", userController, authMiddleware });
@@ -90,6 +95,11 @@ export async function registerRoutes(fastify: FastifyInstance): Promise<void> {
     editorController,
     authMiddleware,
   });
+  await fastify.register(roomRoutes, {
+    prefix: "/api/v1/rooms",
+    roomController: roomContainer.roomController,
+    authMiddleware,
+  });
+
+  return { socketDispatcher: roomContainer.socketDispatcher };
 }
-
-

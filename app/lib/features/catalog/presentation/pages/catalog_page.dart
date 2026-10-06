@@ -47,9 +47,10 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
     if (!mounted) return;
     final state = ref.read(catalogNotifierProvider);
     if (state.selectedDetail != null) {
+      final detail = state.selectedDetail!;
       WordSearchDetailSheet.show(
         context,
-        detail: state.selectedDetail!,
+        detail: detail,
         onPlaySolo: () {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -58,9 +59,10 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
         },
         onCreateMultiplayer: () {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Multijugador próximamente en Épica 5')),
-          );
+          context.push('/create-room', extra: {
+            'wordSearchId': detail.id,
+            'wordSearchTitle': detail.title,
+          });
         },
       );
     }
@@ -78,6 +80,11 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
         elevation: 0,
         title: Text('Explorar Sopas', style: AppTypography.heading2.copyWith(fontSize: 20)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.group_add_rounded, color: AppColors.accentEmerald),
+            tooltip: 'Unirse a Sala',
+            onPressed: () => context.push('/join-room'),
+          ),
           IconButton(
             icon: const Icon(Icons.auto_awesome_motion_rounded, color: AppColors.accentAmber),
             tooltip: 'Mis Creaciones',
@@ -97,7 +104,6 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
         onPressed: () => context.push('/create-word-search'),
       ),
       body: Column(
-
         children: [
           CatalogSearchBar(
             initialValue: state.searchQuery,
@@ -126,9 +132,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
                             if (index == state.items.length) {
                               return const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 16),
-                                child: Center(
-                                  child: CircularProgressIndicator(color: AppColors.accentCyan),
-                                ),
+                                child: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
                               );
                             }
                             final item = state.items[index];
