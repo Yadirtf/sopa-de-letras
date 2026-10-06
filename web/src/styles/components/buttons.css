@@ -1,0 +1,106 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--tr-smooth);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Primary Violet Button */
+.btn--primary {
+  background: var(--wh-accent-violet);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #6d28d9;
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.55);
+  transform: translateY(-1px);
+}
+
+/* Cyan Button */
+.btn--cyan {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: var(--wh-accent-cyan);
+  color: var(--wh-accent-cyan);
+}
+
+.btn--cyan:hover:not(:disabled) {
+  background: var(--wh-accent-cyan);
+  color: var(--wh-bg-primary);
+  box-shadow: var(--wh-glow-cyan);
+}
+
+/* Amber Button (Modo Invitado / Quick Play) */
+.btn--amber {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--wh-accent-amber);
+  color: var(--wh-accent-amber);
+}
+
+.btn--amber:hover:not(:disabled) {
+  background: var(--wh-accent-amber);
+  color: var(--wh-bg-primary);
+  box-shadow: var(--wh-glow-amber);
+  transform: translateY(-1px);
+}
+
+/* Ghost Button */
+.btn--ghost {
+  background: transparent;
+  color: var(--wh-text-secondary);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  color: var(--wh-text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Outline Button */
+.btn--outline {
+  background: transparent;
+  border-color: var(--wh-border-subtle);
+  color: var(--wh-text-primary);
+}
+
+.btn--outline:hover:not(:disabled) {
+  border-color: var(--wh-accent-violet);
+  background: rgba(124, 58, 237, 0.08);
+}
+
+/* Sizes */
+.btn--sm {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.btn--lg {
+  padding: 14px 28px;
+  font-size: 15px;
+  border-radius: 14px;
+}
+
+.btn--block {
+  width: 100%;
+}

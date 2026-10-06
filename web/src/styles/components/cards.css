@@ -1,0 +1,90 @@
+.card {
+  background: var(--wh-glass-fill);
+  backdrop-filter: var(--wh-glass-blur);
+  -webkit-backdrop-filter: var(--wh-glass-blur);
+  border: 1px solid var(--wh-border-subtle);
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--tr-smooth);
+}
+
+.card:hover {
+  border-color: var(--wh-border-glow);
+  box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Auth Container Card */
+.auth-card {
+  max-width: 440px;
+  width: 100%;
+  margin: 40px auto;
+  padding: 36px 32px;
+  border-radius: 24px;
+  border: 1px solid var(--wh-border-glow);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), var(--wh-glow-violet);
+  background: linear-gradient(180deg, rgba(21, 29, 46, 0.9) 0%, rgba(15, 22, 35, 0.95) 100%);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-header__icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+  display: inline-block;
+  filter: drop-shadow(0 0 12px rgba(124, 58, 237, 0.5));
+}
+
+.auth-header__title {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #F0F4FF 40%, #7C3AED 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-header__subtitle {
+  font-size: 14px;
+  color: var(--wh-text-secondary);
+}
+
+/* Feature Grid Card */
+.feature-card {
+  background: rgba(21, 29, 46, 0.55);
+  border: 1px solid var(--wh-border-subtle);
+  border-radius: 18px;
+  padding: 24px;
+  transition: all var(--tr-smooth);
+}
+
+.feature-card:hover {
+  background: rgba(21, 29, 46, 0.85);
+  border-color: var(--wh-accent-cyan);
+  box-shadow: var(--wh-glow-cyan);
+  transform: translateY(-3px);
+}
+
+.feature-card__icon {
+  font-size: 28px;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+
+.feature-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--wh-text-primary);
+}
+
+.feature-card__desc {
+  font-size: 13.5px;
+  color: var(--wh-text-secondary);
+  line-height: 1.5;
+}
