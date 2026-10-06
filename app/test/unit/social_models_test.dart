@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wordhive_app/features/social/data/models/social_models.dart';
 import 'package:wordhive_app/features/social/domain/entities/room_invite_entity.dart';
@@ -67,7 +68,7 @@ void main() {
 
     test('genera textos amables por tipo', () {
       final copy = NotificationCopy.of(AppNotificationModel.fromJson(json));
-      expect(copy.emoji, '🥇');
+      expect(copy.icon, Icons.military_tech_rounded);
       expect(copy.title, contains('1'));
       expect(copy.body, contains('45 trofeos'));
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
 import 'social_empty_state_widget.dart';
 
 /// Los invitados no tienen cuenta permanente, así que no pueden tener amigos.
@@ -10,7 +11,8 @@ class GuestSocialGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SocialEmptyState(
-      emoji: '🐝👋🐝',
+      icon: Icons.group_add_rounded,
+      color: AppColors.accentViolet,
       title: '¡Juega con tus amigos!',
       message: 'Crea una cuenta gratis para agregar amigos, ver quién está en línea e invitarlos a tus salas con un toque.',
       actionLabel: 'Crear mi cuenta',

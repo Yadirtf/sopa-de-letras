@@ -100,7 +100,7 @@ class _InviteFriendsSheetState extends ConsumerState<InviteFriendsSheet> {
 
   Widget _list(List<FriendEntity> friends) {
     if (friends.isEmpty) {
-      return Center(child: Text('Aún no tienes amigos agregados 🫂', style: AppTypography.bodyMedium));
+      return Center(child: Text('Aún no tienes amigos agregados', style: AppTypography.bodyMedium));
     }
     return ListView(
       children: friends.map((f) => SocialTile(

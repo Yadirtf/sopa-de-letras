@@ -2,49 +2,50 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/app_notification_entity.dart';
 
-/// Texto, emoji y color de cada notificación. Frases cortas, en segunda
-/// persona y con emoji: se entienden de un vistazo a cualquier edad.
+/// Texto, icono y color de cada notificación. Frases cortas, en segunda
+/// persona y con un icono claro: se entienden de un vistazo a cualquier edad.
 class NotificationCopy {
-  final String emoji;
+  final IconData icon;
   final Color color;
   final String title;
   final String body;
 
-  const NotificationCopy({required this.emoji, required this.color, required this.title, required this.body});
+  const NotificationCopy({required this.icon, required this.color, required this.title, required this.body});
 
   factory NotificationCopy.of(AppNotificationEntity n) {
     final title = n.text('wordSearchTitle') ?? 'una sopa de letras';
     return switch (n.kind) {
       NotificationKind.friendRequest => NotificationCopy(
-          emoji: '👋',
+          icon: Icons.person_add_alt_1_rounded,
           color: AppColors.accentCyan,
           title: 'Nueva solicitud de amistad',
           body: '${n.text('fromName') ?? 'Alguien'} quiere ser tu amigo',
         ),
       NotificationKind.friendAccepted => NotificationCopy(
-          emoji: '🤝',
+          icon: Icons.handshake_rounded,
           color: AppColors.accentEmerald,
           title: '¡Tienes un nuevo amigo!',
           body: '${n.text('friendName') ?? 'Tu amigo'} aceptó tu solicitud',
         ),
       NotificationKind.roomInvite => NotificationCopy(
-          emoji: '🎮',
+          icon: Icons.sports_esports_rounded,
           color: AppColors.accentViolet,
           title: 'Invitación a jugar',
           body: '${n.text('fromName') ?? 'Un amigo'} te invitó a «$title»',
         ),
       NotificationKind.gameEnd => NotificationCopy(
-          emoji: _medal(n.number('rank')),
+          icon: _medal(n.number('rank')),
           color: AppColors.accentAmber,
           title: '¡Quedaste en el puesto ${n.number('rank') ?? '-'}!',
           body: 'En «$title» ganaste ${n.number('trophiesEarned') ?? 0} trofeos',
         ),
       NotificationKind.other => const NotificationCopy(
-          emoji: '🔔', color: AppColors.accentCyan, title: 'Novedad', body: 'Tienes algo nuevo en WordHive'),
+          icon: Icons.notifications_rounded, color: AppColors.accentCyan, title: 'Novedad', body: 'Tienes algo nuevo en WordHive'),
     };
   }
 
-  static String _medal(int? rank) => switch (rank) { 1 => '🥇', 2 => '🥈', 3 => '🥉', _ => '🏆' };
+  /// Medalla para el podio (1º a 3º) y trofeo para el resto.
+  static IconData _medal(int? rank) => rank != null && rank <= 3 ? Icons.military_tech_rounded : Icons.emoji_events_rounded;
 }
 
 /// "hace 5 min", "ayer"... más humano que una fecha completa.

@@ -24,7 +24,8 @@ class FriendsListTab extends ConsumerWidget {
     }
     if (state.friends.isEmpty) {
       return SocialEmptyState(
-        emoji: '🫂',
+        icon: Icons.diversity_3_rounded,
+        color: AppColors.accentEmerald,
         title: 'Aún no tienes amigos aquí',
         message: 'Busca a tus amigos por su nombre y envíales una solicitud. ¡Jugar juntos es más divertido!',
         actionLabel: 'Buscar amigos',

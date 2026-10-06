@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_avatars.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class AvatarSelectorWidget extends StatelessWidget {
   final String? selectedAvatar;
   final ValueChanged<String> onAvatarSelected;
-
-  static const List<Map<String, String>> avatars = [
-    {'id': 'bee_scout', 'name': 'Explorador', 'icon': '🐝'},
-    {'id': 'bee_queen', 'name': 'Reina', 'icon': '👑'},
-    {'id': 'honey_pot', 'name': 'Panal', 'icon': '🍯'},
-    {'id': 'lightning', 'name': 'Veloz', 'icon': '⚡'},
-    {'id': 'star', 'name': 'Estrella', 'icon': '⭐'},
-    {'id': 'flower', 'name': 'Polen', 'icon': '🌸'},
-  ];
 
   const AvatarSelectorWidget({
     super.key,
@@ -26,19 +18,19 @@ class AvatarSelectorWidget extends StatelessWidget {
       height: 90,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: avatars.length,
+        itemCount: AppAvatars.all.length,
         separatorBuilder: (_, __) => const SizedBox(width: 14),
         itemBuilder: (context, index) {
-          final avatar = avatars[index];
-          final isSelected = selectedAvatar == avatar['id'];
+          final avatar = AppAvatars.all[index];
+          final isSelected = selectedAvatar == avatar.id;
 
           return GestureDetector(
-            onTap: () => onAvatarSelected(avatar['id']!),
+            onTap: () => onAvatarSelected(avatar.id),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 70,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.accentViolet.withOpacity(0.2) : AppColors.bgCard,
+                color: isSelected ? AppColors.accentViolet.withValues(alpha: 0.2) : AppColors.bgCard,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isSelected ? AppColors.accentViolet : AppColors.borderSubtle,
@@ -47,7 +39,7 @@ class AvatarSelectorWidget extends StatelessWidget {
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: AppColors.accentViolet.withOpacity(0.4),
+                          color: AppColors.accentViolet.withValues(alpha: 0.4),
                           blurRadius: 10,
                         ),
                       ]
@@ -56,10 +48,10 @@ class AvatarSelectorWidget extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(avatar['icon']!, style: const TextStyle(fontSize: 28)),
+                  Icon(avatar.icon, size: 30, color: avatar.color),
                   const SizedBox(height: 4),
                   Text(
-                    avatar['name']!,
+                    avatar.name,
                     style: TextStyle(
                       fontSize: 10,
                       color: isSelected ? AppColors.accentViolet : AppColors.textSecondary,

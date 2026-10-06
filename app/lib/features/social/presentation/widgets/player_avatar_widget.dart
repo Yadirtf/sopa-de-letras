@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_avatars.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../auth/presentation/widgets/avatar_selector_widget.dart';
 import '../../domain/entities/social_entities.dart';
 
-/// Avatar circular con emoji y, opcionalmente, el puntito de presencia.
+/// Avatar circular con icono y, opcionalmente, el puntito de presencia.
 /// Reutiliza el catálogo de avatares del registro para que cada jugador
 /// se vea igual en su perfil, en la lista de amigos y en las invitaciones.
 class PlayerAvatar extends StatelessWidget {
@@ -12,11 +12,6 @@ class PlayerAvatar extends StatelessWidget {
   final PresenceStatus? status;
 
   const PlayerAvatar({super.key, required this.avatarId, this.size = 48, this.status});
-
-  static String emojiFor(String? avatarId) {
-    final match = AvatarSelectorWidget.avatars.where((a) => a['id'] == avatarId).firstOrNull;
-    return match?['icon'] ?? '🐝';
-  }
 
   static Color colorFor(PresenceStatus status) => switch (status) {
         PresenceStatus.online => AppColors.accentEmerald,
@@ -27,6 +22,7 @@ class PlayerAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dot = size * 0.3;
+    final avatar = AppAvatars.of(avatarId);
     return SizedBox(
       width: size,
       height: size,
@@ -38,11 +34,11 @@ class PlayerAvatar extends StatelessWidget {
             height: size,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppColors.bgSecondary,
+              color: Color.alphaBlend(avatar.color.withValues(alpha: 0.14), AppColors.bgSecondary),
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderGlow),
+              border: Border.all(color: avatar.color.withValues(alpha: 0.45)),
             ),
-            child: Text(emojiFor(avatarId), style: TextStyle(fontSize: size * 0.5)),
+            child: Icon(avatar.icon, color: avatar.color, size: size * 0.55),
           ),
           if (status != null)
             Positioned(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_label.dart';
 import '../../domain/entities/game_event_entities.dart';
 
 class LiveRaceBarWidget extends StatelessWidget {
@@ -25,8 +26,9 @@ class LiveRaceBarWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '🏁 Carrera en Vivo',
+              IconLabel(
+                icon: Icons.sports_score_rounded,
+                text: 'Carrera en Vivo',
                 style: AppTypography.labelLarge.copyWith(
                   color: AppColors.accentCyan,
                   fontWeight: FontWeight.bold,

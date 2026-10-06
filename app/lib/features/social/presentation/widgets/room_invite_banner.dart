@@ -70,7 +70,7 @@ class _RoomInviteBannerState extends State<RoomInviteBanner> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('🎮 ¡${invite.fromName} te invita a jugar!',
+                        Text('¡${invite.fromName} te invita a jugar!',
                             style: AppTypography.labelBold.copyWith(fontSize: 15), maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 2),
                         Text('«${invite.wordSearchTitle}»', style: AppTypography.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),

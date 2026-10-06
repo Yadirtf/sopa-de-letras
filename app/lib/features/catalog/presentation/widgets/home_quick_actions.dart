@@ -23,14 +23,14 @@ class HomeQuickActions extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _QuickAction(
-            emoji: '👋',
+            icon: Icons.group_rounded,
             label: available > 0 ? 'Amigos · $available en línea' : 'Amigos',
             color: AppColors.accentEmerald,
             badge: pendingRequests,
             onTap: () => context.push('/friends', extra: {'tab': pendingRequests > 0 ? 1 : 0}),
           ),
-          _QuickAction(emoji: '🔑', label: 'Unirme con código', color: AppColors.accentCyan, onTap: () => context.push('/join-room')),
-          _QuickAction(emoji: '🧩', label: 'Mis sopas', color: AppColors.accentAmber, onTap: () => context.push('/my-creations')),
+          _QuickAction(icon: Icons.vpn_key_rounded, label: 'Unirme con código', color: AppColors.accentCyan, onTap: () => context.push('/join-room')),
+          _QuickAction(icon: Icons.extension_rounded, label: 'Mis sopas', color: AppColors.accentAmber, onTap: () => context.push('/my-creations')),
         ],
       ),
     );
@@ -38,13 +38,13 @@ class HomeQuickActions extends ConsumerWidget {
 }
 
 class _QuickAction extends StatelessWidget {
-  final String emoji;
+  final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
   final int badge;
 
-  const _QuickAction({required this.emoji, required this.label, required this.color, required this.onTap, this.badge = 0});
+  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap, this.badge = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +67,14 @@ class _QuickAction extends StatelessWidget {
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(color: color.withValues(alpha: 0.5)),
               ),
-              child: Text('$emoji  $label', style: AppTypography.labelBold.copyWith(color: AppColors.textPrimary)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 20, color: color),
+                  const SizedBox(width: 8),
+                  Text(label, style: AppTypography.labelBold.copyWith(color: AppColors.textPrimary)),
+                ],
+              ),
             ),
           ),
         ),

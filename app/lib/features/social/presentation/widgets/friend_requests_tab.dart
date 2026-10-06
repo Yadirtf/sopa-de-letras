@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_label.dart';
 import '../../domain/entities/social_entities.dart';
 import '../providers/friends_notifier.dart';
 import 'friend_tile_widget.dart';
@@ -19,7 +20,7 @@ class FriendRequestsTab extends ConsumerWidget {
 
     if (state.incoming.isEmpty && state.outgoing.isEmpty) {
       return const SocialEmptyState(
-        emoji: '📭',
+        icon: Icons.inbox_rounded,
         title: 'No hay solicitudes',
         message: 'Cuando alguien quiera ser tu amigo, aparecerá aquí.',
       );
@@ -39,7 +40,7 @@ class FriendRequestsTab extends ConsumerWidget {
       child: ListView(
         padding: const EdgeInsets.symmetric(vertical: 12),
         children: [
-          if (state.incoming.isNotEmpty) _header('👋 Quieren ser tus amigos (${state.incoming.length})'),
+          if (state.incoming.isNotEmpty) _header(Icons.waving_hand_rounded, 'Quieren ser tus amigos (${state.incoming.length})'),
           for (final request in state.incoming)
             _tile(
               request,
@@ -61,7 +62,7 @@ class FriendRequestsTab extends ConsumerWidget {
                 ),
               ],
             ),
-          if (state.outgoing.isNotEmpty) _header('📨 Enviadas, esperando respuesta'),
+          if (state.outgoing.isNotEmpty) _header(Icons.schedule_send_rounded, 'Enviadas, esperando respuesta'),
           for (final request in state.outgoing)
             _tile(
               request,
@@ -82,9 +83,9 @@ class FriendRequestsTab extends ConsumerWidget {
     );
   }
 
-  Widget _header(String text) => Padding(
+  Widget _header(IconData icon, String text) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
-        child: Text(text, style: AppTypography.labelBold.copyWith(color: AppColors.textSecondary)),
+        child: IconLabel(icon: icon, text: text, style: AppTypography.labelBold.copyWith(color: AppColors.textSecondary)),
       );
 
   Widget _tile(FriendRequestEntity request, {required String subtitle, required List<Widget> actions, bool highlighted = false}) {
