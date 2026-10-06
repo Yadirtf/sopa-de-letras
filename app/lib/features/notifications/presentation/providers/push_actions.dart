@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/router/app_messenger.dart';
-import '../../../../core/router/app_router.dart';
+import '../../../../core/router/shell_navigation.dart';
 import '../../../game/presentation/providers/game_room_notifier.dart';
 import '../../../social/domain/entities/room_invite_entity.dart';
 import '../../../social/presentation/providers/social_providers.dart';
@@ -40,6 +40,6 @@ void handlePushTap(WidgetRef ref, Map<String, dynamic> data, {DateTime? now}) {
       // El banner global ofrece "Unirme" con su cuenta atrás.
       ref.read(incomingInviteProvider.notifier).state = invite;
     case 'FRIEND_REQUEST':
-      appRouter.push('/friends', extra: {'tab': 1});
+      openShellLocation('/friends', extra: {'tab': 1});
   }
 }

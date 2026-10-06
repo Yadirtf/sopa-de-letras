@@ -7,12 +7,9 @@ import '../widgets/catalog_search_bar.dart';
 import '../widgets/catalog_filter_chips.dart';
 import '../widgets/catalog_grid_delegate.dart';
 import '../widgets/word_search_tile_card.dart';
-import '../widgets/home_friends_button.dart';
-import '../widgets/home_greeting_title.dart';
 import '../widgets/catalog_skeleton_widget.dart';
 import '../widgets/catalog_empty_state.dart';
 import '../widgets/word_search_detail_sheet.dart';
-import '../../../notifications/presentation/widgets/notification_bell_button.dart';
 
 class CatalogPage extends ConsumerStatefulWidget {
   const CatalogPage({super.key});
@@ -77,14 +74,7 @@ class _CatalogPageState extends ConsumerState<CatalogPage> {
 
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgPrimary,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        titleSpacing: 16,
-        title: const HomeGreetingTitle(),
-        actions: const [HomeFriendsButton(), NotificationBellButton(), SizedBox(width: 8)],
-      ),
+      // El saludo, Amigos y la campana viven en la barra común del marco.
       body: RefreshIndicator(
         color: AppColors.accentCyan,
         backgroundColor: AppColors.bgCard,

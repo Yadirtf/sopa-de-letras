@@ -26,7 +26,7 @@ class HomeFriendsButton extends ConsumerWidget {
           shape: StadiumBorder(side: BorderSide(color: AppColors.accentEmerald.withValues(alpha: 0.5))),
           child: InkWell(
             customBorder: const StadiumBorder(),
-            onTap: () => context.push('/friends', extra: {'tab': pending > 0 ? 1 : 0}),
+            onTap: () => context.go('/friends', extra: {'tab': pending > 0 ? 1 : 0}),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(

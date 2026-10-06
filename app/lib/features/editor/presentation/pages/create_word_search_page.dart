@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/editor_notifier.dart';
+import '../providers/my_creations_notifier.dart';
 import '../widgets/difficulty_selector_widget.dart';
 import '../widgets/word_chips_input_widget.dart';
 import '../widgets/interactive_grid_preview.dart';
@@ -38,7 +39,10 @@ class _CreateWordSearchPageState extends ConsumerState<CreateWordSearchPage> {
         const SnackBar(content: Text('¡Sopa creada exitosamente!')),
       );
       notifier.reset();
-      context.pop();
+      // Crear es una pestaña: no hay nada debajo a lo que volver. Mostramos
+      // la sopa nueva en "Mis sopas", recargada para que aparezca.
+      ref.read(myCreationsNotifierProvider.notifier).fetchMyCreations();
+      context.go('/my-creations');
     }
   }
 

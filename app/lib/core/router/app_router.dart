@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -31,8 +32,10 @@ final appRouter = GoRouter(
       path: '/forgot-pin',
       builder: (context, state) => const ForgotPinPage(),
     ),
-    // Pantallas con barra inferior. El orden de las ramas es el de
-    // HomeBottomBar: Unirme, Mis sopas, Inicio (casita) y Perfil.
+    // Pantallas con barra superior e inferior. Las cinco primeras ramas son
+    // las de HomeBottomBar (Unirme, Mis sopas, Inicio, Crear, Perfil); Amigos
+    // y Notificaciones se abren desde la barra de arriba. Sala, partida y
+    // crear sala quedan fuera: ahí el tablero ocupa toda la pantalla.
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) => HomeShellPage(navigationShell: navigationShell),
       branches: [
@@ -46,16 +49,28 @@ final appRouter = GoRouter(
           GoRoute(path: '/home', builder: (context, state) => const CatalogPage()),
         ]),
         StatefulShellBranch(routes: [
+          GoRoute(path: '/create-word-search', builder: (context, state) => const CreateWordSearchPage()),
+        ]),
+        StatefulShellBranch(routes: [
           GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/friends',
+            builder: (context, state) {
+              final tab = (state.extra as Map<String, dynamic>?)?['tab'] as int? ?? 0;
+              // La key reabre la pestaña pedida aunque la pantalla ya existiera.
+              return FriendsPage(key: ValueKey('friends-tab-$tab'), initialTab: tab);
+            },
+          ),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/notifications', builder: (context, state) => const NotificationsPage()),
         ]),
       ],
     ),
     // Alias antiguo: la sala y el podio vuelven aquí al terminar.
     GoRoute(path: '/catalog', redirect: (context, state) => '/home'),
-    GoRoute(
-      path: '/create-word-search',
-      builder: (context, state) => const CreateWordSearchPage(),
-    ),
     GoRoute(
       path: '/create-room',
       builder: (context, state) {
@@ -77,17 +92,6 @@ final appRouter = GoRouter(
       builder: (context, state) => GamePlayPage(
         roomCode: state.pathParameters['code'] ?? '',
       ),
-    ),
-    GoRoute(
-      path: '/friends',
-      builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>? ?? {};
-        return FriendsPage(initialTab: extra['tab'] as int? ?? 0);
-      },
-    ),
-    GoRoute(
-      path: '/notifications',
-      builder: (context, state) => const NotificationsPage(),
     ),
     GoRoute(
       path: '/game-podium/:code',

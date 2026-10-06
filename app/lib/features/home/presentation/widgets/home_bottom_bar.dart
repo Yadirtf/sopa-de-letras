@@ -6,23 +6,23 @@ import 'home_house_button.dart';
 /// Barra inferior con la casita en el centro. Cada icono lleva su palabra
 /// debajo: nadie tiene que adivinar qué hace un dibujo.
 ///
-/// Orden de ramas del shell: 0 Unirme · 1 Mis sopas · 2 Inicio · 3 Perfil.
-/// "Crear" no es una pestaña sino un atajo que abre el editor encima.
+/// Orden de ramas del shell: 0 Unirme · 1 Mis sopas · 2 Inicio · 3 Crear ·
+/// 4 Perfil. Las ramas 5 (Amigos) y 6 (Notificaciones) se abren desde la
+/// barra de arriba y no encienden ningún botón de esta.
 class HomeBottomBar extends StatelessWidget {
   static const int joinBranch = 0;
   static const int mineBranch = 1;
   static const int homeBranch = 2;
-  static const int profileBranch = 3;
+  static const int createBranch = 3;
+  static const int profileBranch = 4;
 
   final int currentBranch;
   final ValueChanged<int> onBranchSelected;
-  final VoidCallback onCreate;
 
   const HomeBottomBar({
     super.key,
     required this.currentBranch,
     required this.onBranchSelected,
-    required this.onCreate,
   });
 
   @override
@@ -60,13 +60,8 @@ class HomeBottomBar extends StatelessWidget {
                   onTap: () => onBranchSelected(homeBranch),
                 ),
               ),
-              HomeBarItem(
-                icon: Icons.add_circle_outline_rounded,
-                label: 'Crear',
-                color: AppColors.accentEmerald,
-                selected: false,
-                onTap: onCreate,
-              ),
+              tab(createBranch, Icons.add_circle_outline_rounded, Icons.add_circle_rounded, 'Crear',
+                  AppColors.accentEmerald),
               tab(profileBranch, Icons.person_outline_rounded, Icons.person_rounded, 'Perfil', AppColors.accentViolet),
             ],
           ),

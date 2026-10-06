@@ -8,14 +8,12 @@ import 'package:wordhive_app/features/home/presentation/widgets/home_bottom_bar.
 void main() {
   testWidgets('la barra inferior lleva a cada pestaña y la casita va al inicio', (tester) async {
     final visited = <int>[];
-    var created = false;
 
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         bottomNavigationBar: HomeBottomBar(
           currentBranch: HomeBottomBar.homeBranch,
           onBranchSelected: visited.add,
-          onCreate: () => created = true,
         ),
       ),
     ));
@@ -23,16 +21,16 @@ void main() {
     await tester.tap(find.text('Unirme'));
     await tester.tap(find.text('Mis sopas'));
     await tester.tap(find.text('Inicio'));
-    await tester.tap(find.text('Perfil'));
     await tester.tap(find.text('Crear'));
+    await tester.tap(find.text('Perfil'));
 
     expect(visited, [
       HomeBottomBar.joinBranch,
       HomeBottomBar.mineBranch,
       HomeBottomBar.homeBranch,
+      HomeBottomBar.createBranch,
       HomeBottomBar.profileBranch,
     ]);
-    expect(created, isTrue);
     expect(tester.takeException(), isNull);
   });
 
