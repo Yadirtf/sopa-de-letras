@@ -6,12 +6,15 @@ import { IRoomStateReader } from "../../domain/services/room-state-reader.interf
 import { PrismaFriendshipRepository } from "../../infrastructure/database/repositories/prisma-friendship.repository";
 import { PrismaFriendRequestRepository } from "../../infrastructure/database/repositories/prisma-friend-request.repository";
 import { PrismaNotificationRepository } from "../../infrastructure/database/repositories/prisma-notification.repository";
+import { PrismaPushDeviceRepository } from "../../infrastructure/database/repositories/prisma-push-device.repository";
+import { IPushSender } from "../../domain/services/push-sender.interface";
 import { RedisPresenceCache } from "../../infrastructure/cache/redis-presence.cache";
 import { RedisCooldownCache } from "../../infrastructure/cache/redis-cooldown.cache";
 import { SocketIoRealtimeGateway } from "../../infrastructure/websocket/socket-io-realtime.gateway";
 import { PresenceEventsHandler } from "../../infrastructure/websocket/handlers/presence-events.handler";
 import { RoomLifecycleListener } from "../../infrastructure/websocket/handlers/room-events.handler";
 import { NotificationDispatcher } from "../../application/services/notification-dispatcher.service";
+import { PushNotifier } from "../../application/services/push-notifier.service";
 import { FriendshipAnnouncer } from "../../application/services/friendship-announcer.service";
 import { PresenceBroadcaster } from "../../application/services/presence-broadcaster.service";
 import { SearchPlayersUseCase } from "../../application/use-cases/search-players.use-case";
@@ -23,6 +26,7 @@ import { RemoveFriendUseCase } from "../../application/use-cases/remove-friend.u
 import { InviteFriendToRoomUseCase } from "../../application/use-cases/invite-friend-to-room.use-case";
 import { ListNotificationsUseCase } from "../../application/use-cases/list-notifications.use-case";
 import { MarkNotificationsReadUseCase } from "../../application/use-cases/mark-notifications-read.use-case";
+import { ManagePushDeviceUseCase } from "../../application/use-cases/manage-push-device.use-case";
 import { FriendsController } from "../http/controllers/friends.controller";
 import { NotificationsController } from "../http/controllers/notifications.controller";
 
@@ -31,6 +35,7 @@ export interface SocialContainerDeps {
   redis: Redis;
   tokenService: ITokenService;
   sessionCache: ISessionCacheService;
+  pushSender: IPushSender;
 }
 
 /**
@@ -46,7 +51,9 @@ export function createSocialContainer(deps: SocialContainerDeps) {
   const cooldown = new RedisCooldownCache(deps.redis);
   const gateway = new SocketIoRealtimeGateway();
 
-  const dispatcher = new NotificationDispatcher(notifications, gateway);
+  const pushDevices = new PrismaPushDeviceRepository(deps.prisma);
+  const pushNotifier = new PushNotifier(pushDevices, deps.pushSender);
+  const dispatcher = new NotificationDispatcher(notifications, gateway, undefined, pushNotifier);
   const announcer = new FriendshipAnnouncer(dispatcher, gateway);
   const broadcaster = new PresenceBroadcaster(presence, friendships, gateway);
 
@@ -66,7 +73,8 @@ export function createSocialContainer(deps: SocialContainerDeps) {
   });
   const notificationsController = new NotificationsController(
     new ListNotificationsUseCase(notifications),
-    new MarkNotificationsReadUseCase(notifications)
+    new MarkNotificationsReadUseCase(notifications),
+    new ManagePushDeviceUseCase(pushDevices)
   );
 
   const roomLifecycle: RoomLifecycleListener = {

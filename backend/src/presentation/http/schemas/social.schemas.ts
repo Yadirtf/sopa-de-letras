@@ -34,3 +34,10 @@ export const listNotificationsSchema = z.object({
 export const notificationIdParamSchema = z.object({
   id: z.string().min(1),
 });
+
+export const pushDeviceSchema = z.object({
+  token: z.string().min(20, "Token de notificaciones invalido").max(4096),
+  platform: z.enum(["android", "ios", "web"]).default("android"),
+});
+
+export const pushDeviceTokenSchema = pushDeviceSchema.pick({ token: true });
