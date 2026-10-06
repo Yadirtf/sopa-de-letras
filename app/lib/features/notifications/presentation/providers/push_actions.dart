@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/router/app_messenger.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/router/shell_navigation.dart';
 import '../../../game/presentation/providers/game_room_notifier.dart';
 import '../../../social/presentation/providers/room_invite_actions.dart';
 import '../../../social/presentation/providers/social_providers.dart';
@@ -39,10 +40,10 @@ Future<void> handlePushTap(WidgetRef ref, Map<String, dynamic> data) async {
       final error = await joinInvitedRoom(ref, code);
       if (error != null) showRootSnack(error);
     case 'FRIEND_REQUEST':
-      appRouter.push('/friends', extra: {'tab': 1});
+      openShellLocation('/friends', extra: {'tab': 1});
     case 'FRIEND_ACCEPTED':
-      appRouter.push('/friends');
+      openShellLocation('/friends');
     default:
-      appRouter.push('/notifications');
+      openShellLocation('/notifications');
   }
 }
