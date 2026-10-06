@@ -9,115 +9,76 @@ class GameRoomSocketListener {
     required GameRoomState Function() getState,
     required void Function(GameRoomState) setState,
   }) {
-    final subscriptions = <StreamSubscription>[];
+    void update(GameRoomState Function(GameRoomState s) change) => setState(change(getState()));
 
-    subscriptions.add(repository.onPlayerJoined().listen((player) {
-      final state = getState();
-      if (state.room == null) return;
-      final players = List<RoomPlayerEntity>.from(state.room!.players);
-      final index = players.indexWhere((p) => p.userId == player.userId);
-      if (index >= 0) {
-        players[index] = player;
-      } else {
-        players.add(player);
-      }
-      setState(state.copyWith(
-        room: _rebuildRoom(state.room!, players: players),
-      ));
-    }));
+    return [
+      // Entra, sale o cambia "listo": el servidor manda la lista completa y la copiamos tal cual.
+      repository.onPlayersChanged().listen((snapshot) => update((s) {
+            if (s.room == null) return s;
+            return s.copyWith(
+              room: s.room!.copyWith(players: snapshot.players, hostUserId: snapshot.hostUserId),
+            );
+          })),
 
-    subscriptions.add(repository.onPlayerLeft().listen((data) {
-      final state = getState();
-      if (state.room == null) return;
-      final leftId = data['userId'];
-      final players = state.room!.players.where((p) => p.userId != leftId).toList();
-      final newHostId = data['newHostId'] ?? state.room!.hostUserId;
-      setState(state.copyWith(
-        room: _rebuildRoom(state.room!, players: players, hostId: newHostId),
-      ));
-    }));
+      repository.onRoomError().listen((error) => update(
+            (s) => s.copyWith(errorMessage: error.message, isStarting: false),
+          )),
 
-    subscriptions.add(repository.onGameCountdown().listen((data) {
-      final state = getState();
-      setState(state.copyWith(countdownValue: data['countdownSeconds'] ?? 3));
-    }));
+      repository.onGameCountdown().listen((data) => update((s) => s.copyWith(
+            isStarting: false,
+            countdownValue: (data['countdownSeconds'] as num?)?.toInt() ?? 3,
+            room: s.room?.copyWith(status: RoomStatusEnum.countdown),
+          ))),
 
-    subscriptions.add(repository.onGameStarted().listen((data) {
-      final state = getState();
-      List<List<String>> grid = [];
-      if (data['grid'] is List) {
-        grid = (data['grid'] as List)
-            .map((r) => (r as List).map((c) => c.toString()).toList())
-            .toList();
-      }
-      List<String> words = [];
-      if (data['words'] is List) {
-        words = (data['words'] as List).map((w) => w.toString()).toList();
-      }
-
-      setState(state.copyWith(
-        clearCountdown: true,
-        isGameActive: true,
-        room: state.room != null
-            ? _rebuildRoom(
-                state.room!,
+      repository.onGameStarted().listen((data) => update((s) {
+            final grid = _parseGrid(data['grid']);
+            final words = _parseWords(data['words']);
+            return s.copyWith(
+              clearCountdown: true,
+              isGameActive: true,
+              room: s.room?.copyWith(
                 status: RoomStatusEnum.inProgress,
-                grid: grid.isNotEmpty ? grid : state.room!.grid,
-                words: words.isNotEmpty ? words : state.room!.words,
-              )
-            : null,
-      ));
-    }));
+                grid: grid.isNotEmpty ? grid : null,
+                words: words.isNotEmpty ? words : null,
+              ),
+            );
+          })),
 
-    subscriptions.add(repository.onWordFound().listen((event) {
-      final state = getState();
-      final updated = Map<String, dynamic>.from(state.claimedWords);
-      updated[event.word.toUpperCase()] = event;
-      setState(state.copyWith(
-        claimedWords: updated.cast(),
-        latestWordFound: event,
-      ));
-    }));
+      repository.onWordFound().listen((event) => update((s) {
+            final updated = Map.of(s.claimedWords)..[event.word.toUpperCase()] = event;
+            return s.copyWith(claimedWords: updated, latestWordFound: event);
+          })),
 
-    subscriptions.add(repository.onLeaderboardUpdated().listen((entries) {
-      final state = getState();
-      setState(state.copyWith(leaderboard: entries));
-    }));
+      repository.onLeaderboardUpdated().listen((entries) => update((s) => s.copyWith(leaderboard: entries))),
 
-    subscriptions.add(repository.onGameEnded().listen((podium) {
-      final state = getState();
-      setState(state.copyWith(isGameActive: false, podium: podium));
-    }));
+      repository.onGameEnded().listen((podium) => update((s) => s.copyWith(isGameActive: false, podium: podium))),
 
-    subscriptions.add(repository.onRematchUpdate().listen((rematch) {
-      final state = getState();
-      setState(state.copyWith(rematchState: rematch));
-    }));
+      repository.onRematchUpdate().listen((rematch) => update((s) => s.copyWith(rematchState: rematch))),
 
-    return subscriptions;
+      // Revancha aceptada: volvemos al lobby con tablero nuevo y marcadores a cero.
+      repository.onRematchStarted().listen((data) => update((s) {
+            if (s.room == null) return s;
+            // Los jugadores (puntos a cero, listos reiniciados) llegan justo despues por onPlayersChanged.
+            final grid = _parseGrid(data['grid']);
+            final words = _parseWords(data['words']);
+            return GameRoomState(
+              room: s.room!.copyWith(
+                status: RoomStatusEnum.waiting,
+                grid: grid.isNotEmpty ? grid : null,
+                words: words.isNotEmpty ? words : null,
+              ),
+            );
+          })),
+    ];
   }
 
-  static GameRoomEntity _rebuildRoom(
-    GameRoomEntity r, {
-    List<RoomPlayerEntity>? players,
-    String? hostId,
-    RoomStatusEnum? status,
-    List<List<String>>? grid,
-    List<String>? words,
-  }) {
-    return GameRoomEntity(
-      id: r.id,
-      code: r.code,
-      wordSearchId: r.wordSearchId,
-      wordSearchTitle: r.wordSearchTitle,
-      hostUserId: hostId ?? r.hostUserId,
-      status: status ?? r.status,
-      maxPlayers: r.maxPlayers,
-      timeLimitSeconds: r.timeLimitSeconds,
-      isPrivate: r.isPrivate,
-      players: players ?? r.players,
-      grid: grid ?? r.grid,
-      words: words ?? r.words,
-    );
+  static List<List<String>> _parseGrid(dynamic raw) {
+    if (raw is! List) return [];
+    return raw.map((r) => (r as List).map((c) => c.toString()).toList()).toList();
+  }
+
+  static List<String> _parseWords(dynamic raw) {
+    if (raw is! List) return [];
+    return raw.map((w) => w.toString()).toList();
   }
 }

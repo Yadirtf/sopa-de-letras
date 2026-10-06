@@ -2,64 +2,67 @@ import { Server, Socket } from "socket.io";
 import { RoomManagerService } from "../../../application/services/room-manager.service";
 import { FinishGameUseCase } from "../../../application/use-cases/finish-game.use-case";
 import { RoomRematchService } from "../../../application/services/room-rematch.service";
+import { RoomLifecycleService } from "../../../application/services/room-lifecycle.service";
+import { emitRoomError } from "./room-error.emitter";
 
 export class GameEventsHandler {
   constructor(
     private readonly roomManager: RoomManagerService,
     private readonly finishGame: FinishGameUseCase,
-    private readonly rematchService: RoomRematchService
+    private readonly rematchService: RoomRematchService,
+    private readonly roomLifecycle: RoomLifecycleService
   ) {}
+
+  private async launchGame(io: Server, upperCode: string): Promise<void> {
+    try {
+      const state = await this.roomLifecycle.startPlaying(upperCode);
+      if (!state) return;
+
+      io.to(`room:${upperCode}`).emit("game:started", {
+        startedAt: state.startedAt,
+        endsAt: state.endsAt,
+        grid: state.grid,
+        words: state.words,
+      });
+
+      // Temporizador de la partida (solo si tiene limite de tiempo)
+      if (state.timeLimitSeconds && state.timeLimitSeconds > 0) {
+        const startedAt = state.startedAt;
+        setTimeout(() => void this.finishIfRunning(io, upperCode, startedAt), state.timeLimitSeconds * 1000);
+      }
+    } catch {
+      // La sala desaparecio durante la cuenta atras.
+    }
+  }
+
+  /** startedAt evita que el reloj de una partida vieja corte una revancha. */
+  private async finishIfRunning(io: Server, upperCode: string, startedAt?: number | null): Promise<void> {
+    try {
+      const endingState = await this.roomManager.getRoom(upperCode);
+      if (endingState?.status === "IN_PROGRESS" && endingState.startedAt === startedAt) {
+        const result = await this.finishGame.execute(upperCode);
+        io.to(`room:${upperCode}`).emit("game:ended", result);
+      }
+    } catch {
+      // La sala ya fue cerrada.
+    }
+  }
 
   public register(io: Server, socket: Socket): void {
     socket.on("game:start", async (payload: { roomCode: string; userId: string }) => {
       try {
-        const { roomCode, userId } = payload;
-        const upperCode = roomCode.toUpperCase();
-        const state = await this.roomManager.getRoom(upperCode);
-        if (!state || state.hostUserId !== userId) return;
-
-        state.status = 'COUNTDOWN';
-        const now = Date.now();
-        const countdownSeconds = 3;
-        const startTime = now + countdownSeconds * 1000;
-        state.countdownStartTime = startTime;
+        const upperCode = payload.roomCode.toUpperCase();
+        const { state, countdownSeconds } = await this.roomLifecycle.beginCountdown(upperCode, payload.userId);
 
         io.to(`room:${upperCode}`).emit("game:countdown", {
           countdownSeconds,
-          serverTime: now,
-          startTime,
+          serverTime: Date.now(),
+          startTime: state.countdownStartTime,
         });
 
-        setTimeout(async () => {
-          const currentState = await this.roomManager.getRoom(upperCode);
-          if (!currentState || currentState.status !== 'COUNTDOWN') return;
-
-          currentState.status = 'IN_PROGRESS';
-          currentState.startedAt = Date.now();
-          currentState.endsAt = currentState.timeLimitSeconds && currentState.timeLimitSeconds > 0
-            ? currentState.startedAt + currentState.timeLimitSeconds * 1000
-            : null;
-
-          io.to(`room:${upperCode}`).emit("game:started", {
-            startedAt: currentState.startedAt,
-            endsAt: currentState.endsAt,
-            grid: currentState.grid,
-            words: currentState.words,
-          });
-
-          // Timer for game duration (solo si tiene limite de tiempo)
-          if (currentState.timeLimitSeconds && currentState.timeLimitSeconds > 0) {
-            setTimeout(async () => {
-              const endingState = await this.roomManager.getRoom(upperCode);
-              if (endingState && endingState.status === 'IN_PROGRESS') {
-                const result = await this.finishGame.execute(upperCode);
-                io.to(`room:${upperCode}`).emit("game:ended", result);
-              }
-            }, currentState.timeLimitSeconds * 1000);
-          }
-        }, countdownSeconds * 1000);
-      } catch (err: any) {
-        socket.emit("room:error", { message: err.message });
+        setTimeout(() => void this.launchGame(io, upperCode), countdownSeconds * 1000);
+      } catch (err) {
+        emitRoomError(socket, err);
       }
     });
 
@@ -106,8 +109,8 @@ export class GameEventsHandler {
             players: newState.players,
           });
         }
-      } catch (err: any) {
-        socket.emit("room:error", { message: err.message });
+      } catch (err) {
+        emitRoomError(socket, err);
       }
     });
   }

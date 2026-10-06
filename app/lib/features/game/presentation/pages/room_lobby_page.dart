@@ -4,138 +4,140 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_notifier.dart';
+import '../../domain/entities/room_lobby_entities.dart';
 import '../providers/game_room_notifier.dart';
+import '../providers/game_room_state.dart';
+import '../widgets/lobby_action_bar_widget.dart';
+import '../widgets/lobby_status_banner_widget.dart';
 import '../widgets/room_player_slot_widget.dart';
 import '../../../social/presentation/widgets/invite_friends_sheet.dart';
 
-class RoomLobbyPage extends ConsumerWidget {
+class RoomLobbyPage extends ConsumerStatefulWidget {
   final String roomCode;
 
   const RoomLobbyPage({super.key, required this.roomCode});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RoomLobbyPage> createState() => _RoomLobbyPageState();
+}
+
+class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureJoined());
+  }
+
+  /// El anfitrion llega aqui desde "Crear sala" sin haber entrado por socket:
+  /// sin esto, "Listo" e "Iniciar" se enviaban sin usuario y no pasaba nada.
+  Future<void> _ensureJoined() async {
+    final notifier = ref.read(gameRoomNotifierProvider.notifier);
+    if (!mounted || notifier.isJoinedTo(widget.roomCode)) return;
+    final user = ref.read(authNotifierProvider).user;
+    if (user == null) return;
+    await notifier.joinRoom(code: widget.roomCode, userId: user.id, username: user.name, avatarUrl: user.avatarUrl);
+  }
+
+  void _leave() {
+    ref.read(gameRoomNotifierProvider.notifier).leaveRoom();
+    context.go('/catalog');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(gameRoomNotifierProvider);
     final notifier = ref.read(gameRoomNotifierProvider.notifier);
     final room = state.room;
-    final currentUserId = ref.watch(authNotifierProvider).user?.id;
+    final currentUserId = notifier.currentUserId ?? ref.watch(authNotifierProvider).user?.id;
 
-    ref.listen(gameRoomNotifierProvider, (previous, next) {
+    ref.listen<GameRoomState>(gameRoomNotifierProvider, (previous, next) {
       if (next.countdownValue != null || next.isGameActive) {
-        context.go('/game/$roomCode');
+        context.go('/game/${widget.roomCode}');
+      }
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(backgroundColor: AppColors.accentRose, content: Text(next.errorMessage!)));
       }
     });
-
-    final isHost = room != null && room.hostUserId == currentUserId;
-    final me = room?.players.where((p) => p.userId == currentUserId).firstOrNull;
-    final isReady = me?.isReady ?? false;
 
     return Scaffold(
       backgroundColor: AppColors.bgPrimary,
       appBar: AppBar(
         backgroundColor: AppColors.bgPrimary,
         elevation: 0,
-        title: Text('Lobby • $roomCode', style: AppTypography.heading2.copyWith(fontSize: 18)),
+        title: Text('Sala ${widget.roomCode}', style: AppTypography.heading2.copyWith(fontSize: 18)),
         actions: [
-          IconButton(
+          TextButton.icon(
+            onPressed: _leave,
             icon: const Icon(Icons.exit_to_app_rounded, color: AppColors.accentRose),
-            onPressed: () {
-              if (currentUserId != null) {
-                notifier.leaveRoom();
-              }
-              context.go('/catalog');
-            },
+            label: Text('Salir', style: AppTypography.labelLarge.copyWith(color: AppColors.accentRose)),
           ),
         ],
       ),
       body: room == null
           ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
-          : Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(room.wordSearchTitle, style: AppTypography.heading2.copyWith(fontSize: 20)),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Jugadores conectados (${room.players.length}/${room.maxPlayers})',
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 1.1,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                      ),
-                      itemCount: room.maxPlayers,
-                      itemBuilder: (context, index) {
-                        final player = index < room.players.length ? room.players[index] : null;
-                        return RoomPlayerSlotWidget(player: player, slotIndex: index);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (room.players.length < room.maxPlayers)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: TextButton.icon(
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.accentAmber,
-                          minimumSize: const Size.fromHeight(48),
-                          backgroundColor: AppColors.accentAmber.withValues(alpha: 0.1),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                        onPressed: () => InviteFriendsSheet.show(context, room.code),
-                        icon: const Icon(Icons.person_add_alt_1_rounded),
-                        label: Text('Invitar amigos', style: AppTypography.labelLarge.copyWith(color: AppColors.accentAmber)),
-                      ),
-                    ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: isReady ? AppColors.accentEmerald : AppColors.accentCyan,
-                              width: 2,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          ),
-                          onPressed: () => notifier.toggleReady(!isReady),
-                          child: Text(
-                            isReady ? '¡Listo! (Cancelar)' : 'Marcar como Listo',
-                            style: AppTypography.labelLarge.copyWith(
-                              color: isReady ? AppColors.accentEmerald : AppColors.accentCyan,
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (isHost) ...[
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.accentViolet,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            ),
-                            onPressed: () => notifier.startGame(),
-                            child: Text(
-                              'Iniciar Juego',
-                              style: AppTypography.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: _buildLobby(state, notifier, LobbyReadiness.of(room, currentUserId)),
               ),
             ),
+    );
+  }
+
+  Widget _buildLobby(GameRoomState state, GameRoomNotifier notifier, LobbyReadiness readiness) {
+    final room = state.room!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(room.wordSearchTitle, style: AppTypography.heading2.copyWith(fontSize: 20)),
+        const SizedBox(height: 4),
+        Text(
+          'Jugadores en la sala: ${room.players.length} de ${room.maxPlayers}',
+          style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+        ),
+        const SizedBox(height: 12),
+        LobbyStatusBannerWidget(readiness: readiness),
+        const SizedBox(height: 16),
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.1,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: room.maxPlayers,
+            itemBuilder: (context, index) => RoomPlayerSlotWidget(
+              player: index < room.players.length ? room.players[index] : null,
+              slotIndex: index,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (!room.isFull)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.accentAmber,
+                minimumSize: const Size.fromHeight(48),
+                backgroundColor: AppColors.accentAmber.withValues(alpha: 0.1),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () => InviteFriendsSheet.show(context, room.code),
+              icon: const Icon(Icons.person_add_alt_1_rounded),
+              label: Text('Invitar amigos', style: AppTypography.labelLarge.copyWith(color: AppColors.accentAmber)),
+            ),
+          ),
+        LobbyActionBarWidget(
+          readiness: readiness,
+          isStarting: state.isStarting,
+          onToggleReady: notifier.toggleReady,
+          onStart: notifier.startGame,
+        ),
+      ],
     );
   }
 }

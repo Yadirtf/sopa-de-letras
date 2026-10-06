@@ -5,6 +5,9 @@ import '../../domain/entities/game_event_entities.dart';
 class GameRoomState extends Equatable {
   final GameRoomEntity? room;
   final bool isLoading;
+
+  /// El anfitrion pulso Iniciar y esperamos la cuenta atras del servidor.
+  final bool isStarting;
   final String? errorMessage;
   final int? countdownValue;
   final bool isGameActive;
@@ -17,6 +20,7 @@ class GameRoomState extends Equatable {
   const GameRoomState({
     this.room,
     this.isLoading = false,
+    this.isStarting = false,
     this.errorMessage,
     this.countdownValue,
     this.isGameActive = false,
@@ -30,6 +34,7 @@ class GameRoomState extends Equatable {
   GameRoomState copyWith({
     GameRoomEntity? room,
     bool? isLoading,
+    bool? isStarting,
     String? errorMessage,
     int? countdownValue,
     bool clearCountdown = false,
@@ -43,6 +48,7 @@ class GameRoomState extends Equatable {
     return GameRoomState(
       room: room ?? this.room,
       isLoading: isLoading ?? this.isLoading,
+      isStarting: isStarting ?? this.isStarting,
       errorMessage: errorMessage,
       countdownValue: clearCountdown ? null : (countdownValue ?? this.countdownValue),
       isGameActive: isGameActive ?? this.isGameActive,
@@ -58,6 +64,7 @@ class GameRoomState extends Equatable {
   List<Object?> get props => [
         room,
         isLoading,
+        isStarting,
         errorMessage,
         countdownValue,
         isGameActive,

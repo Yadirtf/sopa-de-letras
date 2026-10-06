@@ -110,7 +110,7 @@ class RoomPlayerSlotWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              player!.isReady ? 'Listo' : 'Esperando',
+              player!.isHost ? 'Anfitrión' : (player!.isReady ? 'Listo' : 'Esperando'),
               style: AppTypography.bodySmall.copyWith(
                 fontSize: 10,
                 color: player!.isReady ? AppColors.accentEmerald : AppColors.textMuted,

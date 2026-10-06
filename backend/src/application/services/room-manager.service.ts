@@ -22,26 +22,33 @@ export class RoomManagerService {
   ): Promise<{ state: CachedRoomState; joinedPlayer: any }> {
     const state = await this.roomCache.getRoom(code);
     if (!state) throw new Error('SALA_NO_ENCONTRADA');
+
+    // Reconectar (app en segundo plano, red movil) devuelve al jugador a su sitio.
+    const returning = state.players.find((p) => p.userId === player.userId);
+    if (returning) return { state, joinedPlayer: returning };
+
     if (state.status !== 'WAITING') throw new Error('PARTIDA_EN_CURSO');
     if (state.players.length >= state.maxPlayers) throw new Error('SALA_LLENA');
 
-    let existing = state.players.find((p) => p.userId === player.userId);
-    if (!existing) {
-      const colorHex = PLAYER_COLORS[state.players.length % PLAYER_COLORS.length];
-      existing = {
-        userId: player.userId,
-        username: player.username,
-        avatarUrl: player.avatarUrl,
-        isHost: state.hostUserId === player.userId,
-        isReady: state.hostUserId === player.userId, // Host is ready by default
-        score: 0,
-        wordsFound: [],
-        colorHex,
-      };
-      state.players.push(existing);
-      await this.roomCache.saveRoom(state);
-    }
-    return { state, joinedPlayer: existing };
+    const isHost = state.hostUserId === player.userId;
+    const joinedPlayer = {
+      userId: player.userId,
+      username: player.username,
+      avatarUrl: player.avatarUrl,
+      isHost,
+      isReady: isHost, // El anfitrion siempre esta listo
+      score: 0,
+      wordsFound: [],
+      colorHex: this.pickFreeColor(state),
+    };
+    state.players.push(joinedPlayer);
+    await this.roomCache.saveRoom(state);
+    return { state, joinedPlayer };
+  }
+
+  private pickFreeColor(state: CachedRoomState): string {
+    const used = new Set(state.players.map((p) => p.colorHex));
+    return PLAYER_COLORS.find((c) => !used.has(c)) ?? PLAYER_COLORS[state.players.length % PLAYER_COLORS.length];
   }
 
   async removePlayer(code: string, userId: string): Promise<{ state: CachedRoomState; newHostId?: string }> {
@@ -54,22 +61,12 @@ export class RoomManagerService {
     if (state.hostUserId === userId && state.players.length > 0) {
       state.hostUserId = state.players[0].userId;
       state.players[0].isHost = true;
+      state.players[0].isReady = true;
       newHostId = state.hostUserId;
     }
 
     await this.roomCache.saveRoom(state);
     return { state, newHostId };
-  }
-
-  async toggleReady(code: string, userId: string, isReady: boolean): Promise<CachedRoomState> {
-    const state = await this.roomCache.getRoom(code);
-    if (!state) throw new Error('SALA_NO_ENCONTRADA');
-    const player = state.players.find((p) => p.userId === userId);
-    if (player) {
-      player.isReady = isReady;
-      await this.roomCache.saveRoom(state);
-    }
-    return state;
   }
 
   async submitWord(

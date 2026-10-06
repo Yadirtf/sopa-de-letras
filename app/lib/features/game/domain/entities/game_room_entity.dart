@@ -95,6 +95,32 @@ class GameRoomEntity extends Equatable {
 
   bool get isFull => players.length >= maxPlayers;
 
+  GameRoomEntity copyWith({
+    String? hostUserId,
+    RoomStatusEnum? status,
+    List<RoomPlayerEntity>? players,
+    List<List<String>>? grid,
+    List<String>? words,
+  }) {
+    return GameRoomEntity(
+      id: id,
+      code: code,
+      wordSearchId: wordSearchId,
+      wordSearchTitle: wordSearchTitle,
+      hostUserId: hostUserId ?? this.hostUserId,
+      status: status ?? this.status,
+      maxPlayers: maxPlayers,
+      timeLimitSeconds: timeLimitSeconds,
+      isPrivate: isPrivate,
+      players: players ?? this.players,
+      grid: grid ?? this.grid,
+      words: words ?? this.words,
+      shareUrl: shareUrl,
+      deepLink: deepLink,
+      qrData: qrData,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/icon_label.dart';
+import '../../domain/entities/game_room_entity.dart';
 import '../providers/game_room_notifier.dart';
 
 class GamePodiumPage extends ConsumerWidget {
@@ -19,9 +20,8 @@ class GamePodiumPage extends ConsumerWidget {
     final rematch = state.rematchState;
 
     ref.listen(gameRoomNotifierProvider, (previous, next) {
-      if (next.isGameActive || next.countdownValue != null) {
-        context.go('/game/$roomCode');
-      }
+      if (next.isGameActive || next.countdownValue != null) context.go('/game/$roomCode');
+      if (next.room?.status == RoomStatusEnum.waiting && next.podium.isEmpty) context.go('/lobby/$roomCode');
     });
 
     return Scaffold(

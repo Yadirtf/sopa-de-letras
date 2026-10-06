@@ -1,6 +1,8 @@
 import '../../domain/entities/game_room_entity.dart';
 import '../../domain/entities/game_event_entities.dart';
+import '../../domain/entities/room_lobby_entities.dart';
 import '../../domain/repositories/game_repository.dart';
+import '../models/room_lobby_models.dart';
 import '../datasources/game_remote_datasource.dart';
 import '../datasources/game_socket_datasource.dart';
 
@@ -41,18 +43,23 @@ class GameRepositoryImpl implements GameRepository {
   void disconnectSocket() => _socketDataSource.disconnect();
 
   @override
-  void joinRoom({
+  Future<RoomPlayersSnapshot> joinRoom({
     required String roomCode,
     required String userId,
     required String username,
     String? avatarUrl,
-  }) {
-    _socketDataSource.joinRoom(
+  }) async {
+    final ack = await _socketDataSource.joinRoom(
       roomCode: roomCode,
       userId: userId,
       username: username,
       avatarUrl: avatarUrl,
     );
+    final snapshot = RoomPlayersSnapshotModel.tryParse(ack['room']);
+    if (ack['success'] != true || snapshot == null) {
+      throw RoomFlowExceptionModel.fromCode(ack['error']?.toString());
+    }
+    return snapshot;
   }
 
   @override
@@ -97,14 +104,10 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
-  Stream<RoomPlayerEntity> onPlayerJoined() => _socketDataSource.onPlayerJoined;
+  Stream<RoomPlayersSnapshot> onPlayersChanged() => _socketDataSource.onPlayersChanged;
 
   @override
-  Stream<Map<String, dynamic>> onPlayerLeft() => _socketDataSource.onPlayerLeft;
-
-  @override
-  Stream<Map<String, dynamic>> onPlayerReadyChanged() =>
-      _socketDataSource.onPlayerReadyChanged;
+  Stream<RoomFlowException> onRoomError() => _socketDataSource.onRoomError.map(RoomFlowExceptionModel.fromJson);
 
   @override
   Stream<Map<String, dynamic>> onGameCountdown() => _socketDataSource.onGameCountdown;
@@ -116,8 +119,7 @@ class GameRepositoryImpl implements GameRepository {
   Stream<WordFoundEventEntity> onWordFound() => _socketDataSource.onWordFound;
 
   @override
-  Stream<List<LeaderboardEntryEntity>> onLeaderboardUpdated() =>
-      _socketDataSource.onLeaderboardUpdated;
+  Stream<List<LeaderboardEntryEntity>> onLeaderboardUpdated() => _socketDataSource.onLeaderboardUpdated;
 
   @override
   Stream<List<PodiumEntryEntity>> onGameEnded() => _socketDataSource.onGameEnded;
