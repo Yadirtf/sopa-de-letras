@@ -88,7 +88,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
           : state.items.isEmpty
               ? const SocialEmptyState(
-                  emoji: '🔕',
+                  icon: Icons.notifications_none_rounded,
                   title: 'Todo tranquilo por aquí',
                   message: 'Aquí verás solicitudes de amistad, invitaciones a jugar y tus medallas.',
                 )

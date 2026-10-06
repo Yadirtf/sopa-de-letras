@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_label.dart';
 import '../providers/game_room_notifier.dart';
 
 class GamePodiumPage extends ConsumerWidget {
@@ -32,9 +33,9 @@ class GamePodiumPage extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 12),
-              Text(
-                '🏆 Podio Final',
-                textAlign: TextAlign.center,
+              IconLabel(
+                icon: Icons.emoji_events_rounded, text: 'Podio Final',
+                alignment: MainAxisAlignment.center,
                 style: AppTypography.heading1.copyWith(fontSize: 26, color: AppColors.accentAmber),
               ),
               const SizedBox(height: 20),
@@ -74,7 +75,11 @@ class GamePodiumPage extends ConsumerWidget {
                           ),
                           Text('${item.score} pts', style: AppTypography.labelLarge.copyWith(color: AppColors.accentCyan)),
                           const SizedBox(width: 12),
-                          Text('+${item.trophiesEarned} 🏆', style: AppTypography.labelLarge.copyWith(color: AppColors.accentAmber)),
+                          IconLabel(
+                            icon: Icons.emoji_events_rounded,
+                            text: '+${item.trophiesEarned}',
+                            style: AppTypography.labelLarge.copyWith(color: AppColors.accentAmber),
+                          ),
                         ],
                       ),
                     );

@@ -40,7 +40,7 @@ class FriendsNotifier extends StateNotifier<FriendsState> {
   }
 
   Future<String?> accept(String requestId) =>
-      _run(requestId, () => _repo.acceptRequest(requestId), success: '¡Ahora son amigos! 🎉');
+      _run(requestId, () => _repo.acceptRequest(requestId), success: '¡Ahora son amigos!');
 
   Future<String?> reject(String requestId) => _run(requestId, () => _repo.rejectRequest(requestId));
 

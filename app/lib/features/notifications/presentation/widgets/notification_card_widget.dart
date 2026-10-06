@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_badge.dart';
 import '../../domain/entities/app_notification_entity.dart';
 import 'notification_copy.dart';
 
@@ -38,13 +39,7 @@ class NotificationCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(color: copy.color.withValues(alpha: 0.15), shape: BoxShape.circle),
-                    child: Text(copy.emoji, style: const TextStyle(fontSize: 24)),
-                  ),
+                  IconBadge(icon: copy.icon, color: copy.color),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(

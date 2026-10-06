@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_avatars.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_badge.dart';
 import '../providers/auth_notifier.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -46,13 +48,10 @@ class ProfilePage extends ConsumerWidget {
               child: Stack(
                 alignment: Alignment.bottomRight,
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: AppColors.bgCard,
-                    child: Text(
-                      user.avatarUrl == 'bee_queen' ? '👑' : '🐝',
-                      style: const TextStyle(fontSize: 48),
-                    ),
+                  IconBadge(
+                    icon: AppAvatars.of(user.avatarUrl).icon,
+                    color: AppAvatars.of(user.avatarUrl).color,
+                    size: 100,
                   ),
                   if (user.isGuest)
                     Container(

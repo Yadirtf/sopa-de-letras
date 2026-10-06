@@ -18,7 +18,7 @@ Future<String?> joinInvitedRoom(WidgetRef ref, String roomCode) async {
 
   await game.joinRoom(code: code, userId: user.id, username: user.name, avatarUrl: user.avatarUrl);
   if (ref.read(gameRoomNotifierProvider).errorMessage != null) {
-    return 'Esta sala ya no está disponible 😕';
+    return 'Esta sala ya no está disponible';
   }
   appRouter.go('/lobby/$code');
   return null;

@@ -66,7 +66,7 @@ class PlayerSearchNotifier extends StateNotifier<PlayerSearchState> {
       final outcome = await _repo.sendRequest(userId);
       final relation = outcome == FriendRequestOutcome.accepted ? RelationStatus.friends : RelationStatus.requestSent;
       _setRelation(userId, relation);
-      return outcome == FriendRequestOutcome.accepted ? '¡Ahora son amigos! 🎉' : 'Solicitud enviada 📨';
+      return outcome == FriendRequestOutcome.accepted ? '¡Ahora son amigos!' : 'Solicitud enviada';
     } catch (e) {
       return friendlyApiError(e);
     } finally {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_badge.dart';
 
-/// Estado vacío amable: un emoji grande, una frase y (opcional) un siguiente paso claro.
+/// Estado vacío amable: un icono grande en su círculo de color, una frase y (opcional) un siguiente paso claro.
 class SocialEmptyState extends StatelessWidget {
-  final String emoji;
+  final IconData icon;
+  final Color color;
   final String title;
   final String message;
   final String? actionLabel;
@@ -12,7 +14,8 @@ class SocialEmptyState extends StatelessWidget {
 
   const SocialEmptyState({
     super.key,
-    required this.emoji,
+    required this.icon,
+    this.color = AppColors.accentCyan,
     required this.title,
     required this.message,
     this.actionLabel,
@@ -27,7 +30,7 @@ class SocialEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 64)),
+            IconBadge(icon: icon, color: color, size: 96),
             const SizedBox(height: 16),
             Text(title, textAlign: TextAlign.center, style: AppTypography.titleMedium),
             const SizedBox(height: 8),

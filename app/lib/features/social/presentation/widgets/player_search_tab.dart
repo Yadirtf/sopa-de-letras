@@ -48,11 +48,12 @@ class PlayerSearchTab extends ConsumerWidget {
 
   Widget _results(BuildContext context, WidgetRef ref, PlayerSearchState state, PlayerSearchNotifier notifier) {
     if (state.isTooShort) {
-      return const SocialEmptyState(emoji: '🔎', title: '¿A quién buscas?', message: 'Escribe al menos 2 letras de su nombre.');
+      return const SocialEmptyState(icon: Icons.person_search_rounded, title: '¿A quién buscas?', message: 'Escribe al menos 2 letras de su nombre.');
     }
     if (!state.isSearching && state.results.isEmpty) {
       return const SocialEmptyState(
-        emoji: '🤔',
+        icon: Icons.search_off_rounded,
+        color: AppColors.accentAmber,
         title: 'No encontramos a nadie',
         message: 'Revisa cómo se escribe el nombre o pídele a tu amigo que te busque a ti.',
       );
