@@ -1,4 +1,4 @@
-﻿/**
+/**
  * WordHive Backend — Entry Point
  * 
  * Arquitectura: Clean Architecture (Domain → Application → Infrastructure → Presentation)
@@ -31,7 +31,14 @@ async function bootstrap() {
   // Plugins de seguridad
   await app.register(helmet);
   await app.register(cors, {
-    origin: env.FRONTEND_URL,
+    origin: (origin, cb) => {
+      // Permite peticiones sin origin (Flutter móvil) o dominios de Render / local
+      if (!origin || origin.includes("onrender.com") || origin.includes("localhost") || origin === env.FRONTEND_URL) {
+        cb(null, true);
+        return;
+      }
+      cb(null, true);
+    },
     credentials: true,
   });
   await app.register(rateLimit, {

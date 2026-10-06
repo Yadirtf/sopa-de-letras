@@ -44,15 +44,9 @@ services:
       - key: SMTP_FROM
         value: noreply@wordhive.com
       - key: APP_URL
-        fromService:
-          type: web
-          name: wordhive-api
-          property: url
+        value: https://wordhive-api.onrender.com
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: wordhive-landing
-          property: url
+        value: https://wordhive-landing.onrender.com
 
   # 2. Key Value Cache (Redis / Valkey compatible en Render)
   - type: keyvalue
