@@ -33,3 +33,5 @@ Thumbs.db
 
 # Prisma
 backend/src/infrastructure/database/prisma/migrations/*.sql.lock
+# Firebase: llega desde el secreto GOOGLE_SERVICES_JSON en CI
+app/android/app/google-services.json

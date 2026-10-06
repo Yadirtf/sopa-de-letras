@@ -75,3 +75,16 @@ app/build/app/outputs/flutter-apk/app-release.apk
    En [`AndroidManifest.xml`](file:///c:/Users/pc/Desktop/sopa-de-letras/app/android/app/src/main/AndroidManifest.xml) se encuentra habilitado `android.permission.INTERNET` y `android:usesCleartextTraffic="true"`.
 3. **CORS:**  
    En [`app.ts`](file:///c:/Users/pc/Desktop/sopa-de-letras/backend/src/app.ts), el middleware `@fastify/cors` acepta peticiones sin cabecera `Origin` (como las que emiten los clientes nativos Android y Dio), asegurando comunicación fluida.
+
+---
+
+## 4. Avisos push en la barra del teléfono (Firebase Cloud Messaging)
+
+Las invitaciones a jugar y las solicitudes de amistad llegan a la barra de notificaciones aunque WordHive esté cerrada. Sin estas credenciales todo compila y funciona igual, solo que sin avisos con la app cerrada.
+
+1. Entra a [console.firebase.google.com](https://console.firebase.google.com) y crea un proyecto (por ejemplo `wordhive`). Analytics no es necesario.
+2. **App Android:** en el proyecto, *Agregar app → Android* con el paquete `com.example.wordhive_app`. Descarga `google-services.json`.
+3. **GitHub (APK):** en el repo, *Settings → Secrets and variables → Actions → New repository secret* con nombre `GOOGLE_SERVICES_JSON` y como valor el contenido completo del archivo. La siguiente APK de Actions ya trae Firebase.
+   - Para compilar en local, copia el archivo a `app/android/app/google-services.json` (está en `.gitignore`).
+4. **Render (backend):** en Firebase, *Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada*. En Render, servicio `wordhive-api` → *Environment*, crea `FIREBASE_SERVICE_ACCOUNT` y pega el JSON completo (también acepta base64). Al reiniciar, el log dice `[Push] FCM activo para el proyecto ...`.
+5. Instala la APK nueva, inicia sesión y acepta "¡Sí, avísame!".

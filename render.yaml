@@ -47,6 +47,9 @@ services:
         value: https://wordhive-api.onrender.com
       - key: FRONTEND_URL
         value: https://wordhive-landing.onrender.com
+      # Cuenta de servicio de Firebase para avisos push (pegar el JSON en Render).
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
 
   # 2. Key Value Cache (Redis / Valkey compatible en Render)
   - type: keyvalue

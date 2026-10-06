@@ -32,6 +32,7 @@ model User {
   friendshipsA           Friendship[]          @relation("FriendshipUserA")
   friendshipsB           Friendship[]          @relation("FriendshipUserB")
   passwordResetTokens    PasswordResetToken[]
+  pushDevices            PushDevice[]
 
   @@map("users")
 }
@@ -178,4 +179,20 @@ enum NotificationType {
   FRIEND_ACCEPTED
   GAME_START
   GAME_END
+}
+
+// Telefonos registrados para notificaciones push (FCM). Un token pertenece a
+// un solo usuario: si otra cuenta inicia sesion en el mismo telefono, el token
+// se reasigna en lugar de duplicarse.
+model PushDevice {
+  token     String   @id
+  userId    String   @map("user_id")
+  platform  String   @default("android")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_devices")
 }

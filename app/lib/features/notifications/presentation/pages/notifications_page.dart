@@ -8,6 +8,7 @@ import '../../../social/presentation/widgets/social_empty_state_widget.dart';
 import '../../domain/entities/app_notification_entity.dart';
 import '../providers/notifications_notifier.dart';
 import '../widgets/notification_card_widget.dart';
+import '../widgets/push_enable_banner.dart';
 
 /// Centro de notificaciones (US-25): historial, "marcar todo como leído"
 /// y una acción directa por tarjeta (ver solicitud, unirse a la sala...).
@@ -84,39 +85,46 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             ),
         ],
       ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
-          : state.items.isEmpty
-              ? const SocialEmptyState(
-                  icon: Icons.notifications_none_rounded,
-                  title: 'Todo tranquilo por aquí',
-                  message: 'Aquí verás solicitudes de amistad, invitaciones a jugar y tus medallas.',
-                )
-              : RefreshIndicator(
-                  color: AppColors.accentCyan,
-                  backgroundColor: AppColors.bgCard,
-                  onRefresh: notifier.refresh,
-                  child: ListView.builder(
-                    controller: _scroll,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == state.items.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
-                        );
-                      }
-                      final n = state.items[index];
-                      return NotificationCard(
-                        key: ValueKey(n.id),
-                        notification: n,
-                        actionLabel: _actionLabel(n.kind),
-                        onTap: () => _open(n),
-                      );
-                    },
-                  ),
-                ),
+      body: Column(
+        children: [
+          const PushEnableBanner(),
+          Expanded(
+            child: state.isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.accentCyan))
+                : state.items.isEmpty
+                    ? const SocialEmptyState(
+                        icon: Icons.notifications_none_rounded,
+                        title: 'Todo tranquilo por aquí',
+                        message: 'Aquí verás solicitudes de amistad, invitaciones a jugar y tus medallas.',
+                      )
+                    : RefreshIndicator(
+                        color: AppColors.accentCyan,
+                        backgroundColor: AppColors.bgCard,
+                        onRefresh: notifier.refresh,
+                        child: ListView.builder(
+                          controller: _scroll,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          itemCount: state.items.length + (state.isLoadingMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == state.items.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
+                              );
+                            }
+                            final n = state.items[index];
+                            return NotificationCard(
+                              key: ValueKey(n.id),
+                              notification: n,
+                              actionLabel: _actionLabel(n.kind),
+                              onTap: () => _open(n),
+                            );
+                          },
+                        ),
+                      ),
+          ),
+        ],
+      ),
     );
   }
 }
