@@ -1,13 +1,13 @@
 {
   "name": "wordhive-web",
   "version": "1.0.0",
-  "description": "WordHive Landing Page",
+  "description": "WordHive Landing Page (y puerta de entrada a la version web del juego en /jugar/)",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node test-e2e.js"
+    "build:site": "vite build && bash ../app/tool/web/build_web.sh dist"
   },
   "devDependencies": {
     "vite": "^5.0.0"

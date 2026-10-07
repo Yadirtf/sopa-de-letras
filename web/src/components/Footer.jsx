@@ -1,23 +1,24 @@
 import React from 'react';
+import { BrandLogo } from './BrandLogo';
+import { LOGIN_URL, PLAY_URL } from '../config/links';
 
 export function Footer() {
   return (
     <footer className="footer" role="contentinfo">
       <div className="footer__container">
         <div className="footer__brand">
-          <span style={{ fontSize: '16px' }}>🔤 WordHive</span>
-          <p style={{ fontSize: '13px', marginTop: 4, color: 'var(--wh-text-secondary)' }}>
-            Juega solo, vence a todos. La sopa de letras reinventada.
-          </p>
+          <BrandLogo size={28} />
+          <p className="footer__tagline">Sopas de letras para jugar con amigos y familia.</p>
         </div>
 
         <nav className="footer__links" aria-label="Enlaces de pie de página">
-          <a href="#como-jugar" className="footer__link">Reglas</a>
-          <a href="#explorar" className="footer__link">Sopas</a>
-          <a href="#registro" className="footer__link">Acceso</a>
-          <span style={{ color: 'var(--wh-text-muted)' }}>|</span>
-          <span style={{ color: 'var(--wh-text-secondary)' }}>v1.0.0 Bioluminiscencia</span>
+          <a href="#como-jugar" className="footer__link">Cómo jugar</a>
+          <a href="#funciones" className="footer__link">Funciones</a>
+          <a href={LOGIN_URL} className="footer__link">Entrar</a>
+          <a href={PLAY_URL} className="footer__link">Jugar</a>
         </nav>
+
+        <p className="footer__copy">© {new Date().getFullYear()} WordHive</p>
       </div>
     </footer>
   );

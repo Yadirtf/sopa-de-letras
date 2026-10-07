@@ -16,9 +16,12 @@ import '../../features/game/presentation/pages/game_podium_page.dart';
 import '../../features/social/presentation/pages/friends_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/home/presentation/pages/home_shell_page.dart';
+import 'auth_route_guard.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/login',
+  refreshListenable: authRouteGuard,
+  redirect: (context, state) => authRouteGuard.redirect(state.uri),
   routes: [
     GoRoute(
       path: '/login',
@@ -40,7 +43,13 @@ final appRouter = GoRouter(
       builder: (context, state, navigationShell) => HomeShellPage(navigationShell: navigationShell),
       branches: [
         StatefulShellBranch(routes: [
-          GoRoute(path: '/join-room', builder: (context, state) => const JoinRoomPage()),
+          GoRoute(
+            path: '/join-room',
+            builder: (context, state) {
+              final code = state.uri.queryParameters['code'];
+              return JoinRoomPage(key: ValueKey('join-$code'), initialCode: code);
+            },
+          ),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(path: '/my-creations', builder: (context, state) => const MyCreationsPage()),
@@ -71,6 +80,8 @@ final appRouter = GoRouter(
     ),
     // Alias antiguo: la sala y el podio vuelven aquí al terminar.
     GoRoute(path: '/catalog', redirect: (context, state) => '/home'),
+    // Enlace de invitación (el que va en el QR y en "Copiar enlace").
+    GoRoute(path: '/room/:code', redirect: (context, state) => '/join-room?code=${state.pathParameters['code']}'),
     GoRoute(
       path: '/create-room',
       builder: (context, state) {

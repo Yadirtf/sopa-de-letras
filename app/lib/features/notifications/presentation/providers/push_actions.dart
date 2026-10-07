@@ -8,14 +8,18 @@ import '../../../social/presentation/providers/social_providers.dart';
 import 'notifications_notifier.dart';
 import 'push_providers.dart';
 
-/// Pide el permiso del sistema y guarda el resultado. Si Android ya no
-/// deja mostrar el diálogo (lo negaron dos veces), explica dónde activarlo.
+/// Pide el permiso del sistema y guarda el resultado. Si ya no se puede
+/// mostrar el diálogo (lo bloquearon), explica dónde activarlo.
 Future<bool> enablePushNotifications(WidgetRef ref) async {
-  final granted = await ref.read(systemNotificationsProvider).requestPermission();
+  final system = ref.read(systemNotificationsProvider);
+  final granted = await system.requestPermission();
   ref.read(pushEnabledProvider.notifier).state = granted;
   if (!granted) {
-    showRootSnack('Puedes activarlos en Ajustes › Apps › WordHive › Notificaciones');
+    showRootSnack(system.deniedHint);
+    return false;
   }
+  // En el navegador el token push solo existe después de dar el permiso.
+  await ref.read(pushDeviceRegistrarProvider).register();
   return granted;
 }
 

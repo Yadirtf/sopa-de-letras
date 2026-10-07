@@ -4,6 +4,7 @@ import { IWordSearchRepository } from "../../domain/repositories/word-search.rep
 import { RedisRoomCache, CachedRoomState } from "../../infrastructure/cache/redis-room.cache";
 import { RoomEntity } from "../../domain/entities/room.entity";
 import { CreateRoomDto, RoomResponseDto } from "../dtos/room.dto";
+import { roomLinks } from "../common/room-links";
 
 export class CreateRoomUseCase {
   constructor(
@@ -92,8 +93,6 @@ export class CreateRoomUseCase {
 
     await this.roomCache.saveRoom(cachedState);
 
-    const shareUrl = `https://wordhive.app/room/${code}`;
-    const deepLink = `wordhive://room/${code}`;
 
     return {
       id: roomId,
@@ -106,9 +105,7 @@ export class CreateRoomUseCase {
       timeLimitSeconds,
       isPrivate,
       players: roomEntity.players,
-      shareUrl,
-      deepLink,
-      qrData: shareUrl,
+      ...roomLinks(code),
     };
   }
 

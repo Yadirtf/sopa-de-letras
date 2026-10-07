@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -45,7 +46,7 @@ class _PushPermissionSheet extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'Así sabrás al momento si un amigo te invita a una partida o quiere ser tu amigo, '
-              'aunque WordHive esté cerrada.',
+              '${kIsWeb ? 'aunque estés en otra pestaña' : 'aunque WordHive esté cerrada'}.',
               textAlign: TextAlign.center,
               style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary, height: 1.4),
             ),
@@ -60,7 +61,8 @@ class _PushPermissionSheet extends StatelessWidget {
                 ),
                 onPressed: () => Navigator.of(context).pop(true),
                 icon: const Icon(Icons.check_circle_rounded),
-                label: Text('¡Sí, avísame!', style: AppTypography.labelBold.copyWith(fontSize: 17, color: Colors.white)),
+                label:
+                    Text('¡Sí, avísame!', style: AppTypography.labelBold.copyWith(fontSize: 17, color: Colors.white)),
               ),
             ),
             const SizedBox(height: 8),

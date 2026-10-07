@@ -1,12 +1,12 @@
 {
-    "name": "WordHive",
+    "name": "WordHive · Sopa de letras",
     "short_name": "WordHive",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#080B14",
     "theme_color": "#080B14",
-    "description": "Sopa de letras para jugar con amigos y familia.",
-    "orientation": "portrait-primary",
+    "description": "Sopas de letras para jugar con amigos y familia, en tiempo real.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {
@@ -31,5 +31,12 @@
             "type": "image/png",
             "purpose": "maskable"
         }
+    ],
+    "lang": "es",
+    "scope": ".",
+    "categories": [
+        "games",
+        "education",
+        "kids"
     ]
 }

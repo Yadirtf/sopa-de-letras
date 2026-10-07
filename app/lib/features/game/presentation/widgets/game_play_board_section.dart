@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -85,7 +86,9 @@ class GamePlayBoardSection extends StatelessWidget {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'Desliza el dedo de la primera a la última letra',
+                      kIsWeb
+                          ? 'Arrastra (con el dedo o el ratón) de la primera a la última letra'
+                          : 'Desliza el dedo de la primera a la última letra',
                       textAlign: TextAlign.center,
                       style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
                     ),

@@ -5,9 +5,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_notifier.dart';
 import '../providers/game_room_notifier.dart';
+import '../widgets/room_code_field.dart';
 
 class JoinRoomPage extends ConsumerStatefulWidget {
-  const JoinRoomPage({super.key});
+  /// Código que llega desde un enlace de invitación: se rellena y se entra solo.
+  final String? initialCode;
+
+  const JoinRoomPage({super.key, this.initialCode});
 
   @override
   ConsumerState<JoinRoomPage> createState() => _JoinRoomPageState();
@@ -17,6 +21,17 @@ class _JoinRoomPageState extends ConsumerState<JoinRoomPage> {
   final TextEditingController _codeController = TextEditingController();
   bool _isLoading = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    final code = widget.initialCode?.trim().toUpperCase() ?? '';
+    if (code.isEmpty) return;
+    _codeController.text = code;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _handleJoin();
+    });
+  }
 
   @override
   void dispose() {
@@ -80,36 +95,7 @@ class _JoinRoomPageState extends ConsumerState<JoinRoomPage> {
               style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
-            TextField(
-              controller: _codeController,
-              textAlign: TextAlign.center,
-              textCapitalization: TextCapitalization.characters,
-              maxLength: 6,
-              style: AppTypography.heading1.copyWith(
-                color: AppColors.accentCyan,
-                letterSpacing: 8,
-                fontSize: 28,
-              ),
-              decoration: InputDecoration(
-                hintText: 'HIVE92',
-                hintStyle: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.5)),
-                counterText: '',
-                filled: true,
-                fillColor: AppColors.bgCard,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppColors.borderGlow),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppColors.borderSubtle),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppColors.accentViolet, width: 2),
-                ),
-              ),
-            ),
+            RoomCodeField(controller: _codeController, onSubmitted: _handleJoin),
             if (_error != null) ...[
               const SizedBox(height: 12),
               Text(

@@ -7,11 +7,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // En web las rutas se ven limpias (/jugar/lobby/ABC123, sin #) para que
+  // los enlaces de invitación y el botón "atrás" del navegador funcionen.
+  usePathUrlStrategy();
 
   // Orientacion preferida: portrait + landscape en tablets
   await SystemChrome.setPreferredOrientations([

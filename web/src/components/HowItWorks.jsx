@@ -2,30 +2,30 @@ import React from 'react';
 
 const STEPS = [
   {
-    num: '01',
-    title: 'Elige tu Reto',
-    body: 'Navega el catálogo por tema, dificultad o idioma. Si prefieres un reto único, genera una sopa personalizada en segundos con palabras a tu gusto.',
+    num: '1',
+    title: 'Elige una sopa',
+    body: 'Busca por tema y dificultad entre las sopas de la comunidad, o crea la tuya con tus propias palabras.',
   },
   {
-    num: '02',
-    title: 'Invita a tu Escuadrón',
-    body: 'Genera una sala con un solo clic. Comparte el código único de sala o proyecta un código QR directo para que cualquiera se sume desde su móvil o PC.',
+    num: '2',
+    title: 'Invita a quien quieras',
+    body: 'Crea una sala y comparte el código, el enlace o el QR. Tus amigos entran desde el navegador o el móvil.',
   },
   {
-    num: '03',
-    title: 'Traza Rápido y Gana',
-    body: 'Conforme encuentras palabras, la matriz se ilumina en vivo para todos. Mira cómo subes en la tabla de clasificación antes de que se agote el cronómetro.',
+    num: '3',
+    title: 'Encuentra las palabras',
+    body: 'Arrastra el dedo o el ratón sobre las letras. Cuando todos estén listos empieza la cuenta 3, 2, 1… ¡a jugar!',
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="section" id="multijugador" aria-labelledby="steps-title">
+    <section className="section" id="como-jugar" aria-labelledby="steps-title">
       <div className="section-header">
-        <span className="section-tag">Dinámica Simple & Competitiva</span>
-        <h2 className="section-title" id="steps-title">Cómo Funciona</h2>
+        <span className="section-tag">Sencillo desde la primera partida</span>
+        <h2 className="section-title" id="steps-title">Cómo se juega</h2>
         <p className="section-subtitle">
-          De cero al podio en tres sencillos pasos.
+          De abrir la web a tu primera victoria en tres pasos.
         </p>
       </div>
 
