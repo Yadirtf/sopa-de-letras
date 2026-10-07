@@ -50,7 +50,7 @@ class LobbyStatusBannerWidget extends StatelessWidget {
             ? 'Puedes jugar solo o invitar a tus amigos.'
             : '¡Todos listos! Pulsa Iniciar cuando quieras.';
       }
-      return '¡Todos listos! El anfitrión va a iniciar la partida.';
+      return '¡Todos listos! ${readiness.hostName} va a iniciar la partida.';
     }
     if (!readiness.isHost && !readiness.isReady) return 'Pulsa el botón de abajo cuando estés listo.';
     return 'Esperando a: ${readiness.pendingNames.join(', ')}';
