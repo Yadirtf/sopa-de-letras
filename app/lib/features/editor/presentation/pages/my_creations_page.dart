@@ -55,7 +55,7 @@ class MyCreationsPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.accentCyan),
-            onPressed: () => context.push('/create-word-search'),
+            onPressed: () => context.go('/create-word-search'),
           ),
         ],
       ),
@@ -128,7 +128,7 @@ class MyCreationsPage extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
-            onPressed: () => context.push('/create-word-search'),
+            onPressed: () => context.go('/create-word-search'),
             icon: const Icon(Icons.add_rounded),
             label: const Text('Crear Sopa Ahora'),
             style: ElevatedButton.styleFrom(

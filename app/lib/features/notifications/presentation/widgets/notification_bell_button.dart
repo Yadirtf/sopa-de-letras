@@ -15,7 +15,7 @@ class NotificationBellButton extends ConsumerWidget {
 
     return IconButton(
       tooltip: unread == 0 ? 'Notificaciones' : 'Notificaciones: $unread sin leer',
-      onPressed: () => context.push('/notifications'),
+      onPressed: () => context.go('/notifications'),
       icon: TweenAnimationBuilder<double>(
         key: ValueKey(unread),
         tween: Tween(begin: unread > 0 ? 1 : 0, end: 0),

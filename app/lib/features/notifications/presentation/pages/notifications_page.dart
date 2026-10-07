@@ -50,9 +50,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     ref.read(notificationsNotifierProvider.notifier).markRead(n.id);
     switch (n.kind) {
       case NotificationKind.friendRequest:
-        context.push('/friends', extra: {'tab': 1});
+        context.go('/friends', extra: {'tab': 1});
       case NotificationKind.friendAccepted:
-        context.push('/friends');
+        context.go('/friends');
       case NotificationKind.roomInvite:
         final code = n.text('roomCode');
         if (code == null) return;

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../widgets/home_bottom_bar.dart';
+import '../widgets/shell_top_bar.dart';
 
-/// Marco de las pantallas "de casa": Unirme, Mis sopas, Inicio y Perfil
-/// comparten la barra inferior. Sala, partida y editores son rutas de la raíz,
+/// Marco de las pantallas "de casa": barra de arriba (saludo, Amigos y
+/// campana) y barra de abajo (Unirme, Mis sopas, Inicio, Crear y Perfil). Sala, partida y editores son rutas de la raíz,
 /// así que al entrar en ellas la barra desaparece sola y el tablero tiene
 /// toda la pantalla.
 class HomeShellPage extends StatelessWidget {
@@ -32,11 +33,11 @@ class HomeShellPage extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.bgPrimary,
+        appBar: const ShellTopBar(),
         body: navigationShell,
         bottomNavigationBar: HomeBottomBar(
           currentBranch: navigationShell.currentIndex,
           onBranchSelected: _goTo,
-          onCreate: () => context.push('/create-word-search'),
         ),
       ),
     );
