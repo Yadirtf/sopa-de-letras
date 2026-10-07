@@ -1,11 +1,11 @@
 {
-    "name": "wordhive_app",
-    "short_name": "wordhive_app",
+    "name": "WordHive",
+    "short_name": "WordHive",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#080B14",
+    "theme_color": "#080B14",
+    "description": "Sopa de letras para jugar con amigos y familia.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
