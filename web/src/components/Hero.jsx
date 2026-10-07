@@ -1,67 +1,36 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
 import { MiniWordPuzzle } from './MiniWordPuzzle';
-import { sound } from '../services/sound.service';
+import { LOGIN_URL, PLAY_URL } from '../config/links';
 
 export function Hero() {
-  const { isAuthenticated, openAuth } = useAuth();
-
-  const handlePlayFree = () => {
-    sound.playClick();
-    if (!isAuthenticated) {
-      openAuth('register');
-    } else {
-      const el = document.getElementById('explorar');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleGuestPlay = () => {
-    sound.playClick();
-    openAuth('guest');
-  };
-
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__content">
         <div className="hero__badge">
           <span className="hero__badge-beacon" aria-hidden="true" />
-          <span>1,280+ jugadores en línea compitiendo ahora</span>
+          <span>Gratis · Sin descargas · Para toda la familia</span>
         </div>
 
         <h1 className="hero__title" id="hero-title">
           Encuentra las palabras.<br />
-          <span className="hero__highlight">Vence a todos.</span>
+          <span className="hero__highlight">Juega con quien quieras.</span>
         </h1>
 
         <p className="hero__subtitle">
-          La primera plataforma social de sopa de letras en tiempo real. Compite contra tus amigos, sube en el ranking global y desbloquea miles de niveles generados algorítmicamente.
+          Sopas de letras para jugar solo o con amigos en tiempo real, desde el navegador o el móvil.
+          Crea tu sala, comparte el código y que gane quien complete su sopa primero.
         </p>
 
         <div className="hero__actions">
-          <button
-            type="button"
-            className="btn btn--primary btn--lg"
-            onClick={handlePlayFree}
-          >
-            <span>{isAuthenticated ? 'Ir al Catálogo' : 'Jugar Gratis'}</span>
-            <span>⚡</span>
-          </button>
-
-          {!isAuthenticated && (
-            <button
-              type="button"
-              className="btn btn--amber btn--lg"
-              onClick={handleGuestPlay}
-            >
-              Jugar como Invitado
-            </button>
-          )}
-
-          <a href="#como-jugar" className="btn btn--ghost btn--lg">
-            Cómo funciona
+          <a href={PLAY_URL} className="btn btn--primary btn--lg">
+            <span>Jugar ahora</span>
+            <span aria-hidden="true">▶</span>
+          </a>
+          <a href={LOGIN_URL} className="btn btn--amber btn--lg">
+            Probar como invitado
           </a>
         </div>
+        <p className="hero__hint">¿Calentamos? Toca una a una las letras de una palabra en la sopa de al lado.</p>
       </div>
 
       <div className="hero__interactive">

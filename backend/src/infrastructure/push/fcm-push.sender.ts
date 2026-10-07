@@ -18,11 +18,22 @@ const DEAD_TOKEN_CODES = new Set([
 /** FCM permite hasta 500 tokens por llamada multicast. */
 const MAX_BATCH = 500;
 
+/**
+ * Pagina de la web que abre el aviso al hacer clic en el navegador: la sala
+ * de la invitacion, las solicitudes de amistad o la bandeja de avisos.
+ */
+export function webLinkFor(playUrl: string, data: Record<string, string>): string {
+  const base = playUrl.replace(/\/+$/, "");
+  if (data.type === "ROOM_INVITE" && data.roomCode) return `${base}/room/${data.roomCode.toUpperCase()}`;
+  if (data.type === "FRIEND_REQUEST" || data.type === "FRIEND_ACCEPTED") return `${base}/friends`;
+  return `${base}/notifications`;
+}
+
 export class FcmPushSender implements IPushSender {
   readonly enabled = true;
   private readonly messaging: Messaging;
 
-  constructor(app: App) {
+  constructor(app: App, private readonly playUrl: string) {
     this.messaging = getMessaging(app);
   }
 
@@ -54,6 +65,11 @@ export class FcmPushSender implements IPushSender {
             clickAction: "FLUTTER_NOTIFICATION_CLICK",
           },
         },
+        // Navegadores (version web): icono de la Abejita y clic que abre la pagina justa.
+        webpush: {
+          notification: { icon: `${this.playUrl}/icons/Icon-192.png`, tag: message.tag, renotify: true },
+          fcmOptions: { link: webLinkFor(this.playUrl, message.data) },
+        },
       });
       response.responses.forEach((r, idx) => {
         if (!r.success && r.error && DEAD_TOKEN_CODES.has(r.error.code)) invalidTokens.push(batch[idx]);
@@ -75,7 +91,7 @@ export class DisabledPushSender implements IPushSender {
  * Lee la cuenta de servicio de FIREBASE_SERVICE_ACCOUNT (JSON tal cual o en
  * base64, lo que sea mas comodo de pegar en Render).
  */
-export function createPushSender(rawServiceAccount: string | undefined): IPushSender {
+export function createPushSender(rawServiceAccount: string | undefined, playUrl: string): IPushSender {
   if (!rawServiceAccount?.trim()) {
     console.info("[Push] FIREBASE_SERVICE_ACCOUNT no definido: avisos push desactivados.");
     return new DisabledPushSender();
@@ -86,7 +102,7 @@ export function createPushSender(rawServiceAccount: string | undefined): IPushSe
     const account = JSON.parse(json);
     const app = initializeApp({ credential: cert(account), projectId: account.project_id }, "wordhive-push");
     console.info(`[Push] FCM activo para el proyecto ${account.project_id}.`);
-    return new FcmPushSender(app);
+    return new FcmPushSender(app, playUrl);
   } catch (err) {
     console.error("[Push] FIREBASE_SERVICE_ACCOUNT invalido, push desactivado:", (err as Error).message);
     return new DisabledPushSender();

@@ -1,6 +1,7 @@
 import { RedisRoomCache } from "../../infrastructure/cache/redis-room.cache";
 import { IRoomRepository } from "../../domain/repositories/room.repository.interface";
 import { RoomResponseDto } from "../dtos/room.dto";
+import { roomLinks } from "../common/room-links";
 
 export class GetRoomByCodeUseCase {
   constructor(
@@ -24,9 +25,7 @@ export class GetRoomByCodeUseCase {
         timeLimitSeconds: cached.timeLimitSeconds,
         isPrivate: cached.isPrivate,
         players: cached.players,
-        shareUrl: `https://wordhive.app/room/${cached.code}`,
-        deepLink: `wordhive://room/${cached.code}`,
-        qrData: `https://wordhive.app/room/${cached.code}`,
+        ...roomLinks(cached.code),
       };
     }
 
@@ -46,9 +45,7 @@ export class GetRoomByCodeUseCase {
       timeLimitSeconds: dbRoom.timeLimitSeconds,
       isPrivate: dbRoom.isPrivate,
       players: dbRoom.players,
-      shareUrl: `https://wordhive.app/room/${dbRoom.code}`,
-      deepLink: `wordhive://room/${dbRoom.code}`,
-      qrData: `https://wordhive.app/room/${dbRoom.code}`,
+      ...roomLinks(dbRoom.code),
     };
   }
 }

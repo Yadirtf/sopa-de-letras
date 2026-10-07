@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { sound } from '../services/sound.service';
 import confetti from 'canvas-confetti';
+import { PLAY_URL } from '../config/links';
 
 const GRID_LETTERS = [
   ['H', 'I', 'V', 'E', 'R', 'K'],
@@ -13,7 +14,7 @@ const GRID_LETTERS = [
 
 const TARGET_WORDS = [
   { word: 'HIVE', coords: [[0,0], [0,1], [0,2], [0,3]] },
-  { word: 'BEE', coords: [[0,0], [1,0], [2,0]] },
+  { word: 'BEE', coords: [[1,0], [2,0], [3,0]] },
   { word: 'SOPA', coords: [[1,2], [1,3], [1,4], [1,5]] },
   { word: 'SOL', coords: [[4,0], [4,1], [4,2]] },
 ];
@@ -84,7 +85,7 @@ export function MiniWordPuzzle() {
   return (
     <div className="mini-puzzle-card">
       <div className="mini-puzzle-header">
-        <span>🎮 Prueba rápida en vivo</span>
+        <span>🎮 Prueba aquí mismo</span>
         <span className="mini-puzzle-score">⭐ {score} pts</span>
       </div>
 
@@ -125,6 +126,9 @@ export function MiniWordPuzzle() {
       {isAllFound && (
         <div className="mini-puzzle-win">
           <span>🎉 ¡Completaste la sopa rápida!</span>
+          <a href={PLAY_URL} className="btn-link" style={{ marginLeft: 8 }}>
+            Jugar una de verdad
+          </a>
           <button type="button" onClick={handleReset} className="btn-link" style={{ marginLeft: 8 }}>
             Reiniciar
           </button>

@@ -1,115 +1,33 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'system_notifications_platform.dart' if (dart.library.js_interop) 'web_system_notifications.dart' as platform;
 
-/// Barra de notificaciones de Android: canal, permiso, avisos locales y toques.
+/// Avisos del sistema para invitaciones y solicitudes de amistad.
 ///
-/// El canal es el mismo que usa el backend al enviar por FCM, así los avisos
-/// llegan como un mensaje de WhatsApp: sonido, burbuja flotante y visibles en
-/// la pantalla de bloqueo. El usuario puede silenciarlos desde Ajustes.
-class SystemNotifications {
-  /// "_v2": Android no deja subir la importancia de un canal ya creado, así
-  /// que el canal nuevo nace con importancia máxima y el viejo se borra.
-  static const channelId = 'wordhive_social_v2';
-  static const _legacyChannelId = 'wordhive_social';
-  static const _channel = AndroidNotificationChannel(
-    channelId,
-    'Amigos e invitaciones',
-    description: 'Cuando un amigo te invita a jugar o te envía una solicitud',
-    importance: Importance.max,
-    playSound: true,
-    enableVibration: true,
-    showBadge: true,
-  );
+/// - Android: barra de notificaciones ([AndroidSystemNotifications]).
+/// - Web: notificaciones del navegador ([WebSystemNotifications]), que salen
+///   aunque WordHive esté en otra pestaña o la ventana minimizada.
+abstract class SystemNotifications {
+  /// Elige la implementación de la plataforma en la que corre la app.
+  factory SystemNotifications() => platform.createSystemNotifications();
 
-  final _plugin = FlutterLocalNotificationsPlugin();
-  final _taps = StreamController<Map<String, dynamic>>.broadcast();
-  Map<String, dynamic>? _launchPayload;
-  bool _ready = false;
+  /// ¿Esta plataforma puede mostrar avisos fuera de la app?
+  bool get isSupported;
 
-  static bool get isSupported => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  /// Cómo reactivar los avisos si el usuario los bloqueó.
+  String get deniedHint;
 
   /// Datos del aviso tocado mientras la app ya estaba abierta o en segundo plano.
-  Stream<Map<String, dynamic>> get onTap => _taps.stream;
+  Stream<Map<String, dynamic>> get onTap;
 
-  AndroidFlutterLocalNotificationsPlugin? get _android =>
-      _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+  Future<void> init();
 
-  Future<void> init() async {
-    if (!isSupported || _ready) return;
-    try {
-      await _plugin.initialize(
-        const InitializationSettings(android: AndroidInitializationSettings('ic_stat_wordhive')),
-        onDidReceiveNotificationResponse: (r) => _emit(r.payload),
-      );
-      await _android?.deleteNotificationChannel(_legacyChannelId);
-      await _android?.createNotificationChannel(_channel);
-      final launch = await _plugin.getNotificationAppLaunchDetails();
-      if (launch?.didNotificationLaunchApp ?? false) _launchPayload = _decode(launch!.notificationResponse?.payload);
-      _ready = true;
-    } catch (e) {
-      debugPrint('[SystemNotifications] No disponible: $e');
-    }
-  }
+  /// Aviso que abrió la app desde cero (se entrega una sola vez).
+  Map<String, dynamic>? takeLaunchPayload();
 
-  /// Aviso local que abrió la app desde cero (se entrega una sola vez).
-  Map<String, dynamic>? takeLaunchPayload() {
-    final payload = _launchPayload;
-    _launchPayload = null;
-    return payload;
-  }
+  Future<bool> areEnabled();
 
-  Future<bool> areEnabled() async => _ready && (await _android?.areNotificationsEnabled() ?? false);
+  /// Muestra el diálogo del sistema y devuelve si quedaron activados.
+  Future<bool> requestPermission();
 
-  /// Muestra el diálogo del sistema (Android 13+). En versiones anteriores ya
-  /// vienen activadas y devuelve el estado actual.
-  Future<bool> requestPermission() async {
-    if (!_ready) return false;
-    final granted = await _android?.requestNotificationsPermission();
-    return granted ?? await areEnabled();
-  }
-
-  /// Mismo `tag` que el push de FCM: si llegan ambos, el segundo reemplaza
-  /// al primero en lugar de duplicarse.
-  Future<void> show({required String title, required String body, required String tag, Map<String, dynamic>? data}) async {
-    if (!_ready) return;
-    await _plugin.show(
-      0,
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channel.id,
-          _channel.name,
-          channelDescription: _channel.description,
-          importance: Importance.max,
-          priority: Priority.max,
-          visibility: NotificationVisibility.public,
-          category: AndroidNotificationCategory.social,
-          ticker: title,
-          color: const Color(0xFF7C3AED),
-          tag: tag,
-          styleInformation: BigTextStyleInformation(body),
-        ),
-      ),
-      payload: data == null ? null : jsonEncode(data),
-    );
-  }
-
-  void _emit(String? payload) {
-    final data = _decode(payload);
-    if (data != null && !_taps.isClosed) _taps.add(data);
-  }
-
-  Map<String, dynamic>? _decode(String? payload) {
-    if (payload == null || payload.isEmpty) return null;
-    try {
-      final decoded = jsonDecode(payload);
-      return decoded is Map ? Map<String, dynamic>.from(decoded) : null;
-    } catch (_) {
-      return null;
-    }
-  }
+  /// Mismo `tag` que el push: si llegan ambos, el segundo reemplaza al primero.
+  Future<void> show({required String title, required String body, required String tag, Map<String, dynamic>? data});
 }

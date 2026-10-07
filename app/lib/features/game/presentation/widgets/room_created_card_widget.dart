@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../../../../core/constants/app_links.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/game_room_entity.dart';
@@ -48,9 +49,17 @@ class RoomCreatedCardWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-          child: QrImageView(data: 'https://wordhive.app/room/${room.code}', size: 180, version: QrVersions.auto),
+          child: QrImageView(data: AppLinks.room(room.code), size: 180, version: QrVersions.auto),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          icon: const Icon(Icons.link_rounded, color: AppColors.accentCyan),
+          label: Text('Copiar enlace de invitación',
+              style: AppTypography.labelLarge.copyWith(color: AppColors.accentCyan)),
+          onPressed: () =>
+              _copyToClipboard(context, AppLinks.roomInvite(room.code), 'Enlace copiado: pégalo donde quieras'),
+        ),
+        const SizedBox(height: 16),
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.accentEmerald,

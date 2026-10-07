@@ -20,6 +20,8 @@ const envSchema = z.object({
   SMTP_FROM: z.string().default("noreply@wordhive.com"),
   APP_URL: z.string().default("https://wordhive-api.onrender.com"),
   FRONTEND_URL: z.string().default("https://wordhive-landing.onrender.com"),
+  // Donde vive la version web del juego (enlaces de invitacion, QR y avisos push).
+  PLAY_URL: z.string().default("https://wordhive-landing.onrender.com/jugar"),
   // Cuenta de servicio de Firebase (JSON o base64). Sin ella no hay avisos push.
   FIREBASE_SERVICE_ACCOUNT: z.string().optional(),
 });

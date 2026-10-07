@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/network/api_client.dart';
 
@@ -9,7 +10,7 @@ class PushDeviceRemoteDataSource {
   PushDeviceRemoteDataSource(this._client);
 
   Future<void> register(String token) =>
-      _client.dio.post(ApiEndpoints.pushDevices, data: {'token': token, 'platform': 'android'});
+      _client.dio.post(ApiEndpoints.pushDevices, data: {'token': token, 'platform': kIsWeb ? 'web' : 'android'});
 
   /// Al cerrar sesión el token local ya se borró, por eso se pasa el JWT
   /// que tenía el usuario para que el backend sepa de quién es el teléfono.

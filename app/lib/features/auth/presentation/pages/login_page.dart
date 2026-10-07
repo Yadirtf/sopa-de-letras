@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/auth_notifier.dart';
@@ -30,36 +29,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  Future<void> _submitLogin() async {
-    final success = await ref
-        .read(authNotifierProvider.notifier)
-        .login(_emailController.text.trim(), _pin);
-    if (success && mounted) {
-      context.go('/home');
-    }
-  }
+  // Al entrar no navegamos desde aquí: el portero de rutas (authRouteGuard)
+  // saca al jugador del login hacia el inicio o hacia el enlace que abrió.
+  Future<void> _submitLogin() => ref.read(authNotifierProvider.notifier).login(_emailController.text.trim(), _pin);
 
-  Future<void> _onGuestPlay() async {
-    final success = await ref.read(authNotifierProvider.notifier).guestLogin();
-    if (success && mounted) {
-      context.go('/home');
-    }
-  }
+  Future<void> _onGuestPlay() => ref.read(authNotifierProvider.notifier).guestLogin();
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
 
-    ref.listen<AuthState>(authNotifierProvider, (prev, next) {
-      if (next.status == AuthStatus.authenticated && mounted) {
-        context.go('/home');
-      }
-    });
-
     if (authState.status == AuthStatus.authenticated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) context.go('/home');
-      });
       return const Scaffold(
         backgroundColor: AppColors.bgPrimary,
         body: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
@@ -87,7 +67,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 style: AppTypography.bodyMedium,
               ),
               const SizedBox(height: 32),
-
               if (authState.errorMessage != null) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -100,7 +79,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
                 const SizedBox(height: 24),
               ],
-
               if (!_isPinStep) ...[
                 TextField(
                   controller: _emailController,
@@ -126,11 +104,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => setState(() { _isPinStep = false; _pin = ''; }),
+                  onPressed: () => setState(() {
+                    _isPinStep = false;
+                    _pin = '';
+                  }),
                   child: const Text('Cambiar correo', style: TextStyle(color: AppColors.accentCyan)),
                 ),
               ],
-
               LoginFooterWidget(onGuestPlay: _onGuestPlay),
             ],
           ),

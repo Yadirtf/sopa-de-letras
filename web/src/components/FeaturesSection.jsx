@@ -2,35 +2,45 @@ import React from 'react';
 
 const FEATURES = [
   {
-    icon: '🏆',
-    title: 'Multijugador en Vivo',
-    desc: 'Compite contra múltiples jugadores en una misma sopa. El podio se actualiza en tiempo real cada vez que alguien traza una palabra.',
+    icon: '🏁',
+    title: 'Carreras en tiempo real',
+    desc: 'Hasta varios jugadores en la misma sala. Cada uno tiene su propia sopa y ve cómo avanzan los demás: gana quien la complete primero.',
   },
   {
-    icon: '👥',
-    title: 'Salas & Códigos QR',
-    desc: 'Crea una sala personalizada, comparte el enlace o proyecta un QR para que tus amigos se unan al lobby en un par de segundos.',
+    icon: '🧩',
+    title: 'Solo o en compañía',
+    desc: 'Juega en solitario a tu ritmo o crea una sala e invita a tu familia y amigos con un código, un enlace o un QR.',
   },
   {
-    icon: '🧠',
-    title: 'Algoritmo Backtracking',
-    desc: 'Nuestro motor inteligente genera matrices sin solapamientos inválidos y garantiza una experiencia de juego justa y desafiante.',
+    icon: '✏️',
+    title: 'Crea tus propias sopas',
+    desc: 'Elige un tema, escribe o pega tus palabras y WordHive arma el tablero. Ideal para clases, cumpleaños o repasar vocabulario.',
   },
   {
-    icon: '⚡',
-    title: 'Acceso Instantáneo con PIN',
-    desc: 'Olvídate de contraseñas de 16 caracteres. Tu PIN de 4 dígitos te da acceso instantáneo y seguro a todas tus salas y progresos.',
+    icon: '👋',
+    title: 'Amigos e invitaciones',
+    desc: 'Agrega amigos, mira quién está conectado y recibe un aviso cuando alguien te invite a una partida.',
+  },
+  {
+    icon: '🔢',
+    title: 'Entra con un PIN',
+    desc: 'Nada de contraseñas largas: tu correo y 4 números. ¿Prisa? Entra como invitado y guarda tu cuenta después.',
+  },
+  {
+    icon: '🐝',
+    title: 'Para todas las edades',
+    desc: 'Letras grandes, colores claros y una guía que te muestra la palabra mientras la trazas. Fácil para peques y abuelos.',
   },
 ];
 
 export function FeaturesSection() {
   return (
-    <section className="section" id="como-jugar" aria-labelledby="features-title">
+    <section className="section" id="funciones" aria-labelledby="features-title">
       <div className="section-header">
-        <span className="section-tag">Experiencia de Nueva Generación</span>
+        <span className="section-tag">Todo lo de la app, también en la web</span>
         <h2 className="section-title" id="features-title">¿Por qué WordHive?</h2>
         <p className="section-subtitle">
-          Diseñado para convertir la tradicional sopa de letras en un esport social adictivo y de alta velocidad.
+          La sopa de letras de siempre, pensada para compartirla.
         </p>
       </div>
 

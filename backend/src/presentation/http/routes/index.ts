@@ -41,6 +41,7 @@ import { friendsRoutes } from "./friends.routes";
 import { notificationsRoutes } from "./notifications.routes";
 import { env } from "../../../config/env";
 import { createPushSender } from "../../../infrastructure/push/fcm-push.sender";
+import { configureRoomLinks } from "../../../application/common/room-links";
 
 export async function registerRoutes(fastify: FastifyInstance) {
   // Repositorios e infraestructura
@@ -90,7 +91,8 @@ export async function registerRoutes(fastify: FastifyInstance) {
   const authMiddleware = createAuthMiddleware(tokenService, sessionCache);
 
   // Social Container (Épica 5: Amigos, Presencia, Invitaciones y Notificaciones)
-  const pushSender = createPushSender(env.FIREBASE_SERVICE_ACCOUNT);
+  configureRoomLinks(env.PLAY_URL);
+  const pushSender = createPushSender(env.FIREBASE_SERVICE_ACCOUNT, env.PLAY_URL);
   const socialContainer = createSocialContainer({
     prisma: prismaClient,
     redis: redisClient,

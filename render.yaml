@@ -47,6 +47,9 @@ services:
         value: https://wordhive-api.onrender.com
       - key: FRONTEND_URL
         value: https://wordhive-landing.onrender.com
+      # Version web del juego: enlaces de invitacion, QR y clic en avisos push.
+      - key: PLAY_URL
+        value: https://wordhive-landing.onrender.com/jugar
       # Cuenta de servicio de Firebase para avisos push (pegar el JSON en Render).
       - key: FIREBASE_SERVICE_ACCOUNT
         sync: false
@@ -57,18 +60,32 @@ services:
     plan: free
     ipAllowList: []
 
-  # 3. Landing Page Web (Vite Static Site)
+  # 3. Landing + version web del juego (sitio estatico)
+  #    /        -> landing (web/, Vite)
+  #    /jugar/  -> la app Flutter compilada para web (app/), con todas sus funciones
   - type: web
     name: wordhive-landing
     runtime: static
-    rootDir: web
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    buildCommand: cd web && npm ci && npm run build && cd .. && bash app/tool/web/build_web.sh web/dist
+    staticPublishPath: ./web/dist
+    buildFilter:
+      paths:
+        - web/**
+        - app/**
     envVars:
       - key: VITE_API_URL
         value: https://wordhive-api.onrender.com/api/v1
-      - key: VITE_SOCKET_URL
+      - key: PLAY_URL
+        value: https://wordhive-landing.onrender.com/jugar
+      - key: API_URL
+        value: https://wordhive-api.onrender.com/api/v1
+      - key: SOCKET_URL
         value: https://wordhive-api.onrender.com
+      # Opcionales: avisos push con el navegador cerrado (consola de Firebase).
+      - key: FIREBASE_WEB_CONFIG
+        sync: false
+      - key: FIREBASE_VAPID_KEY
+        sync: false
     headers:
       - path: /*
         name: X-Frame-Options
@@ -80,6 +97,13 @@ services:
         name: Strict-Transport-Security
         value: max-age=31536000; includeSubDomains
     routes:
+      - type: redirect
+        source: /jugar
+        destination: /jugar/
+      # Recargar o abrir un enlace dentro del juego (/jugar/room/ABC123) sirve la app.
+      - type: rewrite
+        source: /jugar/*
+        destination: /jugar/index.html
       - type: rewrite
         source: /*
         destination: /index.html

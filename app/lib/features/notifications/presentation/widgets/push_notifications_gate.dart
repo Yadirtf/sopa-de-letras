@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/push/system_notifications.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../auth/presentation/providers/auth_notifier.dart';
 import '../../../auth/presentation/providers/auth_state.dart';
@@ -11,7 +10,7 @@ import '../providers/push_providers.dart';
 import 'local_push_fallback.dart';
 import 'push_permission_sheet.dart';
 
-/// Avisos en la barra del teléfono para invitaciones y solicitudes.
+/// Avisos en la barra del teléfono (o del navegador) para invitaciones y solicitudes.
 ///
 /// - Registra el token FCM del teléfono al iniciar sesión y lo da de baja al salir.
 /// - Ofrece activar los avisos con una tarjeta amable (nunca en mitad de una partida).
@@ -48,7 +47,7 @@ class _PushNotificationsGateState extends ConsumerState<PushNotificationsGate> w
     await system.init();
     await push.init();
     if (!mounted) return;
-    ref.read(pushEnabledProvider.notifier).state = SystemNotifications.isSupported ? await system.areEnabled() : null;
+    ref.read(pushEnabledProvider.notifier).state = system.isSupported ? await system.areEnabled() : null;
 
     for (final launch in [system.takeLaunchPayload(), await push.takeLaunchData()]) {
       if (launch != null && launch.isNotEmpty) _pendingTaps.add(launch);
@@ -77,8 +76,8 @@ class _PushNotificationsGateState extends ConsumerState<PushNotificationsGate> w
   }
 
   Future<void> _offerPermission() async {
-    if (!mounted || _userId == null || !SystemNotifications.isSupported) return;
     final system = ref.read(systemNotificationsProvider);
+    if (!mounted || _userId == null || !system.isSupported) return;
     if (await system.areEnabled()) {
       ref.read(pushEnabledProvider.notifier).state = true;
       return;
@@ -129,8 +128,9 @@ class _PushNotificationsGateState extends ConsumerState<PushNotificationsGate> w
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
     if (_foreground && _userId != null) {
-      ref.read(systemNotificationsProvider).areEnabled().then((on) {
-        if (mounted && SystemNotifications.isSupported) ref.read(pushEnabledProvider.notifier).state = on;
+      final system = ref.read(systemNotificationsProvider);
+      system.areEnabled().then((on) {
+        if (mounted && system.isSupported) ref.read(pushEnabledProvider.notifier).state = on;
       });
     }
   }
