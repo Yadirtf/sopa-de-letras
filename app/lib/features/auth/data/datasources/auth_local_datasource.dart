@@ -55,12 +55,19 @@ class AuthLocalDataSource {
 
     final secureToken = await _storageService.getAccessToken();
     final hiveToken = box.get(_tokenKey) as String?;
-    if ((secureToken == null || secureToken.isEmpty) && (hiveToken == null || hiveToken.isEmpty)) {
+    final hasSecureToken = secureToken != null && secureToken.isNotEmpty;
+    if (!hasSecureToken && (hiveToken == null || hiveToken.isEmpty)) {
       await clearAuthData();
       return null;
     }
-
-    return UserModel.fromJson(Map<String, dynamic>.from(data as Map));
+    final user = UserModel.fromJson(Map<String, dynamic>.from(data as Map));
+    // Sesiones web guardadas con la versión anterior: el token cifrado quedó
+    // ilegible. Se repara con la copia local para no pedir login de nuevo.
+    if (!hasSecureToken) {
+      await _storageService.clearAll();
+      await _storageService.saveAuthTokens(accessToken: hiveToken!, refreshToken: '', userId: user.id);
+    }
+    return user;
   }
 
   Future<void> clearAuthData() async {

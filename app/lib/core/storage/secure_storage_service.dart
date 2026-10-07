@@ -7,20 +7,21 @@ class SecureStorageService {
 
   final FlutterSecureStorage _storage;
 
-  SecureStorageService([FlutterSecureStorage? storage])
-      : _storage = storage ?? const FlutterSecureStorage();
+  SecureStorageService([FlutterSecureStorage? storage]) : _storage = storage ?? const FlutterSecureStorage();
 
   Future<void> saveAuthTokens({
     required String accessToken,
     required String refreshToken,
     required String userId,
   }) async {
+    // Una tras otra, nunca en paralelo: en el navegador la primera escritura
+    // crea la clave de cifrado, y tres escrituras a la vez creaban tres claves
+    // distintas. Solo sobrevivía la última y el token ya no se podía leer, así
+    // que el servidor respondía 401 al crear una sala o jugar en solitario.
     try {
-      await Future.wait([
-        _storage.write(key: _keyAccessToken, value: accessToken),
-        _storage.write(key: _keyRefreshToken, value: refreshToken),
-        _storage.write(key: _keyUserId, value: userId),
-      ]);
+      await _storage.write(key: _keyAccessToken, value: accessToken);
+      await _storage.write(key: _keyRefreshToken, value: refreshToken);
+      await _storage.write(key: _keyUserId, value: userId);
     } catch (_) {}
   }
 
