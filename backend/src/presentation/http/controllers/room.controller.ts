@@ -27,7 +27,7 @@ export class RoomController {
       req.log.info({ userId: user.userId || user.id, body }, "[RoomController.create] Creando sala...");
 
       const result = await this.createRoomUseCase.execute(
-        { id: user.userId || user.id, name: user.name || 'Anfitrión', avatarUrl: user.avatarUrl },
+        { id: user.userId || user.id, name: user.name || 'Jugador', avatarUrl: user.avatarUrl },
         {
           wordSearchId: body.wordSearchId,
           maxPlayers: body.maxPlayers,

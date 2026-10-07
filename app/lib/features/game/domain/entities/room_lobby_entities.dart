@@ -32,7 +32,11 @@ class LobbyReadiness {
   final int totalPlayers;
   final List<String> pendingNames;
 
+  /// Nombre de quien creo la sala: se muestra en vez de la palabra "anfitrion".
+  final String hostName;
+
   const LobbyReadiness._({
+    required this.hostName,
     required this.isHost,
     required this.isReady,
     required this.readyCount,
@@ -45,7 +49,9 @@ class LobbyReadiness {
     final me = room.players.where((p) => p.userId == userId).firstOrNull;
     // El anfitrion cuenta siempre como listo: su forma de estarlo es pulsar Iniciar.
     bool ready(RoomPlayerEntity p) => p.isReady || p.userId == room.hostUserId;
+    final host = room.players.where((p) => p.userId == room.hostUserId).firstOrNull;
     return LobbyReadiness._(
+      hostName: host?.username ?? 'Quien creó la sala',
       isHost: isHost,
       isReady: isHost || (me?.isReady ?? false),
       readyCount: room.players.where(ready).length,

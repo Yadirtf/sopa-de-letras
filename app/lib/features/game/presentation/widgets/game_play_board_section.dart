@@ -7,6 +7,7 @@ import '../providers/game_board_provider.dart';
 import '../providers/game_room_state.dart';
 import '../providers/race_standings.dart';
 import 'connection_lost_banner.dart';
+import 'forming_word_bar.dart';
 import 'opponents_race_strip_widget.dart';
 import 'target_words_list_widget.dart';
 import 'word_search_canvas_widget.dart';
@@ -60,7 +61,12 @@ class GamePlayBoardSection extends StatelessWidget {
               child: TargetWordsListWidget(words: room.words, claimedWords: state.claimedWords),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
+          FormingWordBar(pendingWords: [
+            for (final w in room.words)
+              if (!state.claimedWords.containsKey(w.toUpperCase())) w,
+          ]),
+          const SizedBox(height: 6),
           Expanded(
             child: WordSearchCanvasWidget(
               grid: room.grid,

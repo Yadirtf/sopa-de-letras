@@ -43,6 +43,16 @@ describe("Flujo del lobby (listo e iniciar)", () => {
     expect((await cache.getRoom("ABC123"))!.players[1].isReady).toBe(false);
   });
 
+  it("al entrar por socket el creador muestra su nombre y avatar (no 'Anfitrion')", async () => {
+    const room = (await cache.getRoom("ABC123"))!;
+    room.players[0].username = "Jugador";
+    await cache.saveRoom(room);
+    await manager.addPlayer("ABC123", { userId: "host", username: "Ana", avatarUrl: "animales_03" });
+    const host = (await cache.getRoom("ABC123"))!.players[0];
+    expect(host.username).toBe("Ana");
+    expect(host.avatarUrl).toBe("animales_03");
+  });
+
   it("el anfitrion siempre queda listo", async () => {
     const state = await lifecycle.setReady("ABC123", "host", false);
     expect(state.players[0].isReady).toBe(true);

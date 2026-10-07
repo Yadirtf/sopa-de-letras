@@ -8,7 +8,6 @@ const PLAYER_COLORS = [
   '#D946EF', '#6366F1', '#0EA5E9', '#84CC16', '#F97316',
   '#A855F7', '#22C55E', '#0284C7', '#FB7185', '#2DD4BF',
 ];
-
 export class RoomManagerService {
   constructor(private readonly roomCache: RedisRoomCache) {}
 
@@ -27,6 +26,9 @@ export class RoomManagerService {
     const returning = state.players.find((p) => p.userId === player.userId);
     if (returning) {
       returning.isConnected = true;
+      // La sala se crea por HTTP sin nombre ni avatar (el token no los lleva): se completan aqui.
+      if (player.username?.trim()) returning.username = player.username.trim();
+      if (player.avatarUrl) returning.avatarUrl = player.avatarUrl;
       await this.roomCache.saveRoom(state);
       return { state, joinedPlayer: returning };
     }

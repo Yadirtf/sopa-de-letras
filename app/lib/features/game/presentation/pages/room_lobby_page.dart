@@ -12,6 +12,7 @@ import '../widgets/connection_lost_banner.dart';
 import '../widgets/leave_room_dialog.dart';
 import '../widgets/lobby_action_bar_widget.dart';
 import '../widgets/lobby_invite_button.dart';
+import '../widgets/lobby_room_header.dart';
 import '../widgets/lobby_status_banner_widget.dart';
 import '../widgets/room_player_slot_widget.dart';
 
@@ -110,12 +111,7 @@ class _RoomLobbyPageState extends ConsumerState<RoomLobbyPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(room.wordSearchTitle, style: AppTypography.heading2.copyWith(fontSize: 20)),
-        const SizedBox(height: 4),
-        Text(
-          'Jugadores en la sala: ${room.players.length} de ${room.maxPlayers}',
-          style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-        ),
+        LobbyRoomHeader(room: room),
         const SizedBox(height: 12),
         ConnectionLostBanner(visible: !state.isConnected),
         LobbyStatusBannerWidget(readiness: readiness),
