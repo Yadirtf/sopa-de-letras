@@ -1,0 +1,43 @@
+/* Créditos de los recursos gratuitos */
+.credits__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 820px;
+  display: grid;
+  gap: 10px;
+}
+
+.credits__item {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--wh-glass-fill);
+  border: 1px solid var(--wh-border-subtle);
+  font-size: 14px;
+}
+
+.credits__what {
+  color: var(--wh-text-primary);
+  font-weight: 600;
+}
+
+.credits__who {
+  color: var(--wh-accent-cyan);
+}
+
+.credits__license {
+  color: var(--wh-text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .credits__item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

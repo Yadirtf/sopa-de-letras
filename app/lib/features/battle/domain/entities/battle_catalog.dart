@@ -5,14 +5,12 @@ import 'dart:ui';
 class BattleUnitType {
   final String id;
   final String name;
-  final String emoji;
   final int width;
   final int height;
 
   const BattleUnitType({
     required this.id,
     required this.name,
-    required this.emoji,
     required this.width,
     required this.height,
   });
@@ -24,7 +22,6 @@ class BattleUnitType {
 class BattleTerrain {
   final String id;
   final String name;
-  final String emoji;
   final String inspiredBy;
   final Color ground;
   final Color gridLine;
@@ -33,7 +30,6 @@ class BattleTerrain {
   const BattleTerrain({
     required this.id,
     required this.name,
-    required this.emoji,
     required this.inspiredBy,
     required this.ground,
     required this.gridLine,
@@ -54,7 +50,6 @@ class BattleTerrain {
 class BattleWeapon {
   final String id;
   final String name;
-  final String emoji;
   final String description;
   final bool damages;
   final int defaultUses;
@@ -62,7 +57,6 @@ class BattleWeapon {
   const BattleWeapon({
     required this.id,
     required this.name,
-    required this.emoji,
     required this.description,
     required this.damages,
     required this.defaultUses,

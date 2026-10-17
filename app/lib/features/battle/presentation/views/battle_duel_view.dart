@@ -13,6 +13,7 @@ import '../widgets/duel/coordinate_input.dart';
 import '../widgets/duel/turn_banner.dart';
 import '../widgets/duel/weapon_picker.dart';
 import '../widgets/grid/battle_grid.dart';
+import '../art/battle_art_images.dart';
 
 /// El duelo: arriba el campo enemigo (donde disparas), abajo tu ejército.
 /// Tocar una casilla la apunta; tocarla otra vez (o el botón) dispara.
@@ -93,7 +94,7 @@ class _BattleDuelViewState extends ConsumerState<BattleDuelView> {
             style:
                 FilledButton.styleFrom(backgroundColor: AppColors.accentRose, minimumSize: const Size.fromHeight(48)),
             onPressed: () => _fire(_aim!.$1, _aim!.$2),
-            icon: Text(weapon.emoji),
+            icon: WeaponIcon(weaponId: weapon.id, size: 26),
             label: Text('Lanzar ${weapon.name.toLowerCase()} a ${BattleCoordinate.format(_aim!.$1, _aim!.$2)}'),
           )
         else

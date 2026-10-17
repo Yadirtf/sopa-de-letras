@@ -6,6 +6,8 @@
 @import './components/hero.css';
 @import './components/catalog.css';
 @import './components/games.css';
+@import './components/mini-battle.css';
+@import './components/credits.css';
 
 /* Secciones Adicionales de la Landing */
 .section {

@@ -28,7 +28,9 @@ class BattleScoreboard extends StatelessWidget {
   Widget _side(BattlePlayerInfo? p, String name, {required bool active, bool alignEnd = false}) {
     final avatar = p?.isBot == true
         ? const CircleAvatar(
-            radius: 18, backgroundColor: AppColors.bgSecondary, child: Text('🐝', style: TextStyle(fontSize: 20)))
+            radius: 18,
+            backgroundColor: AppColors.accentAmber,
+            child: Icon(Icons.smart_toy_rounded, color: AppColors.bgPrimary, size: 22))
         : AvatarView(avatarId: p?.avatarUrl, size: 36);
     final info = Column(
       crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,

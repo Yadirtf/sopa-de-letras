@@ -82,8 +82,51 @@
   font-size: 22px;
 }
 
-.game-tile__emoji {
-  font-size: 36px;
+.game-tile__art {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.game-tile__art--battle {
+  background: url('/batalla/desert.webp') center / 128px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-tile__art--battle img {
+  width: 92%;
+}
+
+.game-tile__art--letters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.game-tile__art--letters span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--wh-accent-cyan);
+  color: var(--wh-bg-primary);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.game-tile__swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: -3px;
+  background-size: cover;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
 
 .game-tile__terrains {
@@ -100,82 +143,6 @@
   padding: 4px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
-}
-
-/* Mini tablero de la batalla */
-.mini-battle {
-  padding: 14px;
-  border-radius: 18px;
-  background: #3b2f1c;
-}
-
-.mini-battle__grid {
-  display: grid;
-  gap: 3px;
-}
-
-.mini-battle__label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: #f3dfb0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mini-battle__cell {
-  aspect-ratio: 1;
-  border: 1px solid rgba(138, 109, 59, 0.9);
-  border-radius: 6px;
-  background: #e0c68a;
-  font-size: clamp(12px, 2.6vw, 20px);
-  line-height: 1;
-  cursor: crosshair;
-  color: #3b2f1c;
-  transition: transform var(--tr-quick);
-}
-
-.mini-battle__cell:hover {
-  transform: scale(1.08);
-}
-
-.mini-battle__cell--miss {
-  background: #c9ad72;
-  font-size: 22px;
-}
-
-.mini-battle__cell--hit {
-  background: #f8a35c;
-}
-
-.mini-battle__cell--fallen {
-  background: #b04a3b;
-}
-
-.mini-battle__cell--last {
-  animation: miniBattleBoom 0.45s ease-out;
-}
-
-@keyframes miniBattleBoom {
-  0% { transform: scale(1.5); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.7); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-}
-
-.mini-battle__status {
-  margin-top: 10px;
-  font-weight: 600;
-  color: #fff4d6 !important;
-}
-
-.mini-battle__footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #f3dfb0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mini-battle__cell--last { animation: none; }
 }
 
 @media (max-width: 860px) {

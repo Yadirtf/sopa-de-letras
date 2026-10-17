@@ -1,0 +1,8 @@
+{
+  "name": "wordhive-battle-art",
+  "private": true,
+  "type": "module",
+  "description": "Modela en 3D (three.js) las figuras, terrenos y armas de La Batalla Más Temida y las renderiza vistas desde arriba",
+  "scripts": { "render": "node render.mjs ../../assets/battle" },
+  "dependencies": { "three": "0.170.0" }
+}

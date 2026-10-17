@@ -112,7 +112,7 @@ class _Problem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text('🧭', style: TextStyle(fontSize: 48)),
+          const Icon(Icons.explore_off_rounded, size: 48, color: AppColors.textSecondary),
           const SizedBox(height: 12),
           Text(message, textAlign: TextAlign.center, style: AppTypography.titleMedium),
           const SizedBox(height: 16),

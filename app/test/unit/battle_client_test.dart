@@ -10,13 +10,12 @@ import 'package:wordhive_app/features/battle/presentation/providers/placement_no
 const desert = BattleTerrain(
   id: 'DESERT',
   name: 'Desierto',
-  emoji: '🏜️',
   inspiredBy: 'El Alamein',
   ground: Color(0xFFE0C68A),
   gridLine: Color(0xFF8A6D3B),
   units: [
-    BattleUnitType(id: 'soldier', name: 'Soldado', emoji: '🪖', width: 1, height: 2),
-    BattleUnitType(id: 'tank', name: 'Tanque', emoji: '🛡️', width: 2, height: 3),
+    BattleUnitType(id: 'soldier', name: 'Soldado', width: 1, height: 2),
+    BattleUnitType(id: 'tank', name: 'Tanque', width: 2, height: 3),
   ],
 );
 

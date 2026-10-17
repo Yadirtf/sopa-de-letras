@@ -34,7 +34,6 @@ abstract class BattleCatalogModel {
   static BattleTerrain _terrain(Map<String, dynamic> t) => BattleTerrain(
         id: t['id'].toString(),
         name: t['name']?.toString() ?? '',
-        emoji: t['emoji']?.toString() ?? '',
         inspiredBy: t['inspiredBy']?.toString() ?? '',
         ground: _color(t['groundHex'], const Color(0xFF2A3346)),
         gridLine: _color(t['gridHex'], const Color(0xFF151D2E)),
@@ -42,7 +41,6 @@ abstract class BattleCatalogModel {
             .map((u) => BattleUnitType(
                   id: u['id'].toString(),
                   name: u['name']?.toString() ?? '',
-                  emoji: u['emoji']?.toString() ?? '',
                   width: _int(u['width'], 1),
                   height: _int(u['height'], 1),
                 ))
@@ -52,7 +50,6 @@ abstract class BattleCatalogModel {
   static BattleWeapon _weapon(Map<String, dynamic> w) => BattleWeapon(
         id: w['id'].toString(),
         name: w['name']?.toString() ?? '',
-        emoji: w['emoji']?.toString() ?? '',
         description: w['description']?.toString() ?? '',
         damages: w['damages'] != false,
         defaultUses: _int(w['defaultUses'], -1),

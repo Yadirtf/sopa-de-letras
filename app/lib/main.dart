@@ -39,6 +39,10 @@ Future<void> main() async {
     final text = await rootBundle.loadString('assets/avatars/LICENSES.txt');
     yield LicenseEntryWithLineBreaks(['Avatares WordHive'], text);
   });
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString('assets/battle/LICENSES.txt');
+    yield LicenseEntryWithLineBreaks(['La Batalla Más Temida'], text);
+  });
 
   // Inicializar almacenamiento local
   await Hive.initFlutter();

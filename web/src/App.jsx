@@ -8,6 +8,7 @@ import { HowItWorks } from './components/HowItWorks';
 import { CatalogPreview } from './components/CatalogPreview';
 import { PlatformsSection } from './components/PlatformsSection';
 import { CtaBanner } from './components/CtaBanner';
+import { CreditsSection } from './components/CreditsSection';
 import { Footer } from './components/Footer';
 
 /**
@@ -27,6 +28,7 @@ export default function App() {
         <CatalogPreview />
         <PlatformsSection />
         <CtaBanner />
+        <CreditsSection />
       </main>
       <Footer />
     </div>
