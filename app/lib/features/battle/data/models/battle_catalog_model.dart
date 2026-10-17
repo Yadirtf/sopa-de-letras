@@ -24,7 +24,7 @@ abstract class BattleCatalogModel {
   static List<BattleReaction> _reactions(dynamic raw) {
     final list = _list(raw)
         .where((r) => r['id'] is String)
-        .map((r) => BattleReaction(r['id'] as String, r['label']?.toString() ?? ''))
+        .map((r) => BattleReaction(r['id'] as String, r['label']?.toString() ?? '', face: r['kind'] == 'face'))
         .toList();
     return list.isEmpty ? BattleReaction.defaults : list;
   }

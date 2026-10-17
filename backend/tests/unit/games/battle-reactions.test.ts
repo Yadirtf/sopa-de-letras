@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { BattleLobbyService } from "../../../src/games/battle/application/battle-lobby.service";
 import { BattleLock } from "../../../src/games/battle/application/battle-lock";
 import { BattleReactionEvent, BattleReactionsService, REACTION_COOLDOWN_MS } from "../../../src/games/battle/application/battle-reactions.service";
+import { BATTLE_REACTIONS, BOT_REPLIES, isBattleReaction } from "../../../src/games/battle/domain/battle-reactions";
 import { InMemoryBattleMatchStore } from "../../../src/games/battle/infrastructure/redis-battle-match.store";
 
 const smallArmy = { cols: 8, rows: 8, terrain: "SKY", army: { paratrooper: 1, balloon: 1 } };
@@ -59,5 +60,12 @@ describe("Reacciones en la batalla", () => {
     expect(delivered).toHaveLength(0);
     await tasks[0]();
     expect(delivered[0]).toMatchObject({ toUserId: "ana", reaction: "winning" });
+  });
+
+  it("hay caras y objetos, y la Abejita sabe contestar a todas", () => {
+    expect(BATTLE_REACTIONS.filter((r) => r.kind === "face").map((r) => r.id)).toEqual(
+      ["laugh", "sly", "angry", "sad", "shocked", "cool"]
+    );
+    for (const r of BATTLE_REACTIONS) expect(isBattleReaction(BOT_REPLIES[r.id])).toBe(true);
   });
 });

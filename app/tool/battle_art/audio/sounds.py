@@ -1,7 +1,8 @@
 """Sonidos de La Batalla Más Temida.
 
 - turn.mp3: toque de corneta propio (sintetizado aquí) que avisa "te toca".
-- tick.mp3, reaction_in.mp3, reaction_out.mp3: de "Interface Sounds" de Kenney (CC0).
+- tick.mp3: de "Interface Sounds" de Kenney (CC0).
+- reactions/*.mp3: los sonidos de cada reacción salen de reactions.py.
 
 Uso: python3 sounds.py <carpeta kenney_interface_sounds> <salida>
 """
@@ -62,8 +63,6 @@ def main(kenney, out):
     to_mp3(tmp, out / "turn.mp3")
     tmp.unlink()
     to_mp3(kenney / "tick_002.wav", out / "tick.mp3", 0.8)
-    to_mp3(kenney / "maximize_006.wav", out / "reaction_in.mp3")
-    to_mp3(kenney / "select_003.wav", out / "reaction_out.mp3", 0.7)
 
 
 if __name__ == "__main__":

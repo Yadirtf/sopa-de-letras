@@ -4,12 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 /// Sonidos de la batalla (assets/battle/sounds). El toque de corneta avisa
-/// que te toca atacar; el tic marca los últimos segundos del turno.
+/// que te toca atacar; el tic marca los últimos segundos del turno. Cada
+/// reacción trae su propio sonido en reactions/<id>.mp3.
 enum BattleSound {
   turn('turn.mp3', 0.9),
-  tick('tick.mp3', 0.6),
-  reactionIn('reaction_in.mp3', 0.8),
-  reactionOut('reaction_out.mp3', 0.6);
+  tick('tick.mp3', 0.6);
 
   final String file;
   final double volume;
@@ -27,6 +26,7 @@ class BattleSounds extends StateNotifier<bool> {
   static bool enabled = true;
 
   final Map<BattleSound, AudioPlayer> _players = {};
+  AudioPlayer? _reaction;
 
   BattleSounds() : super(true) {
     _load();
@@ -61,8 +61,22 @@ class BattleSounds extends StateNotifier<bool> {
     }
   }
 
+  /// Sonido de la escena de una reacción; la que yo mando suena más bajito.
+  /// Una reacción nueva corta la anterior.
+  Future<void> playReaction(String id, {bool quiet = false}) async {
+    if (!state || !enabled) return;
+    try {
+      final player = _reaction ??= AudioPlayer()..setReleaseMode(ReleaseMode.stop);
+      await player.stop();
+      await player.play(AssetSource('battle/sounds/reactions/$id.mp3'), volume: quiet ? 0.6 : 1);
+    } catch (e) {
+      debugPrint('[BattleSounds] reacción $id: $e');
+    }
+  }
+
   @override
   void dispose() {
+    _reaction?.dispose();
     for (final p in _players.values) {
       p.dispose();
     }

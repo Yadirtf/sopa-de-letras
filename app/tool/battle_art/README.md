@@ -18,9 +18,13 @@ node render.mjs ../../assets/battle tank     # solo lo que contenga "tank"
   se coloca acostada) y `<id>_wreck_r`.
 - `scene/terrains.js`: texturas de suelo de 512 px que se repiten sin costura.
 - `scene/weapons.js`: iconos del armamento.
-- `scene/reactions/`: las 8 reacciones del duelo, animadas en bucle. Cada una
-  sale como tira de 24 cuadros de 192 px (6 por fila) en `reactions/<id>.webp`;
-  los ids son los de `battle-reactions.ts` del backend.
+- `scene/reactions/`: las 14 reacciones del duelo, animadas en bucle: 8 objetos
+  de guerra (`props.js`, `gear.js`) y 6 caras del soldado con casco
+  (`faces.js` sobre las piezas de `face_kit.js`). Cada una sale como tira de
+  24 cuadros de 192 px (6 por fila) en `reactions/<id>.webp`; los ids son los
+  de `battle-reactions.ts` del backend. `badge.js` es el icono del botón
+  (`reactions/tray_icon.webp`). La escena completa (vuelo, explosión, confeti…)
+  la monta la app en `widgets/reactions/scene/`.
 - `scene/kit.js` y `scene/craft.js`: piezas comunes (ruedas, orugas,
   soldados, aviones, cascos de barco).
 
@@ -31,4 +35,9 @@ landing las cita en Créditos.
 
 Sonidos (`assets/battle/sounds`): `python3 audio/sounds.py <carpeta de
 Interface Sounds de Kenney> ../../assets/battle/sounds`. El toque de corneta
-del turno se sintetiza ahí mismo; el resto son sonidos de Kenney (CC0).
+del turno se sintetiza ahí mismo; el tic es de Kenney (CC0).
+
+Los de las reacciones se sintetizan con numpy (`audio/synth.py`): explosiones,
+silbido del misil, sirena, fanfarria, aplausos, risas y gruñidos con formantes
+de vocal. Cada uno dura 3,6 s y va al compás de su escena en la app:
+`python3 audio/reactions.py ../../assets/battle/sounds/reactions`.

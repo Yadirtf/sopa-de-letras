@@ -9,7 +9,7 @@ const CREDITS = [
     url: 'https://kenney.nl/assets/smoke-particles',
   },
   {
-    what: 'Sonidos del tic del reloj y de las reacciones',
+    what: 'Sonido del tic del reloj',
     who: 'Interface Sounds, de Kenney',
     license: 'CC0 (dominio público)',
     url: 'https://kenney.nl/assets/interface-sounds',
