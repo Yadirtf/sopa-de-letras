@@ -81,6 +81,7 @@ flutter:
     - assets/battle/fx/
     - assets/battle/reactions/
     - assets/battle/sounds/
+    - assets/battle/sounds/reactions/
     - assets/battle/LICENSES.txt
 
 

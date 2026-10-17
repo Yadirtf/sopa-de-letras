@@ -116,11 +116,13 @@ void main() {
   test('el catálogo trae las reacciones, o usa las de siempre si faltan', () {
     final withList = BattleCatalogModel.fromJson({
       'reactions': [
-        {'id': 'boom', 'label': '¡Boom!'},
+        {'id': 'boom', 'label': '¡Boom!', 'kind': 'action'},
+        {'id': 'laugh', 'label': '¡Jajaja!', 'kind': 'face'},
         {'id': 'alert', 'label': '¡Alerta!'},
       ],
     });
-    expect(withList.reactions.map((r) => r.id), ['boom', 'alert']);
+    expect(withList.reactions.map((r) => r.id), ['boom', 'laugh', 'alert']);
+    expect(withList.reactions.where((r) => r.face).map((r) => r.id), ['laugh']);
     expect(withList.reaction('alert').label, '¡Alerta!');
     expect(BattleCatalogModel.fromJson({}).reactions, BattleReaction.defaults);
   });

@@ -1,6 +1,6 @@
 La Batalla Más Temida: arte del juego
 
-units/, terrains/, weapons/, reactions/
+units/, terrains/, weapons/, reactions/ (incluidas las caras del soldado)
   Modelos 3D y texturas hechos para WordHive con three.js (MIT,
   https://threejs.org) y renderizados con app/tool/battle_art. Sin
   recursos de terceros.
@@ -13,7 +13,11 @@ fx/ (fuego, destello, humo negro y nubes de polvo)
 sounds/turn.mp3 (toque de corneta)
   Sintetizado para WordHive con app/tool/battle_art/audio/sounds.py.
 
-sounds/tick.mp3, reaction_in.mp3, reaction_out.mp3
+sounds/reactions/ (explosiones, misil, sirena, fanfarria, risas...)
+  Sintetizados para WordHive con app/tool/battle_art/audio/reactions.py.
+  Sin grabaciones de terceros.
+
+sounds/tick.mp3
   "Interface Sounds" de Kenney (www.kenney.nl).
   Licencia: Creative Commons Zero (CC0)
   http://creativecommons.org/publicdomain/zero/1.0/

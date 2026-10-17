@@ -69,8 +69,8 @@ class _FramePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     const f = ReactionSheet.frame;
-    final src = Rect.fromLTWH(
-        (frame % ReactionSheet.cols) * f.toDouble(), (frame ~/ ReactionSheet.cols) * f.toDouble(), f.toDouble(), f.toDouble());
+    final src = Rect.fromLTWH((frame % ReactionSheet.cols) * f.toDouble(), (frame ~/ ReactionSheet.cols) * f.toDouble(),
+        f.toDouble(), f.toDouble());
     canvas.drawImageRect(sheet, src, Offset.zero & size, Paint()..filterQuality = FilterQuality.medium);
   }
 

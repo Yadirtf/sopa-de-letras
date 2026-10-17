@@ -1,17 +1,24 @@
 /**
  * Reacciones que un jugador le manda a su rival durante la batalla.
  * Son animaciones 3D en la app (assets/battle/reactions/<id>.webp); aqui
- * solo viven los ids validos y el texto que acompaña a cada una.
+ * solo viven los ids validos, el texto que acompaña a cada una y su grupo:
+ * "face" son las caras del soldado y "action" los objetos de guerra.
  */
 export const BATTLE_REACTIONS = [
-  { id: "boom", label: "¡Boom!" },
-  { id: "bullseye", label: "¡En el blanco!" },
-  { id: "incoming", label: "¡Ahí va!" },
-  { id: "blocked", label: "¡No me das!" },
-  { id: "alert", label: "¡Alerta!" },
-  { id: "winning", label: "¡Voy ganando!" },
-  { id: "well_played", label: "¡Bien jugado!" },
-  { id: "surrender", label: "¡Me rindo!" },
+  { id: "laugh", label: "¡Jajaja!", kind: "face" },
+  { id: "sly", label: "Je, je, je", kind: "face" },
+  { id: "angry", label: "¡Grrr!", kind: "face" },
+  { id: "sad", label: "Ay, no…", kind: "face" },
+  { id: "shocked", label: "¡¿Qué?!", kind: "face" },
+  { id: "cool", label: "Pan comido", kind: "face" },
+  { id: "boom", label: "¡Boom!", kind: "action" },
+  { id: "bullseye", label: "¡En el blanco!", kind: "action" },
+  { id: "incoming", label: "¡Ahí va!", kind: "action" },
+  { id: "blocked", label: "¡No me das!", kind: "action" },
+  { id: "alert", label: "¡Alerta!", kind: "action" },
+  { id: "winning", label: "¡Voy ganando!", kind: "action" },
+  { id: "well_played", label: "¡Bien jugado!", kind: "action" },
+  { id: "surrender", label: "¡Me rindo!", kind: "action" },
 ] as const;
 
 export type BattleReactionId = (typeof BATTLE_REACTIONS)[number]["id"];
@@ -30,4 +37,10 @@ export const BOT_REPLIES: Record<BattleReactionId, BattleReactionId> = {
   winning: "bullseye",
   well_played: "well_played",
   surrender: "winning",
+  laugh: "sly",
+  sly: "angry",
+  angry: "laugh",
+  sad: "cool",
+  shocked: "laugh",
+  cool: "shocked",
 };
