@@ -11,4 +11,10 @@ abstract class AppLinks {
   /// Texto listo para pegar en WhatsApp o en un correo.
   static String roomInvite(String code) =>
       '¡Juega conmigo en WordHive! Entra con el código ${code.toUpperCase()} o en ${room(code)}';
+
+  /// Enlace a una sala de La Batalla Más Temida.
+  static String battle(String code) => '$playUrl/batalla/${code.toUpperCase()}';
+
+  static String battleInvite(String code) =>
+      '¡Te reto a La Batalla Más Temida en WordHive! Entra con el código ${code.toUpperCase()} o en ${battle(code)}';
 }

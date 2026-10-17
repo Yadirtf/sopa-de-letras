@@ -30,7 +30,7 @@ class HomeGreetingTitle extends ConsumerWidget {
                 style: AppTypography.titleMedium.copyWith(fontSize: 18),
               ),
               Text(
-                '¿Qué sopa jugamos hoy?',
+                '¿Qué jugamos hoy?',
                 style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 12),
               ),
             ],

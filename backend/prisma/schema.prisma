@@ -208,3 +208,20 @@ model PushDevice {
   @@index([userId])
   @@map("push_devices")
 }
+
+// La Batalla Mas Temida: resultado de cada batalla terminada. La partida en
+// curso vive en Redis; aqui queda la historia (quien gano, terreno, puntos).
+model BattleMatch {
+  id           String   @id @default(uuid())
+  code         String
+  terrain      String
+  cols         Int
+  rows         Int
+  winnerUserId String?  @map("winner_user_id")
+  endReason    String   @map("end_reason")
+  players      Json
+  finishedAt   DateTime @default(now()) @map("finished_at")
+
+  @@index([winnerUserId])
+  @@map("battle_matches")
+}

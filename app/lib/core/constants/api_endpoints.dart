@@ -57,4 +57,10 @@ abstract class ApiEndpoints {
   static const String notificationsReadAll = '/notifications/read-all';
   static String notificationRead(String id) => '/notifications/$id/read';
   static const String pushDevices = '/notifications/devices';
+
+  // Juegos y La Batalla Más Temida (módulo aparte, socket en `/battle`)
+  static const String games = '/games';
+  static const String battleCatalog = '/battle/catalog';
+  static const String battleRecommendation = '/battle/recommendation';
+  static const String battleRooms = '/battle/rooms';
 }

@@ -15,3 +15,9 @@ export function roomLinks(code: string): { shareUrl: string; deepLink: string; q
   const shareUrl = `${playUrl}/room/${upper}`;
   return { shareUrl, deepLink: `wordhive://room/${upper}`, qrData: shareUrl };
 }
+
+/** Enlace de una sala de La Batalla Mas Temida (la app lo abre en /batalla/CODIGO). */
+export function battleLinks(code: string): { shareUrl: string; deepLink: string } {
+  const upper = code.toUpperCase();
+  return { shareUrl: `${playUrl}/batalla/${upper}`, deepLink: `wordhive://batalla/${upper}` };
+}

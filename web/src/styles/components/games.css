@@ -1,0 +1,183 @@
+/* Cinta de juego nuevo (arriba de todo) */
+.new-game-ribbon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--wh-text-primary);
+  text-decoration: none;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.22), rgba(244, 63, 94, 0.22));
+  border-bottom: 1px solid var(--wh-border-amber);
+}
+
+.new-game-ribbon:hover {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.32), rgba(244, 63, 94, 0.32));
+}
+
+.new-game-ribbon__tag {
+  background: var(--wh-accent-amber);
+  color: var(--wh-bg-primary);
+  font-weight: 800;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+/* Sección "Elige tu juego" */
+.games__grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.game-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 24px;
+  background: var(--wh-glass-fill);
+  border: 1px solid var(--wh-border-subtle);
+}
+
+.game-tile p {
+  color: var(--wh-text-secondary);
+}
+
+.game-tile .btn {
+  align-self: flex-start;
+}
+
+.game-tile--new {
+  border-color: var(--wh-border-amber);
+  box-shadow: var(--wh-glow-amber);
+}
+
+.game-tile__ribbon {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: var(--wh-accent-amber);
+  color: var(--wh-bg-primary);
+  font-weight: 800;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.game-tile__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 72px;
+}
+
+.game-tile__head h3 {
+  font-size: 22px;
+}
+
+.game-tile__emoji {
+  font-size: 36px;
+}
+
+.game-tile__terrains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.game-tile__terrains li {
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Mini tablero de la batalla */
+.mini-battle {
+  padding: 14px;
+  border-radius: 18px;
+  background: #3b2f1c;
+}
+
+.mini-battle__grid {
+  display: grid;
+  gap: 3px;
+}
+
+.mini-battle__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #f3dfb0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-battle__cell {
+  aspect-ratio: 1;
+  border: 1px solid rgba(138, 109, 59, 0.9);
+  border-radius: 6px;
+  background: #e0c68a;
+  font-size: clamp(12px, 2.6vw, 20px);
+  line-height: 1;
+  cursor: crosshair;
+  color: #3b2f1c;
+  transition: transform var(--tr-quick);
+}
+
+.mini-battle__cell:hover {
+  transform: scale(1.08);
+}
+
+.mini-battle__cell--miss {
+  background: #c9ad72;
+  font-size: 22px;
+}
+
+.mini-battle__cell--hit {
+  background: #f8a35c;
+}
+
+.mini-battle__cell--fallen {
+  background: #b04a3b;
+}
+
+.mini-battle__cell--last {
+  animation: miniBattleBoom 0.45s ease-out;
+}
+
+@keyframes miniBattleBoom {
+  0% { transform: scale(1.5); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.7); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.mini-battle__status {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #fff4d6 !important;
+}
+
+.mini-battle__footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #f3dfb0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-battle__cell--last { animation: none; }
+}
+
+@media (max-width: 860px) {
+  .games__grid { grid-template-columns: 1fr; }
+}
