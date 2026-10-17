@@ -4,6 +4,7 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/battle_catalog.dart';
 import '../../../domain/entities/battle_config.dart';
 import 'setup_section.dart';
+import '../../art/battle_art_images.dart';
 
 /// Armería (cuántos usos de cada arma especial) y forma de disparar.
 class ArmorySection extends StatelessWidget {
@@ -66,7 +67,7 @@ class ArmorySection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(children: [
-        Text(w.emoji, style: const TextStyle(fontSize: 26)),
+        WeaponIcon(weaponId: w.id, size: 44),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -33,7 +33,8 @@ class BattleResultView extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(view.iWon ? '🏆' : '🎖️', textAlign: TextAlign.center, style: const TextStyle(fontSize: 64)),
+        Icon(view.iWon ? Icons.emoji_events_rounded : Icons.military_tech_rounded,
+            size: 72, color: view.iWon ? AppColors.accentAmber : AppColors.textSecondary),
         Text(
           view.iWon ? '¡Ganaste la batalla!' : '¡Buena batalla!',
           key: const ValueKey('battle-result-title'),

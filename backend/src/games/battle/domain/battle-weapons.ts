@@ -8,7 +8,6 @@ export type WeaponId = "BULLET" | "MISSILE" | "BOMBING" | "RADAR";
 export interface Weapon {
   id: WeaponId;
   name: string;
-  emoji: string;
   description: string;
   /** El radar solo mira: cuenta casillas ocupadas sin hacer daño. */
   damages: boolean;
@@ -25,7 +24,6 @@ export const BATTLE_WEAPONS: Weapon[] = [
   {
     id: "BULLET",
     name: "Bala",
-    emoji: "🔫",
     description: "Una casilla. Nunca se acaba.",
     damages: true,
     pattern: [[0, 0]],
@@ -34,7 +32,6 @@ export const BATTLE_WEAPONS: Weapon[] = [
   {
     id: "MISSILE",
     name: "Misil",
-    emoji: "🚀",
     description: "Cruz de 5 casillas.",
     damages: true,
     pattern: [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]],
@@ -43,7 +40,6 @@ export const BATTLE_WEAPONS: Weapon[] = [
   {
     id: "BOMBING",
     name: "Bombardeo",
-    emoji: "💣",
     description: "Cuadro de 3 × 3.",
     damages: true,
     pattern: SQUARE_3X3,
@@ -52,7 +48,6 @@ export const BATTLE_WEAPONS: Weapon[] = [
   {
     id: "RADAR",
     name: "Radar",
-    emoji: "📡",
     description: "Mira un cuadro de 3 × 3 y dice cuántas casillas ocupadas hay. No hace daño.",
     damages: false,
     pattern: SQUARE_3X3,

@@ -74,5 +74,10 @@ flutter:
     - assets/avatars/retratos/
     - assets/avatars/bocetos/
     - assets/avatars/LICENSES.txt
+    - assets/battle/units/
+    - assets/battle/terrains/
+    - assets/battle/weapons/
+    - assets/battle/fx/
+    - assets/battle/LICENSES.txt
 
 

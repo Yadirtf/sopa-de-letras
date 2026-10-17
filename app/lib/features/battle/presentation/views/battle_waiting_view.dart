@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/battle_catalog.dart';
 import '../../domain/entities/battle_view.dart';
+import '../art/battle_art_images.dart';
 
 /// Sala esperando al rival: el código grande para dictarlo y el enlace para compartirlo.
 class BattleWaitingView extends StatelessWidget {
@@ -27,8 +28,8 @@ class BattleWaitingView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text(terrain.emoji, textAlign: TextAlign.center, style: const TextStyle(fontSize: 56)),
-        const SizedBox(height: 8),
+        TerrainBanner(terrainId: terrain.id, unitIds: [for (final u in terrain.units.reversed.take(3)) u.id]),
+        const SizedBox(height: 16),
         Text('Esperando a tu rival…',
             textAlign: TextAlign.center, style: AppTypography.titleLarge.copyWith(fontSize: 22)),
         const SizedBox(height: 6),
@@ -60,17 +61,18 @@ class BattleWaitingView extends StatelessWidget {
         ]),
         const SizedBox(height: 24),
         Wrap(alignment: WrapAlignment.center, spacing: 8, runSpacing: 8, children: [
-          _chip('🗺️', 'Arena ${config.cols} × ${config.rows}'),
-          _chip(terrain.emoji, terrain.name),
-          _chip('🪖', '${config.unitCount} figuras'),
-          _chip(config.allowsTap ? '👆' : '⌨️', config.allowsTap ? 'Tocar o escribir' : 'Solo escribir'),
+          _chip(Icons.grid_on_rounded, 'Arena ${config.cols} × ${config.rows}'),
+          _chip(Icons.terrain_rounded, terrain.name),
+          _chip(Icons.shield_rounded, '${config.unitCount} figuras'),
+          _chip(config.allowsTap ? Icons.touch_app_rounded : Icons.keyboard_rounded,
+              config.allowsTap ? 'Tocar o escribir' : 'Solo escribir'),
         ]),
       ],
     );
   }
 
-  Widget _chip(String emoji, String text) => Chip(
-        avatar: Text(emoji),
+  Widget _chip(IconData icon, String text) => Chip(
+        avatar: Icon(icon, size: 18, color: AppColors.accentAmber),
         label: Text(text, style: AppTypography.labelBold.copyWith(fontSize: 13)),
         backgroundColor: AppColors.bgCard,
       );

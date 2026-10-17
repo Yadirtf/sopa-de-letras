@@ -16,13 +16,20 @@ class TurnBanner extends StatefulWidget {
 }
 
 class _TurnBannerState extends State<TurnBanner> {
-  late final Timer _tick = Timer.periodic(const Duration(milliseconds: 500), (_) {
-    if (mounted) setState(() {});
-  });
+  // Se crea en initState: un `late final` sin leer nunca arrancaba y el reloj se quedaba quieto.
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(milliseconds: 250), (_) {
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   void dispose() {
-    _tick.cancel();
+    _tick?.cancel();
     super.dispose();
   }
 
@@ -40,7 +47,7 @@ class _TurnBannerState extends State<TurnBanner> {
         border: Border.all(color: (urgent ? AppColors.accentRose : color).withValues(alpha: 0.7)),
       ),
       child: Row(children: [
-        Text(widget.myTurn ? '🎯' : '⏳', style: const TextStyle(fontSize: 22)),
+        Icon(widget.myTurn ? Icons.gps_fixed_rounded : Icons.hourglass_top_rounded, color: color, size: 24),
         const SizedBox(width: 10),
         Expanded(
           child: Text(

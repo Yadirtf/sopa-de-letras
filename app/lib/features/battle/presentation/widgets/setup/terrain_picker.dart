@@ -3,6 +3,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/battle_catalog.dart';
 import 'setup_section.dart';
+import '../../art/battle_art_images.dart';
 
 /// Terrenos inspirados en batallas reales. Al elegir uno cambia el ejército.
 class TerrainPicker extends StatelessWidget {
@@ -35,17 +36,22 @@ class TerrainPicker extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: 96,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        height: 74,
+        alignment: Alignment.bottomCenter,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Color.alphaBlend(t.ground.withValues(alpha: active ? 0.55 : 0.22), AppColors.bgSecondary),
+          color: t.ground,
+          image: terrainBackdrop(t.id, opacity: active ? 1 : 0.7),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: active ? AppColors.accentAmber : Colors.transparent, width: 2),
+          border: Border.all(color: active ? AppColors.accentAmber : Colors.transparent, width: 2.5),
+          boxShadow: active ? [BoxShadow(color: AppColors.accentAmber.withValues(alpha: 0.4), blurRadius: 10)] : null,
         ),
-        child: Column(children: [
-          Text(t.emoji, style: const TextStyle(fontSize: 28)),
-          const SizedBox(height: 4),
-          Text(t.name, style: AppTypography.labelBold.copyWith(fontSize: 13)),
-        ]),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          color: Colors.black.withValues(alpha: 0.55),
+          child: Text(t.name, textAlign: TextAlign.center, style: AppTypography.labelBold.copyWith(fontSize: 13)),
+        ),
       ),
     );
   }

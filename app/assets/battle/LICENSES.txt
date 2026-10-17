@@ -1,0 +1,11 @@
+La Batalla Más Temida: arte del juego
+
+units/, terrains/, weapons/
+  Modelos 3D y texturas hechos para WordHive con three.js (MIT,
+  https://threejs.org) y renderizados con app/tool/battle_art. Sin
+  recursos de terceros.
+
+fx/ (fuego, destello, humo negro y nubes de polvo)
+  "Smoke Particles" de Kenney (www.kenney.nl).
+  Licencia: Creative Commons Zero (CC0)
+  http://creativecommons.org/publicdomain/zero/1.0/

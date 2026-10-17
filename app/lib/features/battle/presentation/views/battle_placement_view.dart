@@ -134,7 +134,7 @@ class _Waiting extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text('🪖', style: TextStyle(fontSize: 56)),
+          const Icon(Icons.shield_rounded, size: 56, color: AppColors.accentAmber),
           const SizedBox(height: 16),
           Text(text, textAlign: TextAlign.center, style: AppTypography.titleMedium),
           const SizedBox(height: 16),

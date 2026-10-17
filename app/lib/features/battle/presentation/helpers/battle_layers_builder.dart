@@ -6,8 +6,6 @@ import '../widgets/grid/battle_grid_layers.dart';
 
 /// Arma las capas de cada tablero a partir de la vista del servidor.
 abstract class BattleLayersBuilder {
-  static String _emoji(BattleTerrain t, String typeId) => t.unit(typeId)?.emoji ?? '❔';
-
   static bool _allHit(Map<String, CellMark> marks, BattleUnitView u) {
     for (var r = u.row; r < u.row + u.height; r++) {
       for (var c = u.col; c < u.col + u.width; c++) {
@@ -31,7 +29,8 @@ abstract class BattleLayersBuilder {
       units: [
         for (final u in view.enemyRevealed)
           GridUnit(
-            emoji: _emoji(terrain, u.typeId),
+            typeId: u.typeId,
+            rotated: u.rotated,
             col: u.col,
             row: u.row,
             width: u.width,
@@ -55,7 +54,8 @@ abstract class BattleLayersBuilder {
       units: [
         for (final u in view.myUnits)
           GridUnit(
-            emoji: _emoji(terrain, u.typeId),
+            typeId: u.typeId,
+            rotated: u.rotated,
             col: u.col,
             row: u.row,
             width: u.width,
@@ -80,7 +80,8 @@ abstract class BattleLayersBuilder {
       units: [
         for (var i = 0; i < draft.units.length; i++)
           GridUnit(
-            emoji: _emoji(terrain, draft.units[i].typeId),
+            typeId: draft.units[i].typeId,
+            rotated: draft.units[i].rotated,
             col: draft.units[i].col,
             row: draft.units[i].row,
             width: sizeOf(draft.units[i]).$1,

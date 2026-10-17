@@ -12,7 +12,7 @@ export function NewGameRibbon() {
       }}
     >
       <span className="new-game-ribbon__tag">¡Nuevo juego!</span>
-      <span>💥 La Batalla Más Temida ya está en WordHive. Pruébala gratis →</span>
+      <span>La Batalla Más Temida ya está en WordHive, ahora en 3D. Pruébala gratis →</span>
     </a>
   );
 }

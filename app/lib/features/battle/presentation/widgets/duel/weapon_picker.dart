@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/battle_catalog.dart';
+import '../../art/battle_art_images.dart';
 
 /// Armas disponibles con los usos que quedan. Las agotadas o apagadas no aparecen.
 class WeaponPicker extends StatelessWidget {
@@ -27,7 +28,7 @@ class WeaponPicker extends StatelessWidget {
               selected: selected == w.id,
               onSelected: (_) => onSelected(w.id),
               selectedColor: AppColors.accentAmber.withValues(alpha: 0.3),
-              avatar: Text(w.emoji, style: const TextStyle(fontSize: 18)),
+              avatar: WeaponIcon(weaponId: w.id, size: 26),
               label: Text(
                 w.isUnlimited ? w.name : '${w.name} ×${ammo[w.id]}',
                 style: AppTypography.labelBold.copyWith(fontSize: 13),

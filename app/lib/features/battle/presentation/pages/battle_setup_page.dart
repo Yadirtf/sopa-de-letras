@@ -108,7 +108,7 @@ class _SetupForm extends ConsumerWidget {
           key: const ValueKey('battle-create-bot'),
           style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           onPressed: state.isBusy || config.unitCount == 0 ? null : () => create(BattleOpponent.bot),
-          icon: const Text('🐝', style: TextStyle(fontSize: 20)),
+          icon: const Icon(Icons.smart_toy_rounded),
           label: const Text('Practicar contra la Abejita'),
         ),
       ],

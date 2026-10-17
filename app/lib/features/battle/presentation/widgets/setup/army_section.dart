@@ -3,6 +3,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/battle_catalog.dart';
 import 'setup_section.dart';
+import '../../art/battle_art_images.dart';
 
 /// Equipo de batalla del terreno: cuántas figuras de cada una lleva cada jugador.
 class ArmySection extends StatelessWidget {
@@ -57,7 +58,7 @@ class ArmySection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(children: [
-        Text(u.emoji, style: const TextStyle(fontSize: 26)),
+        UnitThumb(typeId: u.id, terrainId: terrain.id),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

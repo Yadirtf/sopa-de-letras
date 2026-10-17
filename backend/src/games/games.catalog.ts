@@ -7,7 +7,6 @@ export interface GameInfo {
   id: "word-search" | "battle";
   name: string;
   tagline: string;
-  emoji: string;
   isNew: boolean;
   /** Ruta de la app donde empieza el juego. */
   appPath: string;
@@ -18,7 +17,6 @@ export const GAMES: GameInfo[] = [
     id: "word-search",
     name: "Sopa de letras",
     tagline: "Encuentra las palabras antes que tus amigos.",
-    emoji: "🔤",
     isNew: false,
     appPath: "/home/sopa",
   },
@@ -26,7 +24,6 @@ export const GAMES: GameInfo[] = [
     id: "battle",
     name: "La Batalla Más Temida",
     tagline: "Esconde tu ejército, elige el terreno y dispara por coordenadas.",
-    emoji: "💥",
     isNew: true,
     appPath: "/batalla",
   },

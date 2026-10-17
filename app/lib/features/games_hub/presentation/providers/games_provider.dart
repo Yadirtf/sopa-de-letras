@@ -7,7 +7,6 @@ class GameInfo {
   final String id;
   final String name;
   final String tagline;
-  final String emoji;
   final bool isNew;
   final String appPath;
 
@@ -15,7 +14,6 @@ class GameInfo {
     required this.id,
     required this.name,
     required this.tagline,
-    required this.emoji,
     required this.isNew,
     required this.appPath,
   });
@@ -24,7 +22,6 @@ class GameInfo {
         id: json['id'].toString(),
         name: json['name']?.toString() ?? '',
         tagline: json['tagline']?.toString() ?? '',
-        emoji: json['emoji']?.toString() ?? '🎮',
         isNew: json['isNew'] == true,
         appPath: json['appPath']?.toString() ?? '/home',
       );
@@ -36,7 +33,6 @@ const fallbackGames = [
     id: 'word-search',
     name: 'Sopa de letras',
     tagline: 'Encuentra las palabras antes que tus amigos.',
-    emoji: '🔤',
     isNew: false,
     appPath: '/home/sopa',
   ),
@@ -44,7 +40,6 @@ const fallbackGames = [
     id: 'battle',
     name: 'La Batalla Más Temida',
     tagline: 'Esconde tu ejército, elige el terreno y dispara por coordenadas.',
-    emoji: '💥',
     isNew: true,
     appPath: '/batalla',
   ),
