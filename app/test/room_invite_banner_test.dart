@@ -31,4 +31,27 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets('un reto de batalla se ve como reto y se acepta', (tester) async {
+    var joined = false;
+    final invite = RoomInviteEntity.fromJson({
+      'game': 'battle',
+      'roomCode': 'bt42ab',
+      'wordSearchTitle': 'Cielo · Arena 8 × 8',
+      'fromName': 'Ana',
+      'expiresAt': DateTime.now().add(const Duration(seconds: 15)).millisecondsSinceEpoch,
+    });
+    expect(invite.isBattle, isTrue);
+
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(body: RoomInviteBanner(invite: invite, onJoin: () => joined = true, onDismiss: () {})),
+    ));
+
+    expect(find.text('Ana te reta a una batalla'), findsOneWidget);
+    expect(find.text('La Batalla Más Temida · Cielo · Arena 8 × 8'), findsOneWidget);
+    await tester.tap(find.text('Aceptar reto'));
+    expect(joined, isTrue);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 }

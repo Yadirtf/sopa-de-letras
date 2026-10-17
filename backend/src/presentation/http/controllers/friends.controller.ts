@@ -66,7 +66,7 @@ export class FriendsController {
     const params = parseOrReply(reply, userIdParamSchema, req.params);
     const body = params && parseOrReply(reply, roomInviteSchema, req.body);
     if (!params || !body) return;
-    const result = await this.useCases.inviteToRoom.execute(req.user!.userId, params.userId, body.roomCode);
+    const result = await this.useCases.inviteToRoom.execute(req.user!.userId, params.userId, body.roomCode, body.game);
     return sendResult(reply, result, 201);
   };
 }

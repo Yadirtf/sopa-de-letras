@@ -1,3 +1,4 @@
+import '../../domain/entities/room_invite_entity.dart';
 import '../../domain/entities/social_entities.dart';
 import '../../domain/repositories/social_repository.dart';
 import '../datasources/social_remote_datasource.dart';
@@ -44,8 +45,12 @@ class SocialRepositoryImpl implements SocialRepository {
   Future<void> removeFriend(String userId) => _remote.removeFriend(userId);
 
   @override
-  Future<DateTime> inviteToRoom({required String friendId, required String roomCode}) async {
-    final json = await _remote.invite(friendId, roomCode);
+  Future<DateTime> inviteToRoom({
+    required String friendId,
+    required String roomCode,
+    String game = RoomInviteEntity.wordSearch,
+  }) async {
+    final json = await _remote.invite(friendId, roomCode, game);
     final millis = (json['expiresAt'] as num?)?.toInt();
     return millis != null
         ? DateTime.fromMillisecondsSinceEpoch(millis)

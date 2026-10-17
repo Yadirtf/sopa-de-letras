@@ -27,6 +27,14 @@ export const INVITE_PUSH_TTL_MS = 10 * 60 * 1000;
 const builders: Partial<Record<NotificationType, (p: NotificationPayload) => Omit<PushMessage, "data">>> = {
   ROOM_INVITE: (p) => {
     const room = text(p.roomCode, "");
+    if (p.game === "battle") {
+      return {
+        title: `${text(p.fromName, "Un amigo")} te reta a La Batalla Más Temida`,
+        body: `${text(p.wordSearchTitle, "Batalla")} · Sala ${room}. Toca para aceptar el reto.`,
+        tag: `battle-invite-${room}`,
+        ttlMs: INVITE_PUSH_TTL_MS,
+      };
+    }
     return {
       title: `🎮 ${text(p.fromName, "Un amigo")} te invita a jugar`,
       body: `${text(p.wordSearchTitle, "Sopa de letras")} · Sala ${room}. ¡Toca para unirte!`,

@@ -24,6 +24,7 @@ export const respondFriendRequestSchema = z.object({
 
 export const roomInviteSchema = z.object({
   roomCode: z.string().min(4, "Codigo de sala invalido").max(12),
+  game: z.enum(["word_search", "battle"]).default("word_search"),
 });
 
 export const listNotificationsSchema = z.object({

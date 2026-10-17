@@ -137,7 +137,9 @@ export async function registerRoutes(fastify: FastifyInstance) {
   });
 
   // Segundo juego: modulo aparte con sus rutas y su propio socket (/battle).
-  const battleModule = createBattleModule({ prisma: prismaClient, redis: redisClient, tokenService, sessionCache });
+  const presence = socialContainer.socketBindings.roomLifecycle;
+  const battleModule = createBattleModule({ prisma: prismaClient, redis: redisClient, tokenService, sessionCache, presence });
+  socialContainer.bindBattleReader(battleModule.roomReader);
   await battleModule.registerRoutes(fastify, authMiddleware);
 
   return {

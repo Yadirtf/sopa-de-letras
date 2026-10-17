@@ -34,14 +34,15 @@ Future<void> handlePushTap(WidgetRef ref, Map<String, dynamic> data) async {
       final code = '${data['roomCode'] ?? ''}'.toUpperCase();
       if (code.isEmpty) return;
       ref.read(incomingInviteProvider.notifier).state = null;
+      final game = data['game'] as String?;
       final room = ref.read(gameRoomNotifierProvider).room;
-      if (room?.code.toUpperCase() == code) {
+      if (game != 'battle' && room?.code.toUpperCase() == code) {
         appRouter.go('/lobby/$code');
         return;
       }
       // Aunque el banner ya haya caducado, la sala puede seguir esperando
       // en el lobby: intentamos entrar y solo avisamos si ya no existe.
-      final error = await joinInvitedRoom(ref, code);
+      final error = await joinInvitedRoom(ref, code, game: game);
       if (error != null) showRootSnack(error);
     case 'FRIEND_REQUEST':
       openShellLocation('/friends', extra: {'tab': 1});

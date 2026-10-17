@@ -20,6 +20,7 @@ LocalPush? localPushFor(Map<String, dynamic> event) {
   if (raw is! Map) return null;
   final n = AppNotificationModel.fromJson(Map<String, dynamic>.from(raw));
   final tag = switch (n.kind) {
+    NotificationKind.roomInvite when n.text('game') == 'battle' => 'battle-invite-${n.text('roomCode') ?? ''}',
     NotificationKind.roomInvite => 'invite-${n.text('roomCode') ?? ''}',
     NotificationKind.friendRequest => 'friend-request-${n.text('fromUserId') ?? ''}',
     NotificationKind.friendAccepted => 'friend-accepted-${n.text('friendId') ?? ''}',

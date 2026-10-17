@@ -1,6 +1,6 @@
 import { FriendPair } from "../../domain/value-objects/friend-pair.vo";
 import { IFriendshipRepository } from "../../domain/repositories/friendship.repository.interface";
-import { IRoomStateReader, LiveRoomSnapshot } from "../../domain/services/room-state-reader.interface";
+import { IRoomStateReader, InviteGame, LiveRoomSnapshot } from "../../domain/services/room-state-reader.interface";
 import { ICooldownStore } from "../../domain/services/cooldown.service.interface";
 import { IRealtimeGateway } from "../../domain/services/realtime-gateway.interface";
 import { DomainError, UserNotFoundError } from "../../domain/errors/auth.errors";
@@ -18,7 +18,8 @@ import { Result, ok, fail } from "../common/result";
 export const INVITE_TTL_SECONDS = 15;
 
 /**
- * Invitar a un amigo a la sala actual con un toque (US-24 / RF-29).
+ * Invitar a un amigo a la sala actual con un toque (US-24 / RF-29), sea de
+ * la sopa de letras o de La Batalla Mas Temida (`game`).
  * Envia `room:invite_received` al canal privado `user:{friendId}` y deja
  * rastro en el centro de notificaciones por si el amigo no estaba mirando.
  */
@@ -32,16 +33,21 @@ export class InviteFriendToRoomUseCase {
     private readonly clock: () => number = Date.now
   ) {}
 
-  async execute(inviterId: string, friendId: string, rawRoomCode: string): Promise<Result<RoomInviteResultDto, DomainError>> {
+  async execute(
+    inviterId: string,
+    friendId: string,
+    rawRoomCode: string,
+    game: InviteGame = "word_search"
+  ): Promise<Result<RoomInviteResultDto, DomainError>> {
     try {
       const pair = FriendPair.of(inviterId, friendId);
       if (!(await this.friendships.areFriends(pair))) return fail(new NotFriendsError());
 
       const roomCode = (rawRoomCode ?? "").trim().toUpperCase();
-      const room = await this.rooms.getRoom(roomCode);
+      const room = await this.rooms.getRoom(roomCode, game);
       this.assertInvitable(room, inviterId, friendId);
 
-      const cooldownKey = `invite:cooldown:${roomCode}:${friendId}`;
+      const cooldownKey = `invite:cooldown:${game === "battle" ? "battle:" : ""}${roomCode}:${friendId}`;
       if (!(await this.cooldown.tryAcquire(cooldownKey, INVITE_TTL_SECONDS))) {
         return fail(new InviteCooldownError());
       }
@@ -51,6 +57,7 @@ export class InviteFriendToRoomUseCase {
 
       const expiresAt = this.clock() + INVITE_TTL_SECONDS * 1000;
       const payload = {
+        game,
         roomCode,
         wordSearchTitle: room!.wordSearchTitle,
         fromUserId: inviter.id,

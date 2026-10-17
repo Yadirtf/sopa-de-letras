@@ -5,11 +5,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/battle_catalog.dart';
 import '../../domain/entities/battle_config.dart';
+import '../helpers/battle_challenge.dart';
 import '../providers/battle_providers.dart';
 import '../providers/battle_setup_notifier.dart';
 import '../widgets/setup/arena_size_section.dart';
 import '../widgets/setup/armory_section.dart';
 import '../widgets/setup/army_section.dart';
+import '../widgets/setup/battle_friends_card.dart';
 import '../widgets/setup/join_battle_card.dart';
 import '../widgets/setup/terrain_picker.dart';
 
@@ -61,6 +63,10 @@ class _SetupForm extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
       children: [
         JoinBattleCard(onJoin: (code) => context.go('/batalla/$code')),
+        BattleFriendsCard(
+          busyFriendId: ref.watch(challengingFriendProvider),
+          onChallenge: (friend) => challengeFriend(context, ref, friend),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 4, 4, 12),
           child: Text('O arma tu propia batalla', style: AppTypography.titleLarge.copyWith(fontSize: 22)),

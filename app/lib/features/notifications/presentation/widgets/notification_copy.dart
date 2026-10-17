@@ -27,6 +27,12 @@ class NotificationCopy {
           title: '¡Tienes un nuevo amigo!',
           body: '${n.text('friendName') ?? 'Tu amigo'} aceptó tu solicitud',
         ),
+      NotificationKind.roomInvite when n.text('game') == 'battle' => NotificationCopy(
+          icon: Icons.gps_fixed_rounded,
+          color: AppColors.accentAmber,
+          title: 'Reto a La Batalla Más Temida',
+          body: '${n.text('fromName') ?? 'Un amigo'} te retó a una batalla · $title',
+        ),
       NotificationKind.roomInvite => NotificationCopy(
           icon: Icons.sports_esports_rounded,
           color: AppColors.accentViolet,

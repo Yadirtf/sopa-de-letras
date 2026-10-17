@@ -5,7 +5,7 @@ import { BattleError } from "../domain/battle-errors";
 import { BattleMatch, ShotReport } from "../domain/battle-match.types";
 import { BattleLobbyService } from "../application/battle-lobby.service";
 import { BattlePlayService } from "../application/battle-play.service";
-import { BattleNotifier } from "../application/battle-ports";
+import { BattleNotifier, BattlePresenceListener } from "../application/battle-ports";
 import { viewFor } from "../application/battle-views";
 import { PrismaBattleUserDirectory } from "./prisma-battle.adapters";
 
@@ -26,7 +26,8 @@ export class BattleSocketGateway implements BattleNotifier {
     private readonly sessionCache: ISessionCacheService,
     private readonly users: PrismaBattleUserDirectory,
     private readonly lobby: BattleLobbyService,
-    private readonly play: () => BattlePlayService
+    private readonly play: () => BattlePlayService,
+    private readonly presence?: BattlePresenceListener
   ) {}
 
   publish(match: BattleMatch, shot?: ShotReport): void {
@@ -64,6 +65,8 @@ export class BattleSocketGateway implements BattleNotifier {
       const user = (await this.users.find(userId)) ?? { id: userId, name: "Jugador" };
       const match = await this.lobby.join(String(code), user);
       await socket.join(playerChannel(match.code, userId));
+      socket.data.battleCode = match.code;
+      this.presence?.onPlayerJoined(userId, match.code);
       this.publish(match);
       void this.play().resume(match.code);
       return { view: viewFor(match, userId) };
@@ -83,7 +86,12 @@ export class BattleSocketGateway implements BattleNotifier {
     on("leave", async ({ code }) => {
       await this.play().leave(String(code), userId);
       await socket.leave(playerChannel(String(code), userId));
+      socket.data.battleCode = null;
+      this.presence?.onPlayerLeft(userId);
       return {};
+    });
+    socket.on("disconnect", () => {
+      if (socket.data.battleCode) this.presence?.onPlayerLeft(userId);
     });
   }
 
