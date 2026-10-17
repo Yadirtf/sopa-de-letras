@@ -103,6 +103,22 @@ jobs:
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "file=wordhive-$name-build${{ github.run_number }}.apk" >> "$GITHUB_OUTPUT"
 
+      # El plugin nativo `jni` (dependencia transitiva de otros plugins) necesita CMake 3.22.1,
+      # que el runner no trae. Si Gradle lo descarga solo y la descarga sale
+      # corrupta ("Archive is not a ZIP archive") el build falla; aquí se instala
+      # antes y se reintenta hasta 3 veces.
+      - name: CMake para plugins nativos
+        run: |
+          sdkmanager="$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)"
+          for intento in 1 2 3; do
+            yes | "$sdkmanager" --install "cmake;3.22.1" >/dev/null \
+              && [ -x "$ANDROID_HOME/cmake/3.22.1/bin/cmake" ] && break
+            echo "Intento $intento falló; reintentando…"
+            rm -rf "$ANDROID_HOME/cmake/3.22.1"
+            sleep $((intento * 10))
+          done
+          "$ANDROID_HOME/cmake/3.22.1/bin/cmake" --version
+
       - name: Compilar APK release
         run: |
           flutter build apk --release \
