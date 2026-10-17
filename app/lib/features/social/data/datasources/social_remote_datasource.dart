@@ -23,7 +23,7 @@ class SocialRemoteDataSource {
 
   Future<void> removeFriend(String userId) => _client.dio.delete(ApiEndpoints.friend(userId));
 
-  Future<Map<String, dynamic>> invite(String friendId, String roomCode) async =>
-      (await _client.dio.post(ApiEndpoints.inviteFriend(friendId), data: {'roomCode': roomCode})).data
+  Future<Map<String, dynamic>> invite(String friendId, String roomCode, String game) async =>
+      (await _client.dio.post(ApiEndpoints.inviteFriend(friendId), data: {'roomCode': roomCode, 'game': game})).data
           as Map<String, dynamic>;
 }

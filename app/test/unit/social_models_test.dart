@@ -48,6 +48,12 @@ void main() {
       expect(invite.secondsLeft(now), 15);
       expect(invite.secondsLeft(now.add(const Duration(seconds: 30))), 0);
     });
+
+    test('sabe si la invitación es a la sopa o un reto de batalla', () {
+      expect(RoomInviteEntity.fromJson({'roomCode': 'A1B2C3'}).game, RoomInviteEntity.wordSearch);
+      expect(RoomInviteEntity.fromJson({'roomCode': 'A1B2C3', 'game': 'battle'}).isBattle, isTrue);
+      expect(RoomInviteEntity.fromJson({'roomCode': 'A1B2C3', 'game': 'raro'}).isBattle, isFalse);
+    });
   });
 
   group('Notificaciones', () {

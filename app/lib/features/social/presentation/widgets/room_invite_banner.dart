@@ -5,8 +5,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/room_invite_entity.dart';
 import 'player_avatar_widget.dart';
 
-/// Banner flotante de invitación (US-24): quién invita, a qué sopa,
-/// un anillo de 15 s que se vacía y dos botones grandes. Nada más.
+/// Banner flotante de invitación (US-24): quién invita, a qué sopa o batalla, un anillo de 15 s y dos botones.
 class RoomInviteBanner extends StatefulWidget {
   final RoomInviteEntity invite;
   final VoidCallback onJoin;
@@ -47,7 +46,9 @@ class _RoomInviteBannerState extends State<RoomInviteBanner> {
     final invite = widget.invite;
     return Semantics(
       liveRegion: true,
-      label: '${invite.fromName} te invita a jugar ${invite.wordSearchTitle}',
+      label: invite.isBattle
+          ? '${invite.fromName} te reta a La Batalla Más Temida, ${invite.wordSearchTitle}'
+          : '${invite.fromName} te invita a jugar ${invite.wordSearchTitle}',
       child: Material(
         color: Colors.transparent,
         child: Container(
@@ -70,10 +71,11 @@ class _RoomInviteBannerState extends State<RoomInviteBanner> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('¡${invite.fromName} te invita a jugar!',
+                        Text(invite.isBattle ? '${invite.fromName} te reta a una batalla' : '¡${invite.fromName} te invita a jugar!',
                             style: AppTypography.labelBold.copyWith(fontSize: 15), maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 2),
-                        Text('«${invite.wordSearchTitle}»', style: AppTypography.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(invite.isBattle ? 'La Batalla Más Temida · ${invite.wordSearchTitle}' : '«${invite.wordSearchTitle}»',
+                            style: AppTypography.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -101,8 +103,8 @@ class _RoomInviteBannerState extends State<RoomInviteBanner> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       onPressed: widget.onJoin,
-                      icon: const Icon(Icons.login_rounded),
-                      label: const Text('¡Unirme!', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                      icon: Icon(invite.isBattle ? Icons.gps_fixed_rounded : Icons.login_rounded),
+                      label: Text(invite.isBattle ? 'Aceptar reto' : '¡Unirme!', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
                     ),
                   ),
                 ],

@@ -40,8 +40,8 @@ export interface SocialContainerDeps {
 
 /**
  * Composicion del Ecosistema Social (EP-05).
- * Se construye en dos tiempos: primero todo lo HTTP, y `bindRoomReader`
- * cuando ya existe la cache de salas (la crea el contenedor de EP-04).
+ * Se construye en dos tiempos: primero todo lo HTTP, y `bindRoomReader` /
+ * `bindBattleReader` cuando ya existen las salas de cada juego.
  */
 export function createSocialContainer(deps: SocialContainerDeps) {
   const friendships = new PrismaFriendshipRepository(deps.prisma);
@@ -58,8 +58,12 @@ export function createSocialContainer(deps: SocialContainerDeps) {
   const broadcaster = new PresenceBroadcaster(presence, friendships, gateway);
 
   let roomReader: IRoomStateReader | null = null;
+  let battleReader: IRoomStateReader | null = null;
   const lazyRoomReader: IRoomStateReader = {
-    getRoom: (code) => (roomReader ? roomReader.getRoom(code) : Promise.resolve(null)),
+    getRoom: (code, game) => {
+      const reader = game === "battle" ? battleReader : roomReader;
+      return reader ? reader.getRoom(code) : Promise.resolve(null);
+    },
   };
 
   const friendsController = new FriendsController({
@@ -93,6 +97,9 @@ export function createSocialContainer(deps: SocialContainerDeps) {
     },
     bindRoomReader: (reader: IRoomStateReader) => {
       roomReader = reader;
+    },
+    bindBattleReader: (reader: IRoomStateReader) => {
+      battleReader = reader;
     },
   };
 }

@@ -24,7 +24,10 @@ const MAX_BATCH = 500;
  */
 export function webLinkFor(playUrl: string, data: Record<string, string>): string {
   const base = playUrl.replace(/\/+$/, "");
-  if (data.type === "ROOM_INVITE" && data.roomCode) return `${base}/room/${data.roomCode.toUpperCase()}`;
+  if (data.type === "ROOM_INVITE" && data.roomCode) {
+    const route = data.game === "battle" ? "batalla" : "room";
+    return `${base}/${route}/${data.roomCode.toUpperCase()}`;
+  }
   if (data.type === "FRIEND_REQUEST" || data.type === "FRIEND_ACCEPTED") return `${base}/friends`;
   return `${base}/notifications`;
 }

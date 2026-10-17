@@ -42,6 +42,23 @@ describe("Avisos push en la barra del telefono", () => {
     });
   });
 
+  it("el reto de batalla lleva su propio texto, sin emojis, y la sala en los datos", async () => {
+    const fcm = sender();
+    await new PushNotifier(devices, fcm).push({
+      id: "n3",
+      recipientId: "ana",
+      type: "ROOM_INVITE",
+      payload: { game: "battle", roomCode: "BT42AB", fromName: "Beto", wordSearchTitle: "Cielo · Arena 8 × 8" },
+    });
+    expect(fcm.send).toHaveBeenCalledWith(["tok-1", "tok-2"], {
+      title: "Beto te reta a La Batalla Más Temida",
+      body: "Cielo · Arena 8 × 8 · Sala BT42AB. Toca para aceptar el reto.",
+      tag: "battle-invite-BT42AB",
+      ttlMs: INVITE_PUSH_TTL_MS,
+      data: expect.objectContaining({ game: "battle", roomCode: "BT42AB" }),
+    });
+  });
+
   it("avisa de solicitudes de amistad", async () => {
     const fcm = sender();
     await new PushNotifier(devices, fcm).push({ id: "n2", recipientId: "ana", type: "FRIEND_REQUEST", payload: { fromName: "Beto", fromUserId: "beto" } });

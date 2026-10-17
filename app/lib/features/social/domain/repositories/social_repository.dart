@@ -1,3 +1,4 @@
+import '../entities/room_invite_entity.dart';
 import '../entities/social_entities.dart';
 
 abstract class SocialRepository {
@@ -9,5 +10,6 @@ abstract class SocialRepository {
   Future<void> rejectRequest(String requestId);
   Future<void> cancelRequest(String requestId);
   Future<void> removeFriend(String userId);
-  Future<DateTime> inviteToRoom({required String friendId, required String roomCode});
+  /// `game`: [RoomInviteEntity.wordSearch] o [RoomInviteEntity.battle].
+  Future<DateTime> inviteToRoom({required String friendId, required String roomCode, String game = RoomInviteEntity.wordSearch});
 }

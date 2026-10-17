@@ -18,6 +18,7 @@ describe("Enlaces de la version web", () => {
 
   it("el clic en un aviso del navegador lleva a la pagina de ese aviso", () => {
     expect(webLinkFor(PLAY, { type: "ROOM_INVITE", roomCode: "hive92" })).toBe(`${PLAY}/room/HIVE92`);
+    expect(webLinkFor(PLAY, { type: "ROOM_INVITE", game: "battle", roomCode: "bt42ab" })).toBe(`${PLAY}/batalla/BT42AB`);
     expect(webLinkFor(PLAY, { type: "FRIEND_REQUEST" })).toBe(`${PLAY}/friends`);
     expect(webLinkFor(PLAY, { type: "FRIEND_ACCEPTED" })).toBe(`${PLAY}/friends`);
     expect(webLinkFor(`${PLAY}/`, { type: "ACHIEVEMENT" })).toBe(`${PLAY}/notifications`);

@@ -1,3 +1,6 @@
+/** Juego al que pertenece la sala: cada uno tiene sus propios codigos. */
+export type InviteGame = "word_search" | "battle";
+
 /**
  * Vista minima de una sala en vivo que el modulo social necesita para invitar.
  * La implementa RedisRoomCache sin que el dominio dependa de Redis.
@@ -12,5 +15,5 @@ export interface LiveRoomSnapshot {
 }
 
 export interface IRoomStateReader {
-  getRoom(code: string): Promise<LiveRoomSnapshot | null>;
+  getRoom(code: string, game?: InviteGame): Promise<LiveRoomSnapshot | null>;
 }

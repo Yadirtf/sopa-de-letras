@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../../../../core/constants/app_links.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../social/domain/entities/room_invite_entity.dart';
+import '../../../social/presentation/widgets/invite_friends_sheet.dart';
 import '../../domain/entities/battle_catalog.dart';
 import '../../domain/entities/battle_view.dart';
 import '../art/battle_art_images.dart';
@@ -34,7 +36,7 @@ class BattleWaitingView extends StatelessWidget {
             textAlign: TextAlign.center, style: AppTypography.titleLarge.copyWith(fontSize: 22)),
         const SizedBox(height: 6),
         Text(
-          'Pásale este código o el enlace. La batalla empieza sola cuando entre.',
+          'Reta a un amigo en línea o pásale el código. La batalla empieza sola cuando entre.',
           textAlign: TextAlign.center,
           style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
         ),
@@ -53,12 +55,20 @@ class BattleWaitingView extends StatelessWidget {
             icon: const Icon(Icons.copy_rounded),
             label: const Text('Copiar código'),
           ),
-          FilledButton.icon(
+          OutlinedButton.icon(
             onPressed: () => _copy(context, AppLinks.battleInvite(view.code), 'Enlace copiado: pégalo donde quieras'),
             icon: const Icon(Icons.link_rounded),
-            label: const Text('Copiar invitación'),
+            label: const Text('Copiar enlace'),
           ),
         ]),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          key: const ValueKey('battle-invite-friends'),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50), backgroundColor: AppColors.accentAmber),
+          onPressed: () => InviteFriendsSheet.show(context, view.code, game: RoomInviteEntity.battle),
+          icon: const Icon(Icons.groups_rounded),
+          label: const Text('Retar a un amigo en línea'),
+        ),
         const SizedBox(height: 24),
         Wrap(alignment: WrapAlignment.center, spacing: 8, runSpacing: 8, children: [
           _chip(Icons.grid_on_rounded, 'Arena ${config.cols} × ${config.rows}'),

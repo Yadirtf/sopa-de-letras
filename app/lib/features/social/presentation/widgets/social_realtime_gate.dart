@@ -68,7 +68,7 @@ class _SocialRealtimeGateState extends ConsumerState<SocialRealtimeGate> {
   void _onInvite(Map<String, dynamic> event) {
     final invite = RoomInviteEntity.fromJson(event);
     final room = ref.read(gameRoomNotifierProvider).room;
-    if (invite.roomCode.isEmpty || room?.code.toUpperCase() == invite.roomCode) return;
+    if (invite.roomCode.isEmpty || (!invite.isBattle && room?.code.toUpperCase() == invite.roomCode)) return;
     HapticFeedback.mediumImpact();
     SystemSound.play(SystemSoundType.alert);
     ref.read(incomingInviteProvider.notifier).state = invite;
@@ -76,7 +76,7 @@ class _SocialRealtimeGateState extends ConsumerState<SocialRealtimeGate> {
 
   Future<void> _join(RoomInviteEntity invite) async {
     _dismiss();
-    final error = await joinInvitedRoom(ref, invite.roomCode);
+    final error = await joinInvitedRoom(ref, invite.roomCode, game: invite.game);
     if (error != null) showRootSnack(error);
   }
 

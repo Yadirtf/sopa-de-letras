@@ -56,7 +56,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       case NotificationKind.roomInvite:
         final code = n.text('roomCode');
         if (code == null) return;
-        final error = await joinInvitedRoom(ref, code);
+        final error = await joinInvitedRoom(ref, code, game: n.text('game'));
         if (error != null && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
         }

@@ -20,3 +20,9 @@ export interface BattleNotifier {
 export interface BattleScheduler {
   after(ms: number, task: () => Promise<void>): void;
 }
+
+/** Avisa al modulo social que alguien entro o salio de una batalla, para que sus amigos lo vean "En partida". */
+export interface BattlePresenceListener {
+  onPlayerJoined(userId: string, code: string): void;
+  onPlayerLeft(userId: string): void;
+}
