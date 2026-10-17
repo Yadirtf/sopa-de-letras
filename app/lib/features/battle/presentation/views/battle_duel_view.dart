@@ -13,6 +13,7 @@ import '../widgets/duel/coordinate_input.dart';
 import '../widgets/duel/turn_banner.dart';
 import '../widgets/duel/weapon_picker.dart';
 import '../widgets/grid/battle_grid.dart';
+import '../sound/battle_sounds.dart';
 import '../art/battle_art_images.dart';
 
 /// El duelo: arriba el campo enemigo (donde disparas), abajo tu ejército.
@@ -66,7 +67,12 @@ class _BattleDuelViewState extends ConsumerState<BattleDuelView> {
       children: [
         BattleScoreboard(view: view),
         const SizedBox(height: 10),
-        TurnBanner(myTurn: view.isMyTurn, enemyName: enemyName, endsAt: view.turnEndsAt),
+        TurnBanner(
+          myTurn: view.isMyTurn,
+          enemyName: enemyName,
+          endsAt: view.turnEndsAt,
+          onFinalSecond: () => ref.read(battleSoundsProvider.notifier).play(BattleSound.tick),
+        ),
         if (narration != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -112,7 +118,6 @@ class _BattleDuelViewState extends ConsumerState<BattleDuelView> {
           key: const ValueKey('battle-my-grid'),
           layers: BattleLayersBuilder.mine(view, terrain),
           shotSeq: view.lastShot?.seq ?? 0,
-          maxCell: 18,
         ),
       ],
     );

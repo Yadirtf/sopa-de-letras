@@ -6,6 +6,7 @@ import { BattleMatch, ShotReport } from "../domain/battle-match.types";
 import { BattleLobbyService } from "../application/battle-lobby.service";
 import { BattlePlayService } from "../application/battle-play.service";
 import { BattleNotifier, BattlePresenceListener } from "../application/battle-ports";
+import { BattleReactionEvent, BattleReactionSink, BattleReactionsService } from "../application/battle-reactions.service";
 import { viewFor } from "../application/battle-views";
 import { PrismaBattleUserDirectory } from "./prisma-battle.adapters";
 
@@ -18,7 +19,7 @@ const playerChannel = (code: string, userId: string) => `battle:${code.toUpperCa
  * userId que mande el cliente. Cada jugador escucha su canal privado y recibe
  * `state` con SU vista de la batalla.
  */
-export class BattleSocketGateway implements BattleNotifier {
+export class BattleSocketGateway implements BattleNotifier, BattleReactionSink {
   private namespace: Namespace | null = null;
 
   constructor(
@@ -27,8 +28,13 @@ export class BattleSocketGateway implements BattleNotifier {
     private readonly users: PrismaBattleUserDirectory,
     private readonly lobby: BattleLobbyService,
     private readonly play: () => BattlePlayService,
-    private readonly presence?: BattlePresenceListener
+    private readonly presence?: BattlePresenceListener,
+    private readonly reactions?: () => BattleReactionsService
   ) {}
+
+  deliver({ code, fromUserId, toUserId, reaction }: BattleReactionEvent): void {
+    this.namespace?.to(playerChannel(code, toUserId)).emit("reaction", { fromUserId, reaction, at: Date.now() });
+  }
 
   publish(match: BattleMatch, shot?: ShotReport): void {
     for (const player of match.players.filter((p) => !p.isBot)) {
@@ -79,6 +85,10 @@ export class BattleSocketGateway implements BattleNotifier {
     on("shoot", async ({ code, weapon, col, row }) => ({
       shot: await this.play().shoot(String(code), userId, String(weapon), Number(col), Number(row)),
     }));
+    on("react", async ({ code, reaction }) => {
+      await this.reactions?.().send(String(code), userId, reaction);
+      return {};
+    });
     on("rematch", async ({ code }) => {
       await this.play().rematch(String(code), userId);
       return {};

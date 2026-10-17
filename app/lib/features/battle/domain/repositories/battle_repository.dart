@@ -24,6 +24,13 @@ class BattleUpdate {
   const BattleUpdate(this.view, this.shot);
 }
 
+/// Reacción que llega por socket.
+class BattleReactionEvent {
+  final String fromUserId;
+  final String reactionId;
+  const BattleReactionEvent(this.fromUserId, this.reactionId);
+}
+
 /// Error de la batalla con texto amable para mostrar tal cual.
 class BattleFailure implements Exception {
   final String code;
@@ -40,6 +47,10 @@ abstract class BattleRepository {
   Future<String> createRoom(BattleConfig config);
 
   Stream<BattleUpdate> get updates;
+
+  /// Reacciones que manda el rival (o la Abejita).
+  Stream<BattleReactionEvent> get reactions;
+  Future<void> react(String code, String reactionId);
   Stream<bool> get connection;
   Future<BattleView> join(String code);
   Future<List<UnitPlacement>> randomLayout(String code);

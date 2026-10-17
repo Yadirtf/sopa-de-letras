@@ -9,7 +9,10 @@ class TurnBanner extends StatefulWidget {
   final String enemyName;
   final DateTime? endsAt;
 
-  const TurnBanner({super.key, required this.myTurn, required this.enemyName, this.endsAt});
+  /// Se llama una vez por segundo en los últimos 5 segundos de MI turno (para el tic).
+  final VoidCallback? onFinalSecond;
+
+  const TurnBanner({super.key, required this.myTurn, required this.enemyName, this.endsAt, this.onFinalSecond});
 
   @override
   State<TurnBanner> createState() => _TurnBannerState();
@@ -18,12 +21,19 @@ class TurnBanner extends StatefulWidget {
 class _TurnBannerState extends State<TurnBanner> {
   // Se crea en initState: un `late final` sin leer nunca arrancaba y el reloj se quedaba quieto.
   Timer? _tick;
+  int _lastLeft = -1;
+
+  int get _left => widget.endsAt == null ? 0 : widget.endsAt!.difference(DateTime.now()).inSeconds.clamp(0, 99);
 
   @override
   void initState() {
     super.initState();
     _tick = Timer.periodic(const Duration(milliseconds: 250), (_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      final left = _left;
+      if (widget.myTurn && left != _lastLeft && left > 0 && left <= 5) widget.onFinalSecond?.call();
+      _lastLeft = left;
+      setState(() {});
     });
   }
 
@@ -35,7 +45,7 @@ class _TurnBannerState extends State<TurnBanner> {
 
   @override
   Widget build(BuildContext context) {
-    final left = widget.endsAt == null ? 0 : widget.endsAt!.difference(DateTime.now()).inSeconds.clamp(0, 99);
+    final left = _left;
     final color = widget.myTurn ? AppColors.accentEmerald : AppColors.accentCyan;
     final urgent = widget.myTurn && left <= 10;
     return AnimatedContainer(

@@ -18,6 +18,9 @@ node render.mjs ../../assets/battle tank     # solo lo que contenga "tank"
   se coloca acostada) y `<id>_wreck_r`.
 - `scene/terrains.js`: texturas de suelo de 512 px que se repiten sin costura.
 - `scene/weapons.js`: iconos del armamento.
+- `scene/reactions/`: las 8 reacciones del duelo, animadas en bucle. Cada una
+  sale como tira de 24 cuadros de 192 px (6 por fila) en `reactions/<id>.webp`;
+  los ids son los de `battle-reactions.ts` del backend.
 - `scene/kit.js` y `scene/craft.js`: piezas comunes (ruedas, orugas,
   soldados, aviones, cascos de barco).
 
@@ -25,3 +28,7 @@ node render.mjs ../../assets/battle tank     # solo lo que contenga "tank"
 Kenney (CC0), reducidos a 160 px en WebP. Licencias en
 `assets/battle/LICENSES.txt`; la app las registra en `LicenseRegistry` y la
 landing las cita en Créditos.
+
+Sonidos (`assets/battle/sounds`): `python3 audio/sounds.py <carpeta de
+Interface Sounds de Kenney> ../../assets/battle/sounds`. El toque de corneta
+del turno se sintetiza ahí mismo; el resto son sonidos de Kenney (CC0).

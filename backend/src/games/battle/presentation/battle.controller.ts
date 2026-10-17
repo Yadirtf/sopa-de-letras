@@ -5,6 +5,7 @@ import { ARENA_LIMITS, MAX_COVERAGE, armyCellCount, recommendArmy } from "../dom
 import { BattleError } from "../domain/battle-errors";
 import { BATTLE_TERRAINS, findTerrain } from "../domain/battle-terrains.catalog";
 import { BATTLE_WEAPONS, MAX_WEAPON_USES } from "../domain/battle-weapons";
+import { BATTLE_REACTIONS } from "../domain/battle-reactions";
 import { BattleLobbyService } from "../application/battle-lobby.service";
 import { PrismaBattleUserDirectory } from "../infrastructure/prisma-battle.adapters";
 import { publicPlayer } from "../application/battle-views";
@@ -24,6 +25,7 @@ export class BattleController {
       data: {
         terrains: BATTLE_TERRAINS,
         weapons: BATTLE_WEAPONS,
+        reactions: BATTLE_REACTIONS,
         limits: { ...ARENA_LIMITS, maxWeaponUses: MAX_WEAPON_USES, maxCoverage: MAX_COVERAGE },
       },
     });

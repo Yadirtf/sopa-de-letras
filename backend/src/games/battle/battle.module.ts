@@ -16,6 +16,7 @@ import {
 import { BattleSocketGateway } from "./infrastructure/battle-socket.gateway";
 import { BattlePresenceListener } from "./application/battle-ports";
 import { BattleRoomReader } from "./application/battle-room-reader";
+import { BattleReactionsService } from "./application/battle-reactions.service";
 import { BattleController } from "./presentation/battle.controller";
 
 /**
@@ -38,15 +39,19 @@ export function createBattleModule(deps: {
   const lobby = new BattleLobbyService(store, lock);
 
   let play: BattlePlayService | null = null;
+  let reactions: BattleReactionsService | null = null;
   const gateway = new BattleSocketGateway(
     deps.tokenService,
     deps.sessionCache,
     users,
     lobby,
     () => play!,
-    deps.presence
+    deps.presence,
+    () => reactions!
   );
-  play = new BattlePlayService(store, gateway, new TimerBattleScheduler(), new PrismaBattleResultRecorder(deps.prisma), lock);
+  const scheduler = new TimerBattleScheduler();
+  play = new BattlePlayService(store, gateway, scheduler, new PrismaBattleResultRecorder(deps.prisma), lock);
+  reactions = new BattleReactionsService(store, gateway, scheduler);
 
   const controller = new BattleController(lobby, users);
 

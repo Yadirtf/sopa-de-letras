@@ -10,6 +10,9 @@ import '../views/battle_duel_view.dart';
 import '../views/battle_placement_view.dart';
 import '../views/battle_result_view.dart';
 import '../views/battle_waiting_view.dart';
+import '../sound/battle_sounds.dart';
+import '../widgets/reactions/reaction_overlay.dart';
+import '../widgets/reactions/reaction_tray.dart';
 
 /// Una sola pantalla para toda la batalla: cambia sola de sala de espera a
 /// colocar, al duelo y al final, siguiendo lo que diga el servidor.
@@ -60,7 +63,13 @@ class BattleMatchPage extends ConsumerWidget {
       ref.read(battleMatchProvider(code).notifier).clearMessage();
     });
 
+    // Toque de corneta cuando el turno pasa a ser mío.
+    ref.listen(battleMatchProvider(code).select((s) => s.view?.status == BattleStatus.playing && s.view!.isMyTurn),
+        (before, mine) => mine && before != true ? ref.read(battleSoundsProvider.notifier).play(BattleSound.turn) : null);
+    final soundOn = ref.watch(battleSoundsProvider);
+
     final view = state.view;
+    final canReact = view != null && view.status != BattleStatus.waiting && view.enemy != null && catalog.hasValue;
     Widget body;
     if (state.fatalError != null) {
       body = _Problem(message: state.fatalError!, onBack: () => context.go('/batalla'));
@@ -74,6 +83,7 @@ class BattleMatchPage extends ConsumerWidget {
         BattleStatus.playing => BattleDuelView(code: code, catalog: c),
         BattleStatus.finished => BattleResultView(code: code, catalog: c),
       };
+      body = ReactionOverlay(code: code, catalog: c, child: body);
     }
 
     return Scaffold(
@@ -86,6 +96,15 @@ class BattleMatchPage extends ConsumerWidget {
           onPressed: () => _leave(context, ref, view),
         ),
         title: Text('Batalla $code', style: AppTypography.titleMedium),
+        actions: [
+          if (canReact) ReactionButton(code: code, catalog: catalog.requireValue),
+          IconButton(
+            key: const ValueKey('battle-sound'),
+            tooltip: soundOn ? 'Silenciar' : 'Activar sonido',
+            onPressed: ref.read(battleSoundsProvider.notifier).toggle,
+            icon: Icon(soundOn ? Icons.volume_up_rounded : Icons.volume_off_rounded),
+          ),
+        ],
       ),
       body: Column(children: [
         if (!state.connected)

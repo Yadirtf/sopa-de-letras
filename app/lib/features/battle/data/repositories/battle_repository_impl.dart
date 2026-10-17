@@ -46,6 +46,13 @@ class BattleRepositoryImpl implements BattleRepository {
   Stream<bool> get connection => _socket.connection;
 
   @override
+  Stream<BattleReactionEvent> get reactions => _socket.reactions;
+
+  @override
+  Future<void> react(String code, String reactionId) =>
+      _socket.emit('react', {'code': code, 'reaction': reactionId});
+
+  @override
   Future<BattleView> join(String code) async {
     final token = await _storage.getAccessToken();
     if (token == null || token.isEmpty) {

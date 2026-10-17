@@ -1,51 +1,11 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/battle_view.dart';
+import '../../domain/entities/battle_reaction.dart';
 import '../../domain/repositories/battle_repository.dart';
+import 'battle_match_state.dart';
 import 'battle_providers.dart';
 
-/// Estado de la pantalla de batalla: la vista que manda el servidor, el
-/// último disparo (para la animación), el arma elegida y avisos para el jugador.
-class BattleMatchState {
-  final BattleView? view;
-  final ShotReportView? lastShot;
-  final String weapon;
-  final bool isBusy;
-  final bool connected;
-  final String? message;
-  final String? fatalError;
-
-  const BattleMatchState({
-    this.view,
-    this.lastShot,
-    this.weapon = 'BULLET',
-    this.isBusy = false,
-    this.connected = true,
-    this.message,
-    this.fatalError,
-  });
-
-  BattleMatchState copyWith({
-    BattleView? view,
-    ShotReportView? lastShot,
-    String? weapon,
-    bool? isBusy,
-    bool? connected,
-    String? message,
-    bool clearMessage = false,
-    String? fatalError,
-  }) {
-    return BattleMatchState(
-      view: view ?? this.view,
-      lastShot: lastShot ?? this.lastShot,
-      weapon: weapon ?? this.weapon,
-      isBusy: isBusy ?? this.isBusy,
-      connected: connected ?? this.connected,
-      message: clearMessage ? null : (message ?? this.message),
-      fatalError: fatalError ?? this.fatalError,
-    );
-  }
-}
+export 'battle_match_state.dart';
 
 final battleMatchProvider =
     StateNotifierProvider.autoDispose.family<BattleMatchNotifier, BattleMatchState, String>((ref, code) {
@@ -62,6 +22,9 @@ class BattleMatchNotifier extends StateNotifier<BattleMatchState> {
   Future<void> start() async {
     _subs.add(_repo.updates.where((u) => u.view.code == code).listen(_onUpdate));
     _subs.add(_repo.connection.listen((ok) => mounted ? state = state.copyWith(connected: ok) : null));
+    _subs.add(_repo.reactions.listen((r) {
+      if (mounted && r.fromUserId != state.view?.myUserId) _showReaction(r.reactionId, fromMe: false);
+    }));
     try {
       final view = await _repo.join(code);
       if (mounted) state = state.copyWith(view: view, isBusy: false, connected: true);
@@ -98,6 +61,19 @@ class BattleMatchNotifier extends StateNotifier<BattleMatchState> {
       return false;
     }
   }
+
+  /// Manda una reacción al rival y la muestra al instante en mi pantalla.
+  Future<void> sendReaction(String reactionId) async {
+    _showReaction(reactionId, fromMe: true);
+    try {
+      await _repo.react(code, reactionId);
+    } on BattleFailure catch (e) {
+      if (mounted) state = state.copyWith(message: e.message);
+    }
+  }
+
+  void _showReaction(String id, {required bool fromMe}) => state = state.copyWith(
+      reaction: BattleReactionShow(reactionId: id, fromMe: fromMe, seq: (state.reaction?.seq ?? 0) + 1));
 
   Future<void> placeUnits(List<UnitPlacement> units) => _guard(() => _repo.place(code, units));
 
