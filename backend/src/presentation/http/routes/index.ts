@@ -42,6 +42,7 @@ import { notificationsRoutes } from "./notifications.routes";
 import { env } from "../../../config/env";
 import { createPushSender } from "../../../infrastructure/push/fcm-push.sender";
 import { configureRoomLinks } from "../../../application/common/room-links";
+import { createBattleModule } from "../../../games/battle/battle.module";
 
 export async function registerRoutes(fastify: FastifyInstance) {
   // Repositorios e infraestructura
@@ -135,5 +136,13 @@ export async function registerRoutes(fastify: FastifyInstance) {
     authMiddleware,
   });
 
-  return { socketDispatcher: roomContainer.socketDispatcher, pushEnabled: pushSender.enabled };
+  // Segundo juego: modulo aparte con sus rutas y su propio socket (/battle).
+  const battleModule = createBattleModule({ prisma: prismaClient, redis: redisClient, tokenService, sessionCache });
+  await battleModule.registerRoutes(fastify, authMiddleware);
+
+  return {
+    socketDispatcher: roomContainer.socketDispatcher,
+    attachGameSockets: battleModule.attachSocket,
+    pushEnabled: pushSender.enabled,
+  };
 }

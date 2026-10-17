@@ -66,7 +66,8 @@ async function bootstrap() {
   pushEnabled = routes.pushEnabled;
 
   // Inicializar Socket.IO con el servidor HTTP de Fastify
-  initializeSocketServer(app.server, socketDispatcher);
+  const io = initializeSocketServer(app.server, socketDispatcher);
+  routes.attachGameSockets(io);
 
   // Conectar a base de datos
   await prismaClient.$connect();
