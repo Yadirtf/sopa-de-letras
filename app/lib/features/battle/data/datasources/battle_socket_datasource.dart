@@ -14,8 +14,10 @@ class BattleSocketDataSource {
   String? _activeCode;
   final _updates = StreamController<BattleUpdate>.broadcast();
   final _connection = StreamController<bool>.broadcast();
+  final _reactions = StreamController<BattleReactionEvent>.broadcast();
 
   Stream<BattleUpdate> get updates => _updates.stream;
+  Stream<BattleReactionEvent> get reactions => _reactions.stream;
   Stream<bool> get connection => _connection.stream;
 
   void connect(String token) {
@@ -35,6 +37,11 @@ class BattleSocketDataSource {
       final view = BattleViewModel.fromJson((map['view'] as Map).cast<String, dynamic>());
       final shot = map['shot'] is Map ? BattleViewModel.shot((map['shot'] as Map).cast<String, dynamic>()) : null;
       _updates.add(BattleUpdate(view, shot));
+    });
+    socket.on('reaction', (data) {
+      if (data is! Map || _reactions.isClosed) return;
+      final from = data['fromUserId'], id = data['reaction'];
+      if (from is String && id is String) _reactions.add(BattleReactionEvent(from, id));
     });
     socket.onConnect((_) => _connection.add(true));
     socket.onDisconnect((_) => _connection.add(false));

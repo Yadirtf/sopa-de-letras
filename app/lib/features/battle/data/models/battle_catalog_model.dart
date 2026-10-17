@@ -17,7 +17,16 @@ abstract class BattleCatalogModel {
         maxWeaponUses: _int(limits['maxWeaponUses'], 5),
         maxCoverage: (limits['maxCoverage'] as num?)?.toDouble() ?? 0.35,
       ),
+      reactions: _reactions(json['reactions']),
     );
+  }
+
+  static List<BattleReaction> _reactions(dynamic raw) {
+    final list = _list(raw)
+        .where((r) => r['id'] is String)
+        .map((r) => BattleReaction(r['id'] as String, r['label']?.toString() ?? ''))
+        .toList();
+    return list.isEmpty ? BattleReaction.defaults : list;
   }
 
   static List<Map<String, dynamic>> _list(dynamic raw) =>

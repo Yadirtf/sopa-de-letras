@@ -9,7 +9,13 @@ const CREDITS = [
     url: 'https://kenney.nl/assets/smoke-particles',
   },
   {
-    what: 'Modelado y render de figuras, terrenos y armas en 3D',
+    what: 'Sonidos del tic del reloj y de las reacciones',
+    who: 'Interface Sounds, de Kenney',
+    license: 'CC0 (dominio público)',
+    url: 'https://kenney.nl/assets/interface-sounds',
+  },
+  {
+    what: 'Modelado y render de figuras, terrenos, armas y reacciones en 3D',
     who: 'three.js',
     license: 'MIT',
     url: 'https://threejs.org',

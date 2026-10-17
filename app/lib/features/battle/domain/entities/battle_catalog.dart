@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'battle_reaction.dart';
+export 'battle_reaction.dart';
 
 /// Catálogo de La Batalla Más Temida tal como lo define el servidor:
 /// terrenos (cada uno con su ejército), armas y límites de la arena.
@@ -89,8 +91,16 @@ class BattleCatalog {
   final List<BattleTerrain> terrains;
   final List<BattleWeapon> weapons;
   final BattleLimits limits;
+  final List<BattleReaction> reactions;
 
-  const BattleCatalog({required this.terrains, required this.weapons, required this.limits});
+  const BattleCatalog({
+    required this.terrains,
+    required this.weapons,
+    required this.limits,
+    this.reactions = BattleReaction.defaults,
+  });
+
+  BattleReaction reaction(String id) => reactions.firstWhere((r) => r.id == id, orElse: () => reactions.first);
 
   BattleTerrain terrain(String id) => terrains.firstWhere((t) => t.id == id, orElse: () => terrains.first);
 

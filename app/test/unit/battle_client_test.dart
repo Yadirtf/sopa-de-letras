@@ -1,3 +1,4 @@
+import 'package:wordhive_app/features/battle/data/models/battle_catalog_model.dart';
 import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wordhive_app/features/battle/data/models/battle_view_model.dart';
@@ -110,5 +111,17 @@ void main() {
     expect(view.myAmmo['MISSILE'], 2);
     expect(view.scans.single.count, 2);
     expect(view.lastShot?.anyHit, isTrue);
+  });
+
+  test('el catálogo trae las reacciones, o usa las de siempre si faltan', () {
+    final withList = BattleCatalogModel.fromJson({
+      'reactions': [
+        {'id': 'boom', 'label': '¡Boom!'},
+        {'id': 'alert', 'label': '¡Alerta!'},
+      ],
+    });
+    expect(withList.reactions.map((r) => r.id), ['boom', 'alert']);
+    expect(withList.reaction('alert').label, '¡Alerta!');
+    expect(BattleCatalogModel.fromJson({}).reactions, BattleReaction.defaults);
   });
 }

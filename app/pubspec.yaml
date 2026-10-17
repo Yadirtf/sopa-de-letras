@@ -47,6 +47,7 @@ dependencies:
   dartz: ^0.10.1
   firebase_core: ^4.15.0
   firebase_messaging: ^16.7.0
+  audioplayers: ^6.7.1
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +79,8 @@ flutter:
     - assets/battle/terrains/
     - assets/battle/weapons/
     - assets/battle/fx/
+    - assets/battle/reactions/
+    - assets/battle/sounds/
     - assets/battle/LICENSES.txt
 
 
