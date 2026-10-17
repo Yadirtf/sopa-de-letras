@@ -70,7 +70,7 @@ export class BattleController {
   };
 
   private fail(reply: FastifyReply, err: unknown, status = 400) {
-    if (err instanceof BattleError) return reply.status(status).send({ error: err.message, code: err.code });
-    return reply.status(500).send({ error: "No pudimos crear la batalla. Inténtalo de nuevo." });
+    if (err instanceof BattleError) return reply.status(status).send({ error: err.message, message: err.message, code: err.code });
+    return reply.status(500).send({ message: "No pudimos crear la batalla. Inténtalo de nuevo." });
   }
 }

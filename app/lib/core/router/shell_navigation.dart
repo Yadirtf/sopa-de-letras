@@ -5,6 +5,7 @@ const shellLocations = {
   '/join-room',
   '/my-creations',
   '/home',
+  '/home/sopa',
   '/create-word-search',
   '/profile',
   '/friends',

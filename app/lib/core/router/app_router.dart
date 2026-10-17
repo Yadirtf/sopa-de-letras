@@ -16,6 +16,9 @@ import '../../features/game/presentation/pages/game_podium_page.dart';
 import '../../features/social/presentation/pages/friends_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/home/presentation/pages/home_shell_page.dart';
+import '../../features/games_hub/presentation/pages/games_hub_page.dart';
+import '../../features/battle/presentation/pages/battle_setup_page.dart';
+import '../../features/battle/presentation/pages/battle_match_page.dart';
 import 'auth_route_guard.dart';
 
 final appRouter = GoRouter(
@@ -55,7 +58,12 @@ final appRouter = GoRouter(
           GoRoute(path: '/my-creations', builder: (context, state) => const MyCreationsPage()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/home', builder: (context, state) => const CatalogPage()),
+          // Inicio = elegir juego; la sopa de letras sigue en la misma pestaña.
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const GamesHubPage(),
+            routes: [GoRoute(path: 'sopa', builder: (context, state) => const CatalogPage())],
+          ),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(path: '/create-word-search', builder: (context, state) => const CreateWordSearchPage()),
@@ -79,7 +87,19 @@ final appRouter = GoRouter(
       ],
     ),
     // Alias antiguo: la sala y el podio vuelven aquí al terminar.
-    GoRoute(path: '/catalog', redirect: (context, state) => '/home'),
+    GoRoute(path: '/catalog', redirect: (context, state) => '/home/sopa'),
+    // Enlaces de la landing: /jugar/juegos/sopa y /jugar/juegos/batalla.
+    GoRoute(path: '/juegos/sopa', redirect: (context, state) => '/home/sopa'),
+    GoRoute(path: '/juegos/batalla', redirect: (context, state) => '/batalla'),
+    // La Batalla Más Temida: módulo aparte, a pantalla completa.
+    GoRoute(path: '/batalla', builder: (context, state) => const BattleSetupPage()),
+    GoRoute(
+      path: '/batalla/:code',
+      builder: (context, state) {
+        final code = (state.pathParameters['code'] ?? '').toUpperCase();
+        return BattleMatchPage(key: ValueKey('battle-$code'), code: code);
+      },
+    ),
     // Enlace de invitación (el que va en el QR y en "Copiar enlace").
     GoRoute(path: '/room/:code', redirect: (context, state) => '/join-room?code=${state.pathParameters['code']}'),
     GoRoute(

@@ -5,6 +5,7 @@
 @import './components/cards.css';
 @import './components/hero.css';
 @import './components/catalog.css';
+@import './components/games.css';
 
 /* Secciones Adicionales de la Landing */
 .section {

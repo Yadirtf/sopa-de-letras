@@ -49,7 +49,8 @@ class GamePodiumPage extends ConsumerWidget {
                         const SizedBox(height: 8),
                         PodiumHeadline(summary: summary),
                         const SizedBox(height: 44),
-                        if (state.podium.isNotEmpty) PodiumStand(podium: state.podium, currentUserId: notifier.currentUserId),
+                        if (state.podium.isNotEmpty)
+                          PodiumStand(podium: state.podium, currentUserId: notifier.currentUserId),
                         const SizedBox(height: 18),
                         if (me != null) PodiumMyResultCard(me: me),
                         if (summary.rest.isNotEmpty) ...[
@@ -68,7 +69,7 @@ class GamePodiumPage extends ConsumerWidget {
                   onExit: () {
                     // Salir de la sala devuelve al jugador a "En línea" para sus amigos (EP-05).
                     notifier.leaveRoom();
-                    context.go('/home');
+                    context.go('/home/sopa');
                   },
                 ),
               ],

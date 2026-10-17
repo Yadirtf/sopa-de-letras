@@ -8,17 +8,17 @@ export function Hero() {
       <div className="hero__content">
         <div className="hero__badge">
           <span className="hero__badge-beacon" aria-hidden="true" />
-          <span>Gratis · Sin descargas · Para toda la familia</span>
+          <span>Nuevo: La Batalla Más Temida · Gratis · Para toda la familia</span>
         </div>
 
         <h1 className="hero__title" id="hero-title">
-          Encuentra las palabras.<br />
+          Encuentra palabras. Gana batallas.<br />
           <span className="hero__highlight">Juega con quien quieras.</span>
         </h1>
 
         <p className="hero__subtitle">
-          Sopas de letras para jugar solo o con amigos en tiempo real, desde el navegador o el móvil.
-          Crea tu sala, comparte el código y que gane quien complete su sopa primero.
+          Dos juegos para jugar solo o con amigos en tiempo real, desde el navegador o el móvil: la sopa de
+          letras de siempre y La Batalla Más Temida, el clásico de papel con terrenos, ejércitos y armas.
         </p>
 
         <div className="hero__actions">

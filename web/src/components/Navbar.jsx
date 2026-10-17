@@ -3,6 +3,7 @@ import { BrandLogo } from './BrandLogo';
 import { LOGIN_URL, PLAY_URL } from '../config/links';
 
 const SECTIONS = [
+  { id: 'juegos', label: 'Juegos' },
   { id: 'como-jugar', label: 'Cómo jugar' },
   { id: 'funciones', label: 'Funciones' },
   { id: 'sopas', label: 'Sopas' },
